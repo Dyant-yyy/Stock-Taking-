@@ -12,7 +12,7 @@
   --toray-blue: #004098;
   --toray-blue-hover: #00337a;
   --toray-cyan: #00a3e0;
-  --toray-navy: #0b192c;
+  --toray-navy: #050a14;
   --toray-sky: #e0f2fe;
 
   /* Accent Colors */
@@ -24,51 +24,51 @@
 }
 
 .theme-dark {
-  --bg-app: #080c14;
-  --bg-surface: #0f172a;
-  --bg-card: #1e293b;
-  --bg-card-hover: #334155;
-  --bg-header: rgba(15, 23, 42, 0.85);
-  --bg-sidebar: #0b1329;
+  --bg-app: #050a14;
+  --bg-surface: #0b1329;
+  --bg-card: rgba(15, 23, 42, 0.92);
+  --bg-card-hover: rgba(30, 41, 59, 0.95);
+  --bg-header: rgba(11, 19, 41, 0.9);
+  --bg-sidebar: #070d1e;
   
-  --border-color: #334155;
-  --border-subtle: #1e293b;
+  --border-color: #1e293b;
+  --border-subtle: #0f172a;
   
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-subtle: #64748b;
   
-  --input-bg: #0f172a;
+  --input-bg: #0b1329;
   --input-border: #334155;
 
   --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 12px 32px rgba(0,0,0,0.6);
-  --glass-bg: rgba(30, 41, 59, 0.75);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.5);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.7);
+  --glass-bg: rgba(15, 23, 42, 0.85);
 }
 
 .theme-light {
-  --bg-app: #f1f5f9;
-  --bg-surface: #ffffff;
-  --bg-card: #ffffff;
-  --bg-card-hover: #f8fafc;
-  --bg-header: rgba(255, 255, 255, 0.9);
-  --bg-sidebar: #0f172a;
+  --bg-app: #080f1e; /* Keep dark industrial backdrop for corporate elegance */
+  --bg-surface: #0f172a;
+  --bg-card: rgba(15, 23, 42, 0.92);
+  --bg-card-hover: rgba(30, 41, 59, 0.95);
+  --bg-header: rgba(11, 19, 41, 0.92);
+  --bg-sidebar: #070d1e;
   
-  --border-color: #e2e8f0;
-  --border-subtle: #f1f5f9;
+  --border-color: #1e293b;
+  --border-subtle: #0f172a;
   
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --text-subtle: #94a3b8;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
   
-  --input-bg: #f8fafc;
-  --input-border: #cbd5e1;
+  --input-bg: #0b1329;
+  --input-border: #334155;
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 12px 32px rgba(0,0,0,0.12);
-  --glass-bg: rgba(255, 255, 255, 0.85);
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.5);
+  --shadow-lg: 0 16px 36px rgba(0,0,0,0.7);
+  --glass-bg: rgba(15, 23, 42, 0.85);
 }
 
 /* ==========================================================================
@@ -80,17 +80,22 @@
   padding: 0;
 }
 
-body {
+html, body {
+  background-color: #050a14 !important;
+  background-image: radial-gradient(circle at 50% 0%, #00255b 0%, #050a14 70%), url('./assets/factory-bg.svg') !important;
+  background-size: cover, cover !important;
+  background-position: center, center !important;
+  background-attachment: fixed, fixed !important;
+  color: #f8fafc !important;
   font-family: var(--font-primary);
-  background-color: var(--bg-app);
-  color: var(--text-main);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
 }
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  color: var(--text-main);
+  color: #f8fafc;
   font-weight: 700;
   letter-spacing: -0.02em;
 }
@@ -113,14 +118,14 @@ input, select, textarea {
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-app);
+  background: #050a14;
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: #334155;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--toray-cyan);
 }
 
 /* ==========================================================================
@@ -130,13 +135,14 @@ input, select, textarea {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: transparent;
 }
 
 /* HEADER BAR */
 .header-bar {
   height: 70px;
-  background-color: var(--bg-header);
-  backdrop-filter: blur(12px);
+  background-color: rgba(11, 19, 41, 0.92);
+  backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
@@ -177,7 +183,7 @@ input, select, textarea {
   font-weight: 800;
   font-size: 1.05rem;
   line-height: 1.2;
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 .sub-title {
@@ -190,7 +196,7 @@ input, select, textarea {
 
 .view-switcher-pill {
   display: flex;
-  background: var(--bg-app);
+  background: rgba(15, 23, 42, 0.8);
   padding: 4px;
   border-radius: 10px;
   border: 1px solid var(--border-color);
@@ -233,7 +239,7 @@ input, select, textarea {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 10px;
-  color: var(--text-main);
+  color: #ffffff;
   font-size: 0.875rem;
   outline: none;
   transition: all 0.2s;
@@ -281,7 +287,7 @@ input, select, textarea {
 .header-action-btn.secondary {
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 .header-action-btn.secondary:hover {
@@ -303,7 +309,7 @@ input, select, textarea {
 }
 
 .header-icon-btn:hover {
-  color: var(--text-main);
+  color: #ffffff;
   border-color: var(--toray-cyan);
 }
 
@@ -363,7 +369,7 @@ input, select, textarea {
   border-radius: 8px;
   margin-bottom: 6px;
   cursor: pointer;
-  background: var(--bg-app);
+  background: rgba(15, 23, 42, 0.6);
 }
 
 .notif-item:hover {
@@ -381,12 +387,13 @@ input, select, textarea {
 
 .portal-sidebar {
   width: 260px;
-  background-color: var(--bg-sidebar);
+  background-color: rgba(7, 13, 30, 0.95);
   border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 16px 12px;
+  backdrop-filter: blur(12px);
 }
 
 .portal-badge {
@@ -490,6 +497,7 @@ input, select, textarea {
   flex: 1;
   padding: 28px 32px;
   overflow-y: auto;
+  background: transparent;
 }
 
 /* ==========================================================================
@@ -498,12 +506,14 @@ input, select, textarea {
 .dashboard-hero-banner {
   position: relative;
   border-radius: 20px;
-  padding: 32px 36px;
-  background: linear-gradient(135deg, #091329 0%, #00255b 50%, #004098 100%);
+  padding: 36px 40px;
+  background: linear-gradient(135deg, rgba(5, 10, 20, 0.85) 0%, rgba(0, 37, 91, 0.8) 50%, rgba(0, 64, 152, 0.85) 100%), url('./assets/factory-bg.svg');
+  background-size: cover;
+  background-position: center;
   color: #ffffff;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(0, 40, 100, 0.35);
-  border: 1px solid rgba(0, 163, 224, 0.3);
+  box-shadow: 0 16px 36px rgba(0, 40, 100, 0.45);
+  border: 1px solid rgba(0, 163, 224, 0.4);
   margin-bottom: 28px;
 }
 
@@ -511,21 +521,9 @@ input, select, textarea {
   position: absolute;
   inset: 0;
   background-image: 
-    radial-gradient(circle at 80% 20%, rgba(0, 163, 224, 0.25) 0%, transparent 50%),
-    radial-gradient(circle at 10% 90%, rgba(0, 64, 152, 0.4) 0%, transparent 60%),
-    linear-gradient(90deg, rgba(11, 25, 44, 0.85) 0%, rgba(0, 37, 91, 0.65) 100%);
-  background-size: cover;
+    radial-gradient(circle at 80% 20%, rgba(0, 163, 224, 0.3) 0%, transparent 50%),
+    radial-gradient(circle at 10% 90%, rgba(0, 64, 152, 0.5) 0%, transparent 60%);
   z-index: 1;
-}
-
-/* Subtle Industrial Structure Silhouette Grid */
-.hero-banner-bg::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255, 255, 255, 0.04) 40px),
-                    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255, 255, 255, 0.04) 40px);
-  opacity: 0.6;
 }
 
 .hero-banner-content {
@@ -547,8 +545,8 @@ input, select, textarea {
   align-items: center;
   gap: 8px;
   padding: 6px 14px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(0, 163, 224, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 163, 224, 0.5);
   backdrop-filter: blur(8px);
   border-radius: 20px;
   font-size: 0.75rem;
@@ -591,12 +589,12 @@ input, select, textarea {
 }
 
 .hero-heading {
-  font-size: 2.1rem;
+  font-size: 2.2rem;
   font-weight: 800;
   color: #ffffff;
   line-height: 1.25;
   margin-bottom: 6px;
-  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -653,7 +651,7 @@ input, select, textarea {
   display: flex;
   gap: 20px;
   padding-top: 18px;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
   flex-wrap: wrap;
 }
 
@@ -663,16 +661,17 @@ input, select, textarea {
   gap: 8px;
   font-size: 0.8rem;
   color: #e2e8f0;
-  background: rgba(0, 0, 0, 0.25);
+  background: rgba(0, 0, 0, 0.35);
   padding: 6px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* GLOWING NEON CARDS */
 .kpi-card {
   position: relative;
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 20px;
@@ -683,7 +682,7 @@ input, select, textarea {
 
 .kpi-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
 .glowing-card-blue:hover { border-color: var(--toray-blue); }
@@ -696,7 +695,7 @@ input, select, textarea {
 .kpi-mini-bar {
   width: 100%;
   height: 4px;
-  background: var(--bg-app);
+  background: rgba(15, 23, 42, 0.8);
   border-radius: 2px;
   margin-top: 10px;
   overflow: hidden;
@@ -788,7 +787,9 @@ input, select, textarea {
 .profile-hero {
   position: relative;
   padding: 80px 40px;
-  background: linear-gradient(135deg, #0b1329 0%, #00255b 60%, #004098 100%);
+  background: linear-gradient(135deg, rgba(5, 10, 20, 0.9) 0%, rgba(0, 37, 91, 0.85) 60%, rgba(0, 64, 152, 0.9) 100%), url('./assets/factory-bg.svg');
+  background-size: cover;
+  background-position: center;
   color: #ffffff;
   border-bottom: 1px solid var(--border-color);
   overflow: hidden;
@@ -829,7 +830,7 @@ input, select, textarea {
   line-height: 1.2;
   font-weight: 800;
   margin-bottom: 20px;
-  background: linear-gradient(180deg, #ffffff 0%, #e2e8f0 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -909,7 +910,8 @@ input, select, textarea {
 }
 
 .stat-card {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px 20px;
@@ -927,7 +929,7 @@ input, select, textarea {
   width: 48px;
   height: 48px;
   border-radius: 12px;
-  background: var(--bg-app);
+  background: rgba(0, 163, 224, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -938,7 +940,7 @@ input, select, textarea {
 .stat-value {
   font-size: 1.4rem;
   font-weight: 800;
-  color: var(--text-main);
+  color: #ffffff;
   margin-bottom: 4px;
 }
 
@@ -957,7 +959,8 @@ input, select, textarea {
 
 .profile-section.dark-accent-bg {
   max-width: 100%;
-  background: var(--bg-surface);
+  background: rgba(11, 19, 41, 0.85);
+  backdrop-filter: blur(12px);
   border-top: 1px solid var(--border-color);
   border-bottom: 1px solid var(--border-color);
 }
@@ -998,7 +1001,8 @@ input, select, textarea {
 }
 
 .plant-card {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
@@ -1024,8 +1028,8 @@ input, select, textarea {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: var(--toray-sky);
-  color: var(--toray-blue);
+  background: rgba(0, 163, 224, 0.15);
+  color: var(--toray-cyan);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1086,7 +1090,8 @@ input, select, textarea {
 }
 
 .launchpad-card {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 28px;
@@ -1098,7 +1103,7 @@ input, select, textarea {
 .launchpad-card:hover {
   transform: translateY(-6px);
   border-color: var(--toray-cyan);
-  box-shadow: 0 12px 30px rgba(0, 64, 152, 0.2);
+  box-shadow: 0 12px 30px rgba(0, 64, 152, 0.3);
 }
 
 .card-badge {
@@ -1106,7 +1111,7 @@ input, select, textarea {
   top: 20px;
   right: 20px;
   padding: 4px 10px;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 20px;
   font-size: 0.75rem;
@@ -1136,7 +1141,8 @@ input, select, textarea {
 }
 
 .commitment-banner {
-  background: linear-gradient(135deg, var(--toray-blue), var(--toray-navy));
+  background: linear-gradient(135deg, var(--toray-blue), #0b1329);
+  border: 1px solid rgba(0, 163, 224, 0.3);
   border-radius: 20px;
   padding: 40px;
   color: #ffffff;
@@ -1223,7 +1229,7 @@ input, select, textarea {
   padding: 10px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
-  color: var(--text-main);
+  color: #ffffff;
   font-weight: 600;
   font-size: 0.875rem;
   border-radius: 10px;
@@ -1241,7 +1247,7 @@ input, select, textarea {
   border-radius: 6px;
   font-size: 0.8rem;
   font-weight: 600;
-  color: var(--text-main);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -1294,7 +1300,7 @@ input, select, textarea {
 .kpi-value {
   font-size: 1.8rem;
   font-weight: 800;
-  color: var(--text-main);
+  color: #ffffff;
   line-height: 1.1;
   margin-bottom: 6px;
 }
@@ -1321,7 +1327,8 @@ input, select, textarea {
 }
 
 .dashboard-panel {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   padding: 24px;
@@ -1356,7 +1363,7 @@ input, select, textarea {
 }
 
 .category-item:hover {
-  background: var(--bg-app);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .cat-icon-name {
@@ -1378,7 +1385,7 @@ input, select, textarea {
 .progress-bar {
   flex: 1;
   height: 8px;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.8);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -1408,7 +1415,7 @@ input, select, textarea {
   justify-content: space-between;
   align-items: center;
   padding: 12px 14px;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border-radius: 10px;
 }
 
@@ -1441,7 +1448,7 @@ input, select, textarea {
 }
 
 .maintenance-card-sm {
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 10px;
   padding: 14px;
@@ -1526,7 +1533,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   gap: 16px;
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
   padding: 12px 18px;
   border-radius: 12px;
   border: 1px solid var(--border-color);
@@ -1547,7 +1554,7 @@ input, select, textarea {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  color: var(--text-main);
+  color: #ffffff;
   font-size: 0.85rem;
   outline: none;
 }
@@ -1583,7 +1590,8 @@ input, select, textarea {
 .table-responsive {
   width: 100%;
   overflow-x: auto;
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 14px;
 }
@@ -1597,7 +1605,7 @@ input, select, textarea {
 
 .device-table th {
   padding: 14px 18px;
-  background: var(--bg-surface);
+  background: rgba(11, 19, 41, 0.95);
   color: var(--text-muted);
   font-weight: 700;
   font-size: 0.75rem;
@@ -1649,7 +1657,7 @@ input, select, textarea {
 
 .cat-pill {
   padding: 2px 8px;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--border-color);
   border-radius: 6px;
   font-size: 0.75rem;
@@ -1702,7 +1710,7 @@ input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--border-color);
   color: var(--text-muted);
 }
@@ -1725,7 +1733,8 @@ input, select, textarea {
 }
 
 .device-card-item {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 20px;
@@ -1760,7 +1769,7 @@ input, select, textarea {
 }
 
 .specs-quick-list {
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   padding: 10px 12px;
   border-radius: 8px;
   font-size: 0.75rem;
@@ -1791,7 +1800,7 @@ input, select, textarea {
   flex: 1;
   padding: 6px;
   border-radius: 6px;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--border-color);
   font-size: 0.75rem;
   font-weight: 600;
@@ -1799,7 +1808,7 @@ input, select, textarea {
   align-items: center;
   justify-content: center;
   gap: 4px;
-  color: var(--text-main);
+  color: #ffffff;
 }
 
 /* SPARE PARTS */
@@ -1849,7 +1858,8 @@ input, select, textarea {
 }
 
 .dept-card {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
   border: 1px solid var(--border-color);
   border-radius: 14px;
   padding: 20px;
@@ -1935,8 +1945,8 @@ input, select, textarea {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1945,7 +1955,8 @@ input, select, textarea {
 }
 
 .modal-container {
-  background: var(--bg-card);
+  background: rgba(15, 23, 42, 0.95);
+  backdrop-filter: blur(16px);
   border: 1px solid var(--border-color);
   border-radius: 16px;
   width: 100%;
@@ -1963,7 +1974,7 @@ input, select, textarea {
 
 .modal-header {
   padding: 20px 24px;
-  background: var(--bg-surface);
+  background: rgba(11, 19, 41, 0.95);
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
@@ -1987,7 +1998,7 @@ input, select, textarea {
 
 .modal-tabs {
   display: flex;
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.8);
   border-bottom: 1px solid var(--border-color);
   padding: 0 24px;
 }
@@ -1999,7 +2010,7 @@ input, select, textarea {
 
 .modal-footer {
   padding: 16px 24px;
-  background: var(--bg-surface);
+  background: rgba(11, 19, 41, 0.95);
   border-top: 1px solid var(--border-color);
   display: flex;
   justify-content: flex-end;
@@ -2041,7 +2052,7 @@ input, select, textarea {
 }
 
 .notes-box {
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   padding: 12px;
   border-radius: 8px;
   font-size: 0.85rem;
@@ -2080,7 +2091,7 @@ input, select, textarea {
   background: var(--input-bg);
   border: 1px solid var(--input-border);
   border-radius: 8px;
-  color: var(--text-main);
+  color: #ffffff;
   font-size: 0.875rem;
   outline: none;
 }
@@ -2132,7 +2143,7 @@ input, select, textarea {
 }
 
 .scanned-result-card {
-  background: var(--bg-app);
+  background: rgba(5, 10, 20, 0.6);
   border: 1px solid var(--accent-emerald);
   border-radius: 12px;
   padding: 16px;
