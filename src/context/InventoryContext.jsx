@@ -7,15 +7,28 @@ import {
   initialCheckouts,
   initialMaintenance,
   initialSpareParts,
+  initialStockTakings,
   initialLogs
 } from '../data/initialData';
 
 const InventoryContext = createContext();
 
+const safeParseStorage = (key, fallback) => {
+  try {
+    const saved = localStorage.getItem(key);
+    if (!saved) return fallback;
+    const parsed = JSON.parse(saved);
+    return Array.isArray(parsed) ? parsed : fallback;
+  } catch (err) {
+    console.warn(`Failed to parse localStorage key ${key}, falling back to initial data`, err);
+    return fallback;
+  }
+};
+
 export const InventoryProvider = ({ children }) => {
   // Navigation & View State
   const [viewMode, setViewMode] = useState('profile'); // 'profile' | 'portal'
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'devices' | 'checkout' | 'maintenance' | 'spareparts' | 'departments' | 'audit'
+  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'devices' | 'checkout' | 'maintenance' | 'spareparts' | 'stocktaking' | 'departments' | 'audit'
   const [theme, setTheme] = useState('dark');
 
   // Search & Filter State
@@ -24,33 +37,15 @@ export const InventoryProvider = ({ children }) => {
   const [selectedDeptFilter, setSelectedDeptFilter] = useState('All');
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
 
-  // Data Collections with LocalStorage Fallback
-  const [devices, setDevices] = useState(() => {
-    const saved = localStorage.getItem('its_devices');
-    return saved ? JSON.parse(saved) : initialDevices;
-  });
+  // Data Collections with Safe LocalStorage Fallback
+  const [devices, setDevices] = useState(() => safeParseStorage('its_devices', initialDevices));
+  const [checkouts, setCheckouts] = useState(() => safeParseStorage('its_checkouts', initialCheckouts));
+  const [maintenance, setMaintenance] = useState(() => safeParseStorage('its_maintenance', initialMaintenance));
+  const [spareParts, setSpareParts] = useState(() => safeParseStorage('its_spareparts', initialSpareParts));
+  const [stockTakings, setStockTakings] = useState(() => safeParseStorage('its_stock_takings', initialStockTakings));
+  const [departments, setDepartments] = useState(() => safeParseStorage('its_departments', initialDepartments));
+  const [logs, setLogs] = useState(() => safeParseStorage('its_logs', initialLogs));
 
-  const [checkouts, setCheckouts] = useState(() => {
-    const saved = localStorage.getItem('its_checkouts');
-    return saved ? JSON.parse(saved) : initialCheckouts;
-  });
-
-  const [maintenance, setMaintenance] = useState(() => {
-    const saved = localStorage.getItem('its_maintenance');
-    return saved ? JSON.parse(saved) : initialMaintenance;
-  });
-
-  const [spareParts, setSpareParts] = useState(() => {
-    const saved = localStorage.getItem('its_spareparts');
-    return saved ? JSON.parse(saved) : initialSpareParts;
-  });
-
-  const [logs, setLogs] = useState(() => {
-    const saved = localStorage.getItem('its_logs');
-    return saved ? JSON.parse(saved) : initialLogs;
-  });
-
-  const [departments] = useState(initialDepartments);
   const [employees] = useState(initialEmployees);
 
   // Modals & Dialog State
@@ -62,30 +57,55 @@ export const InventoryProvider = ({ children }) => {
   const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
   const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
   const [isReportMaintenanceOpen, setIsReportMaintenanceOpen] = useState(false);
+  const [isStockTakingModalOpen, setIsStockTakingModalOpen] = useState(false);
+  const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
+  const [editingDept, setEditingDept] = useState(null);
 
   // LocalStorage Synchronization
   useEffect(() => {
-    localStorage.setItem('its_devices', JSON.stringify(devices));
+    try {
+      localStorage.setItem('its_devices', JSON.stringify(devices));
+    } catch (e) { console.error(e); }
   }, [devices]);
 
   useEffect(() => {
-    localStorage.setItem('its_checkouts', JSON.stringify(checkouts));
+    try {
+      localStorage.setItem('its_checkouts', JSON.stringify(checkouts));
+    } catch (e) { console.error(e); }
   }, [checkouts]);
 
   useEffect(() => {
-    localStorage.setItem('its_maintenance', JSON.stringify(maintenance));
+    try {
+      localStorage.setItem('its_maintenance', JSON.stringify(maintenance));
+    } catch (e) { console.error(e); }
   }, [maintenance]);
 
   useEffect(() => {
-    localStorage.setItem('its_spareparts', JSON.stringify(spareParts));
+    try {
+      localStorage.setItem('its_spareparts', JSON.stringify(spareParts));
+    } catch (e) { console.error(e); }
   }, [spareParts]);
 
   useEffect(() => {
-    localStorage.setItem('its_logs', JSON.stringify(logs));
+    try {
+      localStorage.setItem('its_stock_takings', JSON.stringify(stockTakings));
+    } catch (e) { console.error(e); }
+  }, [stockTakings]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('its_departments', JSON.stringify(departments));
+    } catch (e) { console.error(e); }
+  }, [departments]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('its_logs', JSON.stringify(logs));
+    } catch (e) { console.error(e); }
   }, [logs]);
 
   // Helper to log system activity
-  const addLog = (action, details, category = 'General', user = 'Admin IT') => {
+  const addLog = (action, details, category = 'General', user = 'Auditor IT') => {
     const newLog = {
       id: `LOG-${Date.now()}`,
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
@@ -94,31 +114,89 @@ export const InventoryProvider = ({ children }) => {
       details,
       category
     };
-    setLogs(prev => [newLog, ...prev]);
+    setLogs(prev => [newLog, ...(Array.isArray(prev) ? prev : [])]);
+  };
+
+  // Stock Taking (Opname) Operations
+  const addStockTaking = (recordData) => {
+    const newRecord = {
+      id: `STK-2026-${String((Array.isArray(stockTakings) ? stockTakings.length : 0) + 1).padStart(3, '0')}`,
+      ...recordData,
+      stockTakingDate: recordData.stockTakingDate || new Date().toISOString().split('T')[0]
+    };
+
+    setStockTakings(prev => [newRecord, ...(Array.isArray(prev) ? prev : [])]);
+
+    // Update target device condition & verified status
+    if (recordData.deviceId) {
+      setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => {
+        if (d.id === recordData.deviceId) {
+          return {
+            ...d,
+            condition: recordData.physicalCondition || d.condition,
+            location: recordData.locationStatus === 'Moved' ? recordData.scannedLocation : d.location
+          };
+        }
+        return d;
+      }));
+    }
+
+    addLog('Stock Taking', `Stock Opname input for asset ${recordData.assetTag} (${recordData.departmentCode}) - Result: ${recordData.auditResultStatus}`, 'Stock Taking', recordData.auditorName);
+  };
+
+  // Department Master Operations
+  const addDepartment = (deptData) => {
+    const codeUpper = (deptData.code || 'DEPT').toUpperCase();
+    const newDept = {
+      id: `DEPT-${codeUpper}`,
+      code: codeUpper,
+      name: deptData.name,
+      head: deptData.head || 'Penanggung Jawab',
+      icon: deptData.icon || 'Building2',
+      description: deptData.description || ''
+    };
+    setDepartments(prev => [...(Array.isArray(prev) ? prev : []), newDept]);
+    addLog('Add Master Department', `Added new Master Departemen [${codeUpper}] ${deptData.name}`, 'Department');
+  };
+
+  const updateDepartment = (deptData) => {
+    setDepartments(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === deptData.id ? { ...d, ...deptData } : d));
+    addLog('Update Master Department', `Updated Master Departemen info [${deptData.code}]`, 'Department');
+  };
+
+  const deleteDepartment = (id) => {
+    const safeDepts = Array.isArray(departments) ? departments : [];
+    const target = safeDepts.find(d => d.id === id);
+    if (target) {
+      setDepartments(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
+      addLog('Delete Master Department', `Deleted Master Departemen [${target.code}] ${target.name}`, 'Department');
+    }
   };
 
   // Device CRUD Operations
   const addDevice = (newDeviceData) => {
-    const id = `DEV-${String(devices.length + 1).padStart(3, '0')}`;
-    const assetTag = newDeviceData.assetTag || `ITS-${newDeviceData.category.substring(0, 3).toUpperCase()}-2026-${String(devices.length + 1).padStart(3, '0')}`;
+    const safeDevices = Array.isArray(devices) ? devices : [];
+    const id = `DEV-${String(safeDevices.length + 1).padStart(3, '0')}`;
+    const assetTag = newDeviceData.assetTag || `ITS-${(newDeviceData.category || 'PC').substring(0, 3).toUpperCase()}-2026-${String(safeDevices.length + 1).padStart(3, '0')}`;
     const device = {
       ...newDeviceData,
       id,
       assetTag
     };
-    setDevices(prev => [device, ...prev]);
+    setDevices(prev => [device, ...(Array.isArray(prev) ? prev : [])]);
     addLog('Add Device', `Added new asset ${assetTag} (${device.name})`, 'Device');
   };
 
   const updateDevice = (updatedData) => {
-    setDevices(prev => prev.map(d => d.id === updatedData.id ? { ...d, ...updatedData } : d));
+    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === updatedData.id ? { ...d, ...updatedData } : d));
     addLog('Update Device', `Updated specification & info for asset ${updatedData.assetTag}`, 'Device');
   };
 
   const deleteDevice = (id) => {
-    const target = devices.find(d => d.id === id);
+    const safeDevices = Array.isArray(devices) ? devices : [];
+    const target = safeDevices.find(d => d.id === id);
     if (target) {
-      setDevices(prev => prev.filter(d => d.id !== id));
+      setDevices(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
       addLog('Delete Device', `Decommissioned / Removed asset ${target.assetTag} (${target.name})`, 'Device');
     }
   };
@@ -131,17 +209,18 @@ export const InventoryProvider = ({ children }) => {
       checkoutDate: new Date().toISOString().split('T')[0],
       status: 'Active'
     };
-    setCheckouts(prev => [newCheckout, ...prev]);
+    setCheckouts(prev => [newCheckout, ...(Array.isArray(prev) ? prev : [])]);
 
     // Update Device status
-    setDevices(prev => prev.map(d => d.id === checkoutData.deviceId ? { ...d, status: 'In Use', assignedTo: checkoutData.borrowerName } : d));
+    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === checkoutData.deviceId ? { ...d, status: 'In Use', assignedTo: checkoutData.borrowerName } : d));
     addLog('Checkout Device', `Assigned asset ${checkoutData.assetTag} to ${checkoutData.borrowerName} (${checkoutData.purpose})`, 'Checkout');
   };
 
   const returnDevice = (checkoutId, condition, notes) => {
-    const targetCheckout = checkouts.find(c => c.id === checkoutId);
+    const safeCheckouts = Array.isArray(checkouts) ? checkouts : [];
+    const targetCheckout = safeCheckouts.find(c => c.id === checkoutId);
     if (targetCheckout) {
-      setCheckouts(prev => prev.map(c => c.id === checkoutId ? {
+      setCheckouts(prev => (Array.isArray(prev) ? prev : []).map(c => c.id === checkoutId ? {
         ...c,
         actualReturnDate: new Date().toISOString().split('T')[0],
         status: 'Returned',
@@ -149,7 +228,7 @@ export const InventoryProvider = ({ children }) => {
       } : c));
 
       // Reset device status
-      setDevices(prev => prev.map(d => d.id === targetCheckout.deviceId ? {
+      setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === targetCheckout.deviceId ? {
         ...d,
         status: 'Available',
         condition: condition || d.condition,
@@ -168,16 +247,17 @@ export const InventoryProvider = ({ children }) => {
       reportDate: new Date().toISOString().split('T')[0],
       status: 'In Progress'
     };
-    setMaintenance(prev => [newTicket, ...prev]);
+    setMaintenance(prev => [newTicket, ...(Array.isArray(prev) ? prev : [])]);
 
     // Update device status to Maintenance
-    setDevices(prev => prev.map(d => d.id === ticketData.deviceId ? { ...d, status: 'Maintenance', condition: 'Under Repair' } : d));
+    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === ticketData.deviceId ? { ...d, status: 'Maintenance', condition: 'Under Repair' } : d));
     addLog('Report Maintenance', `Reported fault for ${ticketData.assetTag}: ${ticketData.description}`, 'Maintenance');
   };
 
   const updateMaintenanceStatus = (ticketId, newStatus, technicianNotes = '') => {
-    const ticket = maintenance.find(m => m.id === ticketId);
-    setMaintenance(prev => prev.map(m => m.id === ticketId ? {
+    const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+    const ticket = safeMaintenance.find(m => m.id === ticketId);
+    setMaintenance(prev => (Array.isArray(prev) ? prev : []).map(m => m.id === ticketId ? {
       ...m,
       status: newStatus,
       completionDate: newStatus === 'Completed' ? new Date().toISOString().split('T')[0] : m.completionDate,
@@ -185,17 +265,18 @@ export const InventoryProvider = ({ children }) => {
     } : m));
 
     if (ticket && newStatus === 'Completed') {
-      setDevices(prev => prev.map(d => d.id === ticket.deviceId ? { ...d, status: 'In Use', condition: 'Good' } : d));
+      setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === ticket.deviceId ? { ...d, status: 'In Use', condition: 'Good' } : d));
       addLog('Maintenance Completed', `Completed repair ticket ${ticketId} for ${ticket.assetTag}`, 'Maintenance');
     }
   };
 
   // Spare Parts Operations
   const updateSparePartStock = (partId, delta) => {
-    setSpareParts(prev => prev.map(p => p.id === partId ? { ...p, stockQuantity: Math.max(0, p.stockQuantity + delta) } : p));
-    const target = spareParts.find(p => p.id === partId);
+    setSpareParts(prev => (Array.isArray(prev) ? prev : []).map(p => p.id === partId ? { ...p, stockQuantity: Math.max(0, (p.stockQuantity || 0) + delta) } : p));
+    const safeParts = Array.isArray(spareParts) ? spareParts : [];
+    const target = safeParts.find(p => p.id === partId);
     if (target) {
-      addLog('Stock Adjustment', `Adjusted stock for ${target.name} by ${delta > 0 ? '+' : ''}${delta} (New Stock: ${Math.max(0, target.stockQuantity + delta)})`, 'Spare Parts');
+      addLog('Stock Adjustment', `Adjusted stock for ${target.name} by ${delta > 0 ? '+' : ''}${delta}`, 'Spare Parts');
     }
   };
 
@@ -204,18 +285,22 @@ export const InventoryProvider = ({ children }) => {
       id: `SPR-${Date.now()}`,
       ...partData
     };
-    setSpareParts(prev => [newPart, ...prev]);
+    setSpareParts(prev => [newPart, ...(Array.isArray(prev) ? prev : [])]);
     addLog('Add Spare Part', `Added new inventory item ${partData.name} (${partData.partNumber})`, 'Spare Parts');
   };
 
   // Reset to original mock data
   const resetToSeedData = () => {
+    try {
+      localStorage.clear();
+    } catch (e) { console.error(e); }
     setDevices(initialDevices);
     setCheckouts(initialCheckouts);
     setMaintenance(initialMaintenance);
     setSpareParts(initialSpareParts);
+    setStockTakings(initialStockTakings);
+    setDepartments(initialDepartments);
     setLogs(initialLogs);
-    localStorage.clear();
     addLog('Reset Data', 'Reset all system data to initial PT. Indonesia Toray Synthetics factory seeds', 'System');
   };
 
@@ -240,13 +325,14 @@ export const InventoryProvider = ({ children }) => {
       setSelectedDeptFilter,
       selectedStatusFilter,
       setSelectedStatusFilter,
-      devices,
-      checkouts,
-      maintenance,
-      spareParts,
-      logs,
-      departments,
-      employees,
+      devices: Array.isArray(devices) ? devices : initialDevices,
+      checkouts: Array.isArray(checkouts) ? checkouts : initialCheckouts,
+      maintenance: Array.isArray(maintenance) ? maintenance : initialMaintenance,
+      spareParts: Array.isArray(spareParts) ? spareParts : initialSpareParts,
+      stockTakings: Array.isArray(stockTakings) ? stockTakings : initialStockTakings,
+      departments: Array.isArray(departments) ? departments : initialDepartments,
+      employees: Array.isArray(employees) ? employees : initialEmployees,
+      logs: Array.isArray(logs) ? logs : initialLogs,
       // Modals
       selectedDevice,
       setSelectedDevice,
@@ -264,7 +350,17 @@ export const InventoryProvider = ({ children }) => {
       setIsCheckoutModalOpen,
       isReportMaintenanceOpen,
       setIsReportMaintenanceOpen,
+      isStockTakingModalOpen,
+      setIsStockTakingModalOpen,
+      isDeptModalOpen,
+      setIsDeptModalOpen,
+      editingDept,
+      setEditingDept,
       // Methods
+      addStockTaking,
+      addDepartment,
+      updateDepartment,
+      deleteDepartment,
       addDevice,
       updateDevice,
       deleteDevice,

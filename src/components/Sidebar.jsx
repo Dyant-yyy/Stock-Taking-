@@ -6,6 +6,7 @@ import {
   Clock,
   Wrench,
   Package,
+  ClipboardCheck,
   Users,
   History,
   Printer,
@@ -15,19 +16,36 @@ import {
 } from 'lucide-react';
 
 export const Sidebar = () => {
-  const { activeTab, setActiveTab, viewMode, setViewMode, devices, checkouts, maintenance, spareParts } = useInventory();
+  const {
+    activeTab,
+    setActiveTab,
+    viewMode,
+    setViewMode,
+    devices = [],
+    checkouts = [],
+    maintenance = [],
+    spareParts = [],
+    stockTakings = []
+  } = useInventory();
 
-  const activeCheckoutsCount = checkouts.filter(c => c.status === 'Active').length;
-  const inProgressMaintenanceCount = maintenance.filter(m => m.status === 'In Progress').length;
-  const lowStockCount = spareParts.filter(p => p.stockQuantity <= p.minThreshold).length;
+  const safeDevices = Array.isArray(devices) ? devices : [];
+  const safeCheckouts = Array.isArray(checkouts) ? checkouts : [];
+  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+  const safeSpareParts = Array.isArray(spareParts) ? spareParts : [];
+  const safeStockTakings = Array.isArray(stockTakings) ? stockTakings : [];
+
+  const activeCheckoutsCount = safeCheckouts.filter(c => c?.status === 'Active').length;
+  const inProgressMaintenanceCount = safeMaintenance.filter(m => m?.status === 'In Progress').length;
+  const lowStockCount = safeSpareParts.filter(p => (p?.stockQuantity || 0) <= (p?.minThreshold || 0)).length;
 
   const navItems = [
     { id: 'dashboard', label: 'Dashboard Utama', icon: LayoutDashboard, badge: null },
-    { id: 'devices', label: 'Katalog Perangkat', icon: HardDrive, badge: devices.length },
+    { id: 'devices', label: 'Katalog Perangkat', icon: HardDrive, badge: safeDevices.length },
+    { id: 'stocktaking', label: 'Stock Taking (Opname)', icon: ClipboardCheck, badge: `${safeStockTakings.length} Audit`, badgeColor: 'badge-info' },
     { id: 'checkout', label: 'Peminjaman Asset', icon: Clock, badge: activeCheckoutsCount > 0 ? activeCheckoutsCount : null, badgeColor: 'badge-info' },
     { id: 'maintenance', label: 'Perbaikan & Servis', icon: Wrench, badge: inProgressMaintenanceCount > 0 ? inProgressMaintenanceCount : null, badgeColor: 'badge-warning' },
     { id: 'spareparts', label: 'Stok Spare Parts', icon: Package, badge: lowStockCount > 0 ? `${lowStockCount} Alert` : null, badgeColor: 'badge-danger' },
-    { id: 'departments', label: 'Unit & Pegawai ITS', icon: Users, badge: null },
+    { id: 'departments', label: 'Master Departemen ITS', icon: Users, badge: null },
     { id: 'audit', label: 'Audit Trail & Log', icon: History, badge: null },
     { id: 'print', label: 'Cetak Tag QR Asset', icon: Printer, badge: null },
   ];

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useInventory } from '../context/InventoryContext';
 import {
   HardDrive,
@@ -27,12 +27,11 @@ import {
 
 export const Dashboard = () => {
   const {
-    devices,
-    checkouts,
-    maintenance,
-    spareParts,
-    logs,
-    departments,
+    devices = [],
+    checkouts = [],
+    maintenance = [],
+    logs = [],
+    departments = [],
     setActiveTab,
     setIsDeviceFormOpen,
     setEditingDevice,
@@ -42,20 +41,27 @@ export const Dashboard = () => {
     setViewMode
   } = useInventory();
 
+  // Safe Arrays
+  const safeDevices = Array.isArray(devices) ? devices : [];
+  const safeCheckouts = Array.isArray(checkouts) ? checkouts : [];
+  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+  const safeLogs = Array.isArray(logs) ? logs : [];
+  const safeDepts = Array.isArray(departments) ? departments : [];
+
   // Metrics
-  const totalDevices = devices.length;
-  const inUseDevices = devices.filter(d => d.status === 'In Use').length;
-  const availableDevices = devices.filter(d => d.status === 'Available').length;
-  const maintenanceDevices = devices.filter(d => d.status === 'Maintenance').length;
-  const activeCheckouts = checkouts.filter(c => c.status === 'Active').length;
+  const totalDevices = safeDevices.length;
+  const inUseDevices = safeDevices.filter(d => d && d.status === 'In Use').length;
+  const availableDevices = safeDevices.filter(d => d && d.status === 'Available').length;
+  const maintenanceDevices = safeDevices.filter(d => d && d.status === 'Maintenance').length;
+  const activeCheckouts = safeCheckouts.filter(c => c && c.status === 'Active').length;
 
-  const totalValuation = devices.reduce((sum, d) => sum + (d.purchaseCost || 0), 0);
+  const totalValuation = safeDevices.reduce((sum, d) => sum + (d?.purchaseCost || 0), 0);
 
-  // Warranty Warning Count (Expiring within 6 months or 2026)
-  const expiringWarrantyCount = devices.filter(d => d.warrantyExpiry && d.warrantyExpiry.startsWith('2026')).length;
+  // Warranty Warning Count (Expiring within 2026)
+  const expiringWarrantyCount = safeDevices.filter(d => d?.warrantyExpiry && String(d.warrantyExpiry).startsWith('2026')).length;
 
   const formatIDR = (amount) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
   };
 
   // Categories Count
@@ -69,29 +75,29 @@ export const Dashboard = () => {
     { name: 'Mobile & Handheld', icon: Tablet, color: 'text-pink', bg: 'bg-gold-soft' },
   ];
 
-  const getCategoryCount = (catName) => devices.filter(d => d.category === catName).length;
+  const getCategoryCount = (catName) => safeDevices.filter(d => d && d.category === catName).length;
 
   const handleCategoryQuickFilter = (catName) => {
-    setSelectedCategoryFilter(catName);
-    setActiveTab('devices');
-    setViewMode('portal');
+    if (setSelectedCategoryFilter) setSelectedCategoryFilter(catName);
+    if (setActiveTab) setActiveTab('devices');
+    if (setViewMode) setViewMode('portal');
   };
 
   // Export to CSV Function
   const exportToCSV = () => {
     const headers = ["ID Asset", "Asset Tag", "Nama Perangkat", "Kategori", "Merk/Model", "Serial Number", "Departemen", "Lokasi", "Pengguna", "Status", "Kondisi", "Harga Beli (IDR)"];
-    const rows = devices.map(d => [
-      d.id,
-      d.assetTag,
-      `"${d.name.replace(/"/g, '""')}"`,
-      d.category,
-      `"${d.brand} ${d.model}"`,
-      d.serialNumber,
-      d.departmentId,
-      `"${d.location}"`,
-      `"${d.assignedTo}"`,
-      d.status,
-      d.condition,
+    const rows = safeDevices.map(d => [
+      d.id || '',
+      d.assetTag || '',
+      `"${(d.name || '').replace(/"/g, '""')}"`,
+      d.category || '',
+      `"${d.brand || ''} ${d.model || ''}"`,
+      d.serialNumber || '',
+      d.departmentId || '',
+      `"${d.location || ''}"`,
+      `"${d.assignedTo || ''}"`,
+      d.status || '',
+      d.condition || '',
       d.purchaseCost || 0
     ]);
 
@@ -134,11 +140,11 @@ export const Dashboard = () => {
             </div>
 
             <div className="hero-quick-actions">
-              <button className="btn-hero-action primary" onClick={() => { setEditingDevice(null); setIsDeviceFormOpen(true); }}>
+              <button className="btn-hero-action primary" onClick={() => { if (setEditingDevice) setEditingDevice(null); if (setIsDeviceFormOpen) setIsDeviceFormOpen(true); }}>
                 <Plus size={16} />
                 <span>+ Asset Baru</span>
               </button>
-              <button className="btn-hero-action secondary" onClick={() => setIsQRScannerOpen(true)}>
+              <button className="btn-hero-action secondary" onClick={() => { if (setIsQRScannerOpen) setIsQRScannerOpen(true); }}>
                 <QrCode size={16} />
                 <span>Scan QR</span>
               </button>
@@ -173,7 +179,7 @@ export const Dashboard = () => {
 
       {/* METRICS KPI GRID */}
       <div className="kpi-grid margin-top-lg">
-        <div className="kpi-card glowing-card-blue" onClick={() => setActiveTab('devices')}>
+        <div className="kpi-card glowing-card-blue" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Total Asset IT</span>
             <div className="kpi-icon-box bg-blue-soft"><HardDrive className="text-blue" size={22} /></div>
@@ -186,7 +192,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill blue" style={{ width: '100%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-emerald" onClick={() => setActiveTab('devices')}>
+        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Perangkat Aktif (In Use)</span>
             <div className="kpi-icon-box bg-emerald-soft"><CheckCircle2 className="text-emerald" size={22} /></div>
@@ -198,7 +204,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill emerald" style={{ width: `${Math.round((inUseDevices / (totalDevices || 1)) * 100)}%` }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-cyan" onClick={() => setActiveTab('devices')}>
+        <div className="kpi-card glowing-card-cyan" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Stok Tersedia (Stock)</span>
             <div className="kpi-icon-box bg-cyan-soft"><ShieldCheck className="text-cyan" size={22} /></div>
@@ -208,19 +214,19 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill cyan" style={{ width: `${Math.round((availableDevices / (totalDevices || 1)) * 100)}%` }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-amber" onClick={() => setActiveTab('maintenance')}>
+        <div className="kpi-card glowing-card-amber" onClick={() => { if (setActiveTab) setActiveTab('maintenance'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Perbaikan & Service</span>
             <div className="kpi-icon-box bg-amber-soft"><Wrench className="text-amber" size={22} /></div>
           </div>
           <div className="kpi-value">{maintenanceDevices}</div>
           <div className="kpi-subtext">
-            <span className="text-amber"><strong>{maintenance.filter(m => m.status === 'In Progress').length}</strong> Ticket aktif</span>
+            <span className="text-amber"><strong>{safeMaintenance.filter(m => m?.status === 'In Progress').length}</strong> Ticket aktif</span>
           </div>
           <div className="kpi-mini-bar"><div className="bar-fill amber" style={{ width: '40%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-purple" onClick={() => setActiveTab('checkout')}>
+        <div className="kpi-card glowing-card-purple" onClick={() => { if (setActiveTab) setActiveTab('checkout'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Peminjaman Sementara</span>
             <div className="kpi-icon-box bg-purple-soft"><Clock className="text-purple" size={22} /></div>
@@ -251,7 +257,7 @@ export const Dashboard = () => {
               <p>Terdapat <strong>{expiringWarrantyCount} perangkat</strong> yang masa garansinya berakhir di tahun 2026. Pertimbangkan perpanjangan garansi vendor atau peremajaan perangkat.</p>
             </div>
           </div>
-          <button className="btn-secondary-sm" onClick={() => setActiveTab('devices')}>
+          <button className="btn-secondary-sm" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
             Periksa Garansi Perangkat →
           </button>
         </div>
@@ -266,7 +272,7 @@ export const Dashboard = () => {
               <Sparkles size={18} className="text-cyan" />
               <h3>Kategori Perangkat & Akses Cepat</h3>
             </div>
-            <button className="btn-link" onClick={() => setActiveTab('devices')}>Lihat Semua Katalog →</button>
+            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>Lihat Semua Katalog →</button>
           </div>
           <div className="categories-list">
             {categories.map((cat, idx) => {
@@ -300,11 +306,11 @@ export const Dashboard = () => {
               <Building2 size={18} className="text-blue" />
               <h3>Distribusi Asset per Departemen ITS</h3>
             </div>
-            <button className="btn-link" onClick={() => setActiveTab('departments')}>Detail Unit →</button>
+            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('departments'); }}>Detail Unit →</button>
           </div>
           <div className="departments-widget-list">
-            {departments.map((dept) => {
-              const deptDevices = devices.filter(d => d.departmentId === dept.id);
+            {safeDepts.map((dept) => {
+              const deptDevices = safeDevices.filter(d => d && d.departmentId === dept.id);
               const pct = totalDevices ? Math.round((deptDevices.length / totalDevices) * 100) : 0;
               return (
                 <div key={dept.id} className="dept-widget-item">
@@ -337,31 +343,34 @@ export const Dashboard = () => {
               <Wrench size={18} className="text-amber" />
               <h3>Status Service & Maintenance Ticket</h3>
             </div>
-            <button className="btn-secondary-sm" onClick={() => setIsReportMaintenanceOpen(true)}>+ Laporkan Rusak</button>
+            <button className="btn-secondary-sm" onClick={() => { if (setIsReportMaintenanceOpen) setIsReportMaintenanceOpen(true); }}>+ Laporkan Rusak</button>
           </div>
           <div className="maintenance-alerts-list">
-            {maintenance.length === 0 ? (
+            {safeMaintenance.length === 0 ? (
               <div className="empty-state-sm">
                 <CheckCircle2 size={32} className="text-emerald" />
                 <p>Tidak ada ticket perbaikan aktif saat ini.</p>
               </div>
             ) : (
-              maintenance.slice(0, 4).map((ticket) => (
-                <div key={ticket.id} className="maintenance-card-sm">
-                  <div className="m-card-header">
-                    <span className={`status-badge status-${ticket.status.toLowerCase().replace(' ', '-')}`}>
-                      {ticket.status}
-                    </span>
-                    <span className="m-date">{ticket.reportDate}</span>
+              safeMaintenance.slice(0, 4).map((ticket) => {
+                const statusClass = ticket?.status ? ticket.status.toLowerCase().replace(/\s+/g, '-') : 'available';
+                return (
+                  <div key={ticket.id} className="maintenance-card-sm">
+                    <div className="m-card-header">
+                      <span className={`status-badge status-${statusClass}`}>
+                        {ticket.status || 'Active'}
+                      </span>
+                      <span className="m-date">{ticket.reportDate || ''}</span>
+                    </div>
+                    <h4 className="m-title">{ticket.assetTag || ''} - {ticket.deviceName || ''}</h4>
+                    <p className="m-desc">{ticket.description || ''}</p>
+                    <div className="m-footer">
+                      <span>Pelapor: <strong>{ticket.reportedBy || ''}</strong></span>
+                      <span>Teknisi: <strong>{ticket.technician || ''}</strong></span>
+                    </div>
                   </div>
-                  <h4 className="m-title">{ticket.assetTag} - {ticket.deviceName}</h4>
-                  <p className="m-desc">{ticket.description}</p>
-                  <div className="m-footer">
-                    <span>Pelapor: <strong>{ticket.reportedBy}</strong></span>
-                    <span>Teknisi: <strong>{ticket.technician}</strong></span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
@@ -373,19 +382,19 @@ export const Dashboard = () => {
               <Activity size={18} className="text-cyan" />
               <h3>Aktivitas Sistem & Audit Trail</h3>
             </div>
-            <button className="btn-link" onClick={() => setActiveTab('audit')}>Semua Audit Log →</button>
+            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('audit'); }}>Semua Audit Log →</button>
           </div>
           <div className="audit-feed-list">
-            {logs.slice(0, 5).map((log) => (
+            {safeLogs.slice(0, 5).map((log) => (
               <div key={log.id} className="audit-feed-item">
                 <div className="audit-dot"></div>
                 <div className="audit-content">
                   <div className="audit-meta">
-                    <strong>{log.action}</strong>
-                    <span className="audit-time">{log.timestamp}</span>
+                    <strong>{log.action || ''}</strong>
+                    <span className="audit-time">{log.timestamp || ''}</span>
                   </div>
-                  <p className="audit-details">{log.details}</p>
-                  <div className="audit-user">Oleh: {log.user}</div>
+                  <p className="audit-details">{log.details || ''}</p>
+                  <div className="audit-user">Oleh: {log.user || ''}</div>
                 </div>
               </div>
             ))}

@@ -4,41 +4,48 @@ export const companyProfileData = {
   established: 1971,
   location: "Tangerang, Banten, Indonesia",
   parentGroup: "Toray Industries, Inc. (Japan)",
-  description: "PT. Indonesia Toray Synthetics (ITS) adalah produsen serat sintetis terkemuka di Indonesia yang memproduksi Polyester Staple Fiber, Polyester Filament Yarn, dan Nylon Filament Yarn berkualitas dunia dengan standar teknologi Jepang. Terletak di kawasan industri Tangerang, ITS didukung oleh infrastruktur IT dan otomatisasi industri mutakhir.",
+  description: "PT. Indonesia Toray Synthetics (ITS) adalah produsen serat sintetis terkemuka di Indonesia yang memproduksi Polyester Staple Fiber (PSF), Polyester Filament Yarn (PFY), Nylon Filament Yarn (NFY), dan Resin (RSN) berkualitas dunia dengan standar teknologi Jepang. Terletak di kawasan industri Tangerang, ITS didukung oleh infrastruktur IT dan otomatisasi industri mutakhir.",
   stats: [
     { label: "Luas Area Pabrik", value: "35 Hektar", icon: "Factory" },
     { label: "Kapasitas Produksi", value: "120,000 Ton/Tahun", icon: "Boxes" },
     { label: "Tenaga Kerja & Staf", value: "1,500+ Karyawan", icon: "Users" },
     { label: "Perangkat IT Terkelola", value: "450+ Asset", icon: "Cpu" },
-    { label: "Unit Operasional", value: "4 Plant Utama", icon: "Building2" },
+    { label: "Unit Operasional", value: "6 Divisi Utama", icon: "Building2" },
     { label: "Standar Sertifikasi", value: "ISO 9001 / 14001 / 45001", icon: "ShieldCheck" }
   ],
   plants: [
     {
-      id: "plant-1",
-      name: "Plant 1 - Polymerization & Polyester Staple Fiber",
-      description: "Pusat polimerisasi kimia dan pembuatan serat stapel poliester berkecepatan tinggi.",
+      id: "plant-rsn",
+      name: "RSN - Polymerization & Resin Plant",
+      description: "Pusat polimerisasi kimia dan produksi Resin (RSN) sintetis berkecepatan tinggi.",
       managedDevices: 124,
       status: "Operational"
     },
     {
-      id: "plant-2",
-      name: "Plant 2 - Filament Yarn & Spinning",
-      description: "Fasilitas pemintalan serat filamen poliester dan nilon berteknologi otomatis.",
+      id: "plant-pfy",
+      name: "PFY - Polyester Filament Yarn Plant",
+      description: "Fasilitas pemintalan dan pembuatan serat filamen poliester (PFY) otomatis.",
       managedDevices: 148,
       status: "Operational"
     },
     {
-      id: "utility",
-      name: "Power Plant & Utility Center",
-      description: "Pusat pembangkit listrik mandiri, pemeliharaan utilitas, dan pengolahan limbah (EHS).",
+      id: "plant-nfy",
+      name: "NFY - Nylon Filament Yarn Plant",
+      description: "Fasilitas pemintalan serat nilon filamen (NFY) kualitas tinggi untuk aplikasi tekstil industri.",
+      managedDevices: 95,
+      status: "Operational"
+    },
+    {
+      id: "plant-sis",
+      name: "SIS - System Integration & Utility Center",
+      description: "Pusat utilitas pembangkit listrik, otomasi pabrik, dan sistem pengolahan EHS.",
       managedDevices: 62,
       status: "Operational"
     },
     {
-      id: "hq-server",
-      name: "Main Office & Data Center HQ",
-      description: "Pusat komando IT, server room, administrasi utama, dan divisi HR/Finance/Logistik.",
+      id: "hq-is",
+      name: "IS - Information System & Data Center",
+      description: "Pusat komando IT, server room, jaringan enterprise, dan infrastruktur data ITS.",
       managedDevices: 118,
       status: "Operational"
     }
@@ -46,25 +53,27 @@ export const companyProfileData = {
 };
 
 export const initialDepartments = [
-  { id: "DEPT-IT", name: "IT & System Automation", head: "Budi Santoso, S.T.", code: "IT", icon: "Monitor" },
-  { id: "DEPT-PRD", name: "Production & Manufacturing", head: "Hendra Wijaya", code: "PRD", icon: "Factory" },
-  { id: "DEPT-MNT", name: "Plant Maintenance & Utility", head: "Ir. Agus Rahardjo", code: "MNT", icon: "Wrench" },
-  { id: "DEPT-QC", name: "Quality Assurance & Lab", head: "Dr. Retno Astuti", code: "QC", icon: "FlaskConical" },
-  { id: "DEPT-HR", name: "Human Resources & GA", head: "Siti Rahmawati", code: "HR", icon: "Users" },
-  { id: "DEPT-FIN", name: "Finance & Accounting", head: "Dedi Kurniawan, SE", code: "FIN", icon: "Receipt" },
-  { id: "DEPT-LOG", name: "Logistics & Warehouse", head: "Bambang Supriadi", code: "LOG", icon: "Truck" },
-  { id: "DEPT-EHS", name: "EHS & Sustainability", head: "Rian Hidayat", code: "EHS", icon: "ShieldAlert" }
+  { id: "DEPT-IS", name: "Information System (IS)", head: "Budi Santoso, S.T.", code: "IS", icon: "Monitor", description: "Divisi Teknologi Informasi & Infrastruktur Komputer" },
+  { id: "DEPT-RSN", name: "Resin & Polymerization (RSN)", head: "Ir. Agus Rahardjo", code: "RSN", icon: "Flame", description: "Pabrik Polimerisasi & Pengolahan Bahan Resin" },
+  { id: "DEPT-QATECH", name: "Quality Assurance & Tech (QATECH)", head: "Dr. Retno Astuti", code: "QATECH", icon: "FlaskConical", description: "Laboratorium Pengujian Kualitas & Teknik Material" },
+  { id: "DEPT-SIS", name: "System Integration & Services (SIS)", head: "Hendra Wijaya", code: "SIS", icon: "Wrench", description: "Divisi Integrasi Sistem, Utilitas & Maintenance Pabrik" },
+  { id: "DEPT-NFY", name: "Nylon Filament Yarn (NFY)", head: "Bambang Supriadi", code: "NFY", icon: "Boxes", description: "Pabrik Pemintalan & Produksi Serat Filamen Nilon" },
+  { id: "DEPT-PFY", name: "Polyester Filament Yarn (PFY)", head: "Dewi Lestari", code: "PFY", icon: "Factory", description: "Pabrik Pemintalan & Produksi Serat Filamen Poliester" },
+  { id: "DEPT-PSF", name: "Polyester Staple Fiber (PSF)", head: "Rian Hidayat", code: "PSF", icon: "Boxes", description: "Pabrik Produksi Serat Stapel Poliester" },
+  { id: "DEPT-HRGA", name: "Human Resources & GA (HRGA)", head: "Siti Rahmawati", code: "HRGA", icon: "Users", description: "Divisi Sumber Daya Manusia & General Affairs" },
+  { id: "DEPT-FIN", name: "Finance & Accounting (FIN)", head: "Dedi Kurniawan, SE", code: "FIN", icon: "Receipt", description: "Divisi Keuangan, Perencanaan & Akuntansi" }
 ];
 
 export const initialEmployees = [
-  { id: "EMP-001", name: "Budi Santoso", deptId: "DEPT-IT", position: "IT Infrastructure Manager", email: "budi.santoso@toray.co.id" },
-  { id: "EMP-002", name: "Ahmad Rizky", deptId: "DEPT-IT", position: "Network & Systems Specialist", email: "ahmad.rizky@toray.co.id" },
-  { id: "EMP-003", name: "Hendra Wijaya", deptId: "DEPT-PRD", position: "Production Superintendent", email: "hendra.wijaya@toray.co.id" },
-  { id: "EMP-004", name: "Dewi Lestari", deptId: "DEPT-PRD", position: "Control Room Operator", email: "dewi.lestari@toray.co.id" },
-  { id: "EMP-005", name: "Ir. Agus Rahardjo", deptId: "DEPT-MNT", position: "Chief Maintenance Engineer", email: "agus.rahardjo@toray.co.id" },
-  { id: "EMP-006", name: "Dr. Retno Astuti", deptId: "DEPT-QC", position: "QA Laboratory Lead", email: "retno.astuti@toray.co.id" },
-  { id: "EMP-007", name: "Siti Rahmawati", deptId: "DEPT-HR", position: "HR Manager", email: "siti.rahmawati@toray.co.id" },
-  { id: "EMP-008", name: "Dedi Kurniawan", deptId: "DEPT-FIN", position: "Accounting Lead", email: "dedi.kurniawan@toray.co.id" }
+  { id: "EMP-001", name: "Budi Santoso", deptId: "DEPT-IS", position: "IS Department Manager", email: "budi.santoso@toray.co.id" },
+  { id: "EMP-002", name: "Ahmad Rizky", deptId: "DEPT-IS", position: "Network & Systems Specialist", email: "ahmad.rizky@toray.co.id" },
+  { id: "EMP-003", name: "Ir. Agus Rahardjo", deptId: "DEPT-RSN", position: "RSN Plant Superintendent", email: "agus.rahardjo@toray.co.id" },
+  { id: "EMP-004", name: "Dr. Retno Astuti", deptId: "DEPT-QATECH", position: "QA Technical Lead", email: "retno.astuti@toray.co.id" },
+  { id: "EMP-005", name: "Hendra Wijaya", deptId: "DEPT-SIS", position: "SIS Chief Engineer", email: "hendra.wijaya@toray.co.id" },
+  { id: "EMP-006", name: "Bambang Supriadi", deptId: "DEPT-NFY", position: "NFY Plant Manager", email: "bambang.supriadi@toray.co.id" },
+  { id: "EMP-007", name: "Dewi Lestari", deptId: "DEPT-PFY", position: "PFY Spinning Specialist", email: "dewi.lestari@toray.co.id" },
+  { id: "EMP-008", name: "Siti Rahmawati", deptId: "DEPT-HRGA", position: "HRGA Manager", email: "siti.rahmawati@toray.co.id" },
+  { id: "EMP-009", name: "Dedi Kurniawan", deptId: "DEPT-FIN", position: "Finance Lead", email: "dedi.kurniawan@toray.co.id" }
 ];
 
 export const initialDevices = [
@@ -76,7 +85,7 @@ export const initialDevices = [
     brand: "Dell Enterprise",
     model: "PowerEdge R750",
     serialNumber: "DELL-SRV-98421-ITS",
-    departmentId: "DEPT-IT",
+    departmentId: "DEPT-IS",
     location: "Main HQ - Server Room Rack 02",
     assignedTo: "Ahmad Rizky",
     purchaseDate: "2024-03-15",
@@ -102,9 +111,9 @@ export const initialDevices = [
     brand: "Advantech",
     model: "TPC-1782H Touch",
     serialNumber: "ADV-IPC-4412-ITS",
-    departmentId: "DEPT-PRD",
-    location: "Plant 1 - Polymerization Control Desk A",
-    assignedTo: "Dewi Lestari",
+    departmentId: "DEPT-RSN",
+    location: "RSN Plant - Control Room Desk A",
+    assignedTo: "Ir. Agus Rahardjo",
     purchaseDate: "2024-01-20",
     purchaseCost: 32000000,
     warrantyExpiry: "2026-01-20",
@@ -118,7 +127,7 @@ export const initialDevices = [
       ipAddress: "192.168.20.102",
       macAddress: "00:0E:8C:99:AA:11"
     },
-    notes: "DCS Polymerization Plant Monitoring Station."
+    notes: "DCS Resin Polymerization Monitoring Station."
   },
   {
     id: "DEV-003",
@@ -128,8 +137,8 @@ export const initialDevices = [
     brand: "Lenovo",
     model: "ThinkPad X1 Carbon",
     serialNumber: "PF-4421X-ITS",
-    departmentId: "DEPT-IT",
-    location: "Main Office - IT Management Room",
+    departmentId: "DEPT-IS",
+    location: "Main Office - IS Management Room",
     assignedTo: "Budi Santoso",
     purchaseDate: "2025-02-10",
     purchaseCost: 28500000,
@@ -144,7 +153,7 @@ export const initialDevices = [
       ipAddress: "192.168.1.45",
       macAddress: "E4:A8:DF:12:34:56"
     },
-    notes: "Mobile Laptop IT Management & Remote Site Access."
+    notes: "Mobile Laptop IS Management & Remote Site Access."
   },
   {
     id: "DEV-004",
@@ -180,17 +189,17 @@ export const initialDevices = [
     brand: "HP",
     model: "EliteDesk 800 G9",
     serialNumber: "HP-ED-3391-ITS",
-    departmentId: "DEPT-QC",
-    location: "Plant 2 - QA Spectrometry Lab",
+    departmentId: "DEPT-QATECH",
+    location: "QATECH Lab - Spectrometry Unit",
     assignedTo: "Dr. Retno Astuti",
     purchaseDate: "2023-08-12",
     purchaseCost: 16800000,
     warrantyExpiry: "2026-08-12",
     status: "In Use",
-    condition: "Fair",
+    condition: "Good",
     specs: {
       cpu: "Intel Core i7-12700",
-      ram: "16 GB DDR5",
+      ram: "32 GB DDR5",
       storage: "512 GB NVMe + 2TB HDD Data",
       os: "Windows 11 Pro",
       ipAddress: "192.168.30.50",
@@ -206,8 +215,8 @@ export const initialDevices = [
     brand: "Zebra",
     model: "ZT411 300dpi Thermal",
     serialNumber: "ZEB-ZT411-901-ITS",
-    departmentId: "DEPT-LOG",
-    location: "Logistics Warehouse Gate B",
+    departmentId: "DEPT-NFY",
+    location: "NFY Packing & Warehouse Gate B",
     assignedTo: "Bambang Supriadi",
     purchaseDate: "2024-04-18",
     purchaseCost: 24000000,
@@ -232,9 +241,9 @@ export const initialDevices = [
     brand: "Cisco",
     model: "C9300-48P-A",
     serialNumber: "FOC2411L0XX",
-    departmentId: "DEPT-IT",
-    location: "Plant 2 - IDF Rack Cabinet 01",
-    assignedTo: "Ahmad Rizky",
+    departmentId: "DEPT-SIS",
+    location: "PFY / SIS - IDF Rack Cabinet 01",
+    assignedTo: "Hendra Wijaya",
     purchaseDate: "2024-06-01",
     purchaseCost: 65000000,
     warrantyExpiry: "2029-06-01",
@@ -248,7 +257,7 @@ export const initialDevices = [
       ipAddress: "192.168.10.2",
       macAddress: "00:1C:B0:99:88:77"
     },
-    notes: "Core edge switch feeding Plant 2 spinning machines."
+    notes: "Core edge switch feeding PFY spinning machines."
   },
   {
     id: "DEV-008",
@@ -258,9 +267,9 @@ export const initialDevices = [
     brand: "Zebra",
     model: "TC57x Handheld Scanner",
     serialNumber: "ZEB-TC57-4412",
-    departmentId: "DEPT-LOG",
-    location: "Finished Goods Storage Area",
-    assignedTo: "Bambang Supriadi",
+    departmentId: "DEPT-PFY",
+    location: "PFY Finished Goods Storage Area",
+    assignedTo: "Dewi Lestari",
     purchaseDate: "2025-01-15",
     purchaseCost: 14500000,
     warrantyExpiry: "2027-01-15",
@@ -285,7 +294,7 @@ export const initialCheckouts = [
     assetTag: "ITS-LPT-2025-088",
     deviceName: "Dell Latitude 5440 Corporate",
     borrowerName: "Dedi Kurniawan",
-    department: "Finance & Accounting",
+    department: "Finance & Accounting (FIN)",
     purpose: "Business Audit Trip to Toray HQ Jakarta",
     checkoutDate: "2026-10-01",
     expectedReturnDate: "2026-10-15",
@@ -293,21 +302,6 @@ export const initialCheckouts = [
     status: "Active",
     conditionOnCheckout: "Good",
     notes: "Handed over with power adapter and laptop bag."
-  },
-  {
-    id: "CHK-100",
-    deviceId: "DEV-008",
-    assetTag: "ITS-HND-2025-003",
-    deviceName: "Zebra TC57x Rugged Mobile Computer",
-    borrowerName: "Bambang Supriadi",
-    department: "Logistics & Warehouse",
-    purpose: "Quarterly Physical Stock Opname Count",
-    checkoutDate: "2026-09-20",
-    expectedReturnDate: "2026-09-25",
-    actualReturnDate: "2026-09-24",
-    status: "Returned",
-    conditionOnCheckout: "Good",
-    notes: "Returned in clean condition with charging dock."
   }
 ];
 
@@ -317,31 +311,15 @@ export const initialMaintenance = [
     deviceId: "DEV-006",
     assetTag: "ITS-PRN-2024-004",
     deviceName: "Zebra ZT411 Industrial Barcode Printer",
-    reportedBy: "Bambang Supriadi",
+    reportedBy: "Bambang Supriadi (NFY)",
     issueCategory: "Hardware Malfunction",
     description: "Thermal printhead wearing out causing faint barcode scans on pallet labels.",
     reportDate: "2026-10-05",
-    technician: "Agus Rahardjo (Plant Maintenance)",
+    technician: "Hendra Wijaya (SIS)",
     status: "In Progress",
     costEstimate: 3500000,
     partsReplaced: "Zebra ZT411 Printhead 300dpi Kit",
     notes: "Replacement printhead ordered from vendor Zebra Indonesia."
-  },
-  {
-    id: "MNT-500",
-    deviceId: "DEV-005",
-    assetTag: "ITS-PC-2023-019",
-    deviceName: "HP EliteDesk 800 G9 Tower",
-    reportedBy: "Dr. Retno Astuti",
-    issueCategory: "Preventive Cleaning & RAM Upgrade",
-    description: "Scheduled preventive maintenance & dust cleaning for QC lab workstation.",
-    reportDate: "2026-09-10",
-    completionDate: "2026-09-11",
-    technician: "Ahmad Rizky (IT Dept)",
-    status: "Completed",
-    costEstimate: 850000,
-    partsReplaced: "Kingston 16GB DDR5 RAM",
-    notes: "Upgraded RAM to 32GB total for high-res spectral analysis."
   }
 ];
 
@@ -354,7 +332,7 @@ export const initialSpareParts = [
     stockQuantity: 8,
     minThreshold: 3,
     unitCost: 1400000,
-    location: "IT Server Room Spare Cabinet A2",
+    location: "IS Server Room Spare Cabinet A2",
     compatibility: "Dell PowerEdge R750 / HP ProLiant"
   },
   {
@@ -365,7 +343,7 @@ export const initialSpareParts = [
     stockQuantity: 2,
     minThreshold: 4,
     unitCost: 2200000,
-    location: "IT Spare Shelf B1",
+    location: "IS Spare Shelf B1",
     compatibility: "Desktops, Laptops & Workstations"
   },
   {
@@ -376,45 +354,61 @@ export const initialSpareParts = [
     stockQuantity: 15,
     minThreshold: 5,
     unitCost: 320000,
-    location: "Warehouse Logistics Office Desk",
+    location: "NFY Packing Office Store",
     compatibility: "Zebra ZT411 / ZT421 Industrial Printers"
+  }
+];
+
+export const initialStockTakings = [
+  {
+    id: "STK-2026-001",
+    stockTakingDate: "2026-10-08",
+    auditorName: "Ahmad Rizky (IS)",
+    departmentId: "DEPT-RSN",
+    departmentCode: "RSN",
+    deviceId: "DEV-002",
+    assetTag: "ITS-IPC-2024-012",
+    deviceName: "Advantech Industrial Panel PC 17\"",
+    expectedLocation: "RSN Plant - Control Room Desk A",
+    scannedLocation: "RSN Plant - Control Room Desk A",
+    locationStatus: "Verified",
+    physicalCondition: "Good",
+    auditResultStatus: "Verified",
+    notes: "Fisik bersih, layar sentuh responsif, IP 192.168.20.102 aktif."
   },
   {
-    id: "SPR-004",
-    partNumber: "CBL-CAT6A-305M",
-    name: "Belden Cat6A SFTP Industrial Ethernet Cable Reel (305m)",
-    category: "Networking",
-    stockQuantity: 4,
-    minThreshold: 2,
-    unitCost: 3800000,
-    location: "Maintenance Store Room C",
-    compatibility: "Plant 1 & Plant 2 Network Backbone"
+    id: "STK-2026-002",
+    stockTakingDate: "2026-10-09",
+    auditorName: "Dr. Retno Astuti (QATECH)",
+    departmentId: "DEPT-QATECH",
+    departmentCode: "QATECH",
+    deviceId: "DEV-005",
+    assetTag: "ITS-PC-2023-019",
+    deviceName: "HP EliteDesk 800 G9 Tower",
+    expectedLocation: "QATECH Lab - Spectrometry Unit",
+    scannedLocation: "QATECH Lab - Spectrometry Unit",
+    locationStatus: "Verified",
+    physicalCondition: "Good",
+    auditResultStatus: "Verified",
+    notes: "Terhubung ke instrumen FTIR, spesifikasi RAM 32GB terverifikasi."
   }
 ];
 
 export const initialLogs = [
   {
     id: "LOG-901",
-    timestamp: "2026-10-09 00:10:00",
-    user: "Budi Santoso",
-    action: "System Initialization",
-    details: "PT. Indonesia Toray Synthetics IT Device Inventory Portal initialized with mock seed database.",
+    timestamp: "2026-10-10 02:00:00",
+    user: "Budi Santoso (IS)",
+    action: "Master Departemen Updated",
+    details: "Diperbarui Master Departemen resmi ITS: IS, RSN, QATECH, SIS, NFY, PFY, PSF, HRGA, FIN.",
     category: "System"
   },
   {
     id: "LOG-902",
-    timestamp: "2026-10-05 14:30:22",
-    user: "Bambang Supriadi",
-    action: "Report Maintenance Ticket",
-    details: "Reported hardware fault for ITS-PRN-2024-004 Zebra Barcode Printer.",
-    category: "Maintenance"
-  },
-  {
-    id: "LOG-903",
-    timestamp: "2026-10-01 09:15:10",
-    user: "Dedi Kurniawan",
-    action: "Device Checkout",
-    details: "Checked out ITS-LPT-2025-088 for Finance Audit Trip.",
-    category: "Checkout"
+    timestamp: "2026-10-09 14:00:00",
+    user: "Ahmad Rizky (IS)",
+    action: "Input Stock Taking",
+    details: "Pelaksanaan Stock Opname fisik perangkat ITS-IPC-2024-012 di RSN Plant.",
+    category: "Stock Taking"
   }
 ];

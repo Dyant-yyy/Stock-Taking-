@@ -12,7 +12,7 @@ import {
   RotateCcw,
   CheckCircle,
   AlertTriangle,
-  FileSpreadsheet
+  ClipboardCheck
 } from 'lucide-react';
 
 export const Header = () => {
@@ -26,38 +26,39 @@ export const Header = () => {
     setIsQRScannerOpen,
     setIsDeviceFormOpen,
     setEditingDevice,
-    setIsReportMaintenanceOpen,
+    setIsStockTakingModalOpen,
     resetToSeedData,
-    devices,
-    maintenance,
-    spareParts,
+    maintenance = [],
+    spareParts = [],
     setActiveTab
   } = useInventory();
 
   const [showNotifications, setShowNotifications] = useState(false);
 
-  // Compute notifications
-  const lowStockParts = spareParts.filter(p => p.stockQuantity <= p.minThreshold);
-  const pendingMaintenance = maintenance.filter(m => m.status === 'In Progress');
+  const safeSpareParts = Array.isArray(spareParts) ? spareParts : [];
+  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+
+  const lowStockParts = safeSpareParts.filter(p => (p?.stockQuantity || 0) <= (p?.minThreshold || 0));
+  const pendingMaintenance = safeMaintenance.filter(m => m?.status === 'In Progress');
   const totalNotifications = lowStockParts.length + pendingMaintenance.length;
 
   const handleCreateNewDevice = () => {
-    setEditingDevice(null);
-    setIsDeviceFormOpen(true);
-    setViewMode('portal');
-    setActiveTab('devices');
+    if (setEditingDevice) setEditingDevice(null);
+    if (setIsDeviceFormOpen) setIsDeviceFormOpen(true);
+    if (setViewMode) setViewMode('portal');
+    if (setActiveTab) setActiveTab('devices');
   };
 
-  const handleReportFault = () => {
-    setIsReportMaintenanceOpen(true);
-    setViewMode('portal');
-    setActiveTab('maintenance');
+  const handleInputStockTaking = () => {
+    if (setIsStockTakingModalOpen) setIsStockTakingModalOpen(true);
+    if (setViewMode) setViewMode('portal');
+    if (setActiveTab) setActiveTab('stocktaking');
   };
 
   return (
     <header className="header-bar">
       <div className="header-left">
-        <div className="brand-logo" onClick={() => setViewMode('profile')}>
+        <div className="brand-logo" onClick={() => setViewMode && setViewMode('profile')}>
           <div className="brand-icon">
             <Cpu className="icon-toray" />
           </div>
@@ -71,14 +72,14 @@ export const Header = () => {
         <div className="view-switcher-pill">
           <button
             className={`view-btn ${viewMode === 'profile' ? 'active' : ''}`}
-            onClick={() => setViewMode('profile')}
+            onClick={() => setViewMode && setViewMode('profile')}
           >
             <Building2 size={16} />
             <span>Company Profile</span>
           </button>
           <button
             className={`view-btn ${viewMode === 'portal' ? 'active' : ''}`}
-            onClick={() => setViewMode('portal')}
+            onClick={() => setViewMode && setViewMode('portal')}
           >
             <Cpu size={16} />
             <span>IT Inventory Portal</span>
@@ -93,12 +94,12 @@ export const Header = () => {
             <input
               type="text"
               placeholder="Cari Asset Tag (ITS-PC-...), Model, S/N, Pegawai, atau Spesifikasi..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchQuery || ''}
+              onChange={(e) => setSearchQuery && setSearchQuery(e.target.value)}
               className="global-search-input"
             />
             {searchQuery && (
-              <button className="clear-search" onClick={() => setSearchQuery('')}>×</button>
+              <button className="clear-search" onClick={() => setSearchQuery && setSearchQuery('')}>×</button>
             )}
           </div>
         )}
@@ -108,11 +109,20 @@ export const Header = () => {
         {/* Quick Actions */}
         <button
           className="header-action-btn secondary"
-          onClick={() => setIsQRScannerOpen(true)}
+          onClick={() => setIsQRScannerOpen && setIsQRScannerOpen(true)}
           title="Scan QR Code Asset"
         >
           <QrCode size={18} />
           <span className="btn-text">Scan QR</span>
+        </button>
+
+        <button
+          className="header-action-btn secondary"
+          onClick={handleInputStockTaking}
+          title="Input Stock Taking (Opname)"
+        >
+          <ClipboardCheck size={18} />
+          <span className="btn-text">+ Stock Taking</span>
         </button>
 
         <button
@@ -152,7 +162,7 @@ export const Header = () => {
                 ) : (
                   <>
                     {lowStockParts.map(part => (
-                      <div key={part.id} className="notif-item warning" onClick={() => { setViewMode('portal'); setActiveTab('spareparts'); setShowNotifications(false); }}>
+                      <div key={part.id} className="notif-item warning" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('spareparts'); setShowNotifications(false); }}>
                         <AlertTriangle size={18} className="icon-warning" />
                         <div>
                           <strong>Stok Sparepart Menipis!</strong>
@@ -161,7 +171,7 @@ export const Header = () => {
                       </div>
                     ))}
                     {pendingMaintenance.map(item => (
-                      <div key={item.id} className="notif-item danger" onClick={() => { setViewMode('portal'); setActiveTab('maintenance'); setShowNotifications(false); }}>
+                      <div key={item.id} className="notif-item danger" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('maintenance'); setShowNotifications(false); }}>
                         <AlertTriangle size={18} className="icon-danger" />
                         <div>
                           <strong>Perbaikan Berjalan!</strong>
@@ -190,7 +200,7 @@ export const Header = () => {
           className="header-icon-btn danger-hover"
           onClick={() => {
             if (window.confirm('Apakah Anda yakin ingin mereset seluruh data inventaris ke data bawaan pabrik ITS Tangerang?')) {
-              resetToSeedData();
+              if (resetToSeedData) resetToSeedData();
             }
           }}
           title="Reset ke Data Bawaan Pabrik"

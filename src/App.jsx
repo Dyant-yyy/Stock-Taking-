@@ -8,12 +8,15 @@ import { DeviceList } from './components/DeviceList';
 import { CheckoutManagement } from './components/CheckoutManagement';
 import { MaintenanceManagement } from './components/MaintenanceManagement';
 import { SparePartsManagement } from './components/SparePartsManagement';
+import { StockTakingManagement } from './components/StockTakingManagement';
 import { DepartmentUserManagement } from './components/DepartmentUserManagement';
 import { AuditLogView } from './components/AuditLogView';
 import { DeviceFormModal } from './components/DeviceFormModal';
 import { DeviceDetailModal } from './components/DeviceDetailModal';
 import { QRScannerModal } from './components/QRScannerModal';
 import { AssetTagPrintModal } from './components/AssetTagPrintModal';
+import { StockTakingFormModal } from './components/StockTakingFormModal';
+import { DepartmentFormModal } from './components/DepartmentFormModal';
 
 const MainAppContent = () => {
   const { viewMode, activeTab } = useInventory();
@@ -24,6 +27,8 @@ const MainAppContent = () => {
         return <Dashboard />;
       case 'devices':
         return <DeviceList />;
+      case 'stocktaking':
+        return <StockTakingManagement />;
       case 'checkout':
         return <CheckoutManagement />;
       case 'maintenance':
@@ -65,6 +70,8 @@ const MainAppContent = () => {
       <DeviceDetailModal />
       <QRScannerModal />
       <AssetTagPrintModal />
+      <StockTakingFormModal />
+      <DepartmentFormModal />
     </div>
   );
 };

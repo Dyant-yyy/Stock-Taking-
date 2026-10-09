@@ -23,19 +23,24 @@ import {
 
 export const CompanyProfileView = () => {
   const {
-    companyProfileData,
+    companyProfileData = {},
     setViewMode,
     setActiveTab,
-    devices,
-    maintenance,
-    spareParts,
-    setIsQRScannerOpen,
-    setIsReportMaintenanceOpen
+    devices = [],
+    maintenance = [],
+    spareParts = [],
+    setIsQRScannerOpen
   } = useInventory();
 
+  const safeDevices = Array.isArray(devices) ? devices : [];
+  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+  const safeSpareParts = Array.isArray(spareParts) ? spareParts : [];
+  const safeStats = Array.isArray(companyProfileData?.stats) ? companyProfileData.stats : [];
+  const safePlants = Array.isArray(companyProfileData?.plants) ? companyProfileData.plants : [];
+
   const handleLaunchPortal = (tab = 'dashboard') => {
-    setActiveTab(tab);
-    setViewMode('portal');
+    if (setActiveTab) setActiveTab(tab);
+    if (setViewMode) setViewMode('portal');
   };
 
   return (
@@ -54,7 +59,7 @@ export const CompanyProfileView = () => {
           </h1>
 
           <p className="hero-description">
-            {companyProfileData.description}
+            {companyProfileData?.description || 'PT. Indonesia Toray Synthetics (ITS) adalah produsen serat sintetis terkemuka di Indonesia yang memproduksi Polyester Staple Fiber, Polyester Filament Yarn, dan Nylon Filament Yarn berkualitas dunia.'}
           </p>
 
           <div className="hero-actions">
@@ -70,11 +75,11 @@ export const CompanyProfileView = () => {
               onClick={() => handleLaunchPortal('devices')}
             >
               <HardDrive size={18} />
-              <span>Lihat Inventaris Device ({devices.length})</span>
+              <span>Lihat Inventaris Device ({safeDevices.length})</span>
             </button>
             <button
               className="btn-hero-outline"
-              onClick={() => setIsQRScannerOpen(true)}
+              onClick={() => { if (setIsQRScannerOpen) setIsQRScannerOpen(true); }}
             >
               <QrCode size={18} />
               <span>Scan QR Stock Opname</span>
@@ -85,7 +90,7 @@ export const CompanyProfileView = () => {
 
       {/* STATS MATRIX SECTION */}
       <section className="profile-stats-grid">
-        {companyProfileData.stats.map((stat, idx) => (
+        {safeStats.map((stat, idx) => (
           <div key={idx} className="stat-card">
             <div className="stat-icon-box">
               {idx === 0 && <Factory size={28} />}
@@ -115,7 +120,7 @@ export const CompanyProfileView = () => {
         </div>
 
         <div className="plants-grid">
-          {companyProfileData.plants.map((plant) => (
+          {safePlants.map((plant) => (
             <div key={plant.id} className="plant-card">
               <div className="plant-header">
                 <div className="plant-icon-wrapper">
@@ -168,7 +173,7 @@ export const CompanyProfileView = () => {
           </div>
 
           <div className="launchpad-card" onClick={() => handleLaunchPortal('devices')}>
-            <div className="card-badge">{devices.length} Perangkat</div>
+            <div className="card-badge">{safeDevices.length} Perangkat</div>
             <div className="launchpad-icon text-blue"><Cpu size={32} /></div>
             <h3>Katalog Perangkat (CRUD & QR)</h3>
             <p>Manajemen lengkap PC, Laptop, Server, IPC Industri, Network Switch, dan Printer Barcode dengan pencarian presisi.</p>
@@ -184,7 +189,7 @@ export const CompanyProfileView = () => {
           </div>
 
           <div className="launchpad-card" onClick={() => handleLaunchPortal('maintenance')}>
-            <div className="card-badge">{maintenance.filter(m => m.status === 'In Progress').length} Active Repair</div>
+            <div className="card-badge">{safeMaintenance.filter(m => m?.status === 'In Progress').length} Active Repair</div>
             <div className="launchpad-icon text-amber"><Wrench size={32} /></div>
             <h3>Perbaikan & Maintenance Ticket</h3>
             <p>Sistem ticketing perbaikan perangkat rusak, pencatatan biaya, teknisi/vendor, serta jadwal perawatan preventif.</p>
@@ -192,7 +197,7 @@ export const CompanyProfileView = () => {
           </div>
 
           <div className="launchpad-card" onClick={() => handleLaunchPortal('spareparts')}>
-            <div className="card-badge">{spareParts.length} Kategori</div>
+            <div className="card-badge">{safeSpareParts.length} Kategori</div>
             <div className="launchpad-icon text-purple"><Package size={32} /></div>
             <h3>Stok Spare Parts & Consumable</h3>
             <p>Pengawasan stok RAM, SSD, Ribbon Printer, Kabulator, dan kabel jaringan dengan alert ambang batas minimum.</p>
