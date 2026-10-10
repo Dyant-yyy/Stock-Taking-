@@ -1,303 +1,436 @@
 import React from 'react';
 import { useInventory } from '../context/InventoryContext';
 import {
-  HardDrive,
+  Monitor,
+  Search,
+  Filter,
+  Plus,
+  FileSpreadsheet,
+  RotateCcw,
+  Edit2,
+  Trash2,
   CheckCircle2,
   Clock,
   AlertTriangle,
   XCircle,
-  Plus,
-  QrCode,
-  FileSpreadsheet,
-  Building2,
-  TrendingUp,
   Cpu,
+  Building2,
+  User,
+  ArrowUpDown,
+  Laptop,
   Server,
-  Activity,
-  ShieldCheck,
   Zap,
-  Globe,
-  Sparkles,
-  ClipboardCheck
+  Activity
 } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
     devices = [],
-    stockTakings = [],
-    logs = [],
     departments = [],
-    setActiveTab,
-    setIsDeviceFormOpen,
-    setEditingDevice,
-    setIsQRScannerOpen,
-    setIsStockTakingModalOpen,
-    setSelectedCategoryFilter,
-    setSelectedDeptFilter,
-    setSelectedStatusFilter,
-    setViewMode
+    statusOptions = [],
+    typeOptions = [],
+    searchQuery,
+    setSearchQuery,
+    filterDept,
+    setFilterDept,
+    filterStatus,
+    setFilterStatus,
+    filterType,
+    setFilterType,
+    openAddModal,
+    openEditModal,
+    updateDeviceStatus,
+    deleteDevice,
+    resetToSeedData
   } = useInventory();
 
-  // Safe Arrays
-  const safeDevices = Array.isArray(devices) ? devices : [];
-  const safeStockTakings = Array.isArray(stockTakings) ? stockTakings : [];
-  const safeLogs = Array.isArray(logs) ? logs : [];
-  const safeDepts = Array.isArray(departments) ? departments : [];
+  // Status Metrics Counting
+  const totalCount = devices.length;
+  const onlineCount = devices.filter(d => d.status === 'Online').length;
+  const inCount = devices.filter(d => d.status === 'In').length;
+  const outCount = devices.filter(d => d.status === 'Out').length;
+  const notUsedCount = devices.filter(d => d.status === 'Not Used').length;
+  const brokenCount = devices.filter(d => d.status === 'Broken').length;
+  const disposalCount = devices.filter(d => d.status === 'Disposal').length;
 
-  // Metrics
-  const totalDevices = safeDevices.length;
-  const verifiedDevices = safeDevices.filter(d => d && (d.status === 'Verified' || d.status === 'In Use')).length;
-  const discrepancyDevices = safeDevices.filter(d => d && d.status === 'Discrepancy').length;
-  const missingDevices = safeDevices.filter(d => d && d.status === 'Missing').length;
-  const pendingDevices = safeDevices.filter(d => d && (d.status === 'Pending Audit' || !d.status)).length;
+  // Filter Logic
+  const filteredDevices = devices.filter((dev) => {
+    const query = (searchQuery || '').toLowerCase();
+    const matchesSearch =
+      query === '' ||
+      (dev.computerName || '').toLowerCase().includes(query) ||
+      (dev.user || '').toLowerCase().includes(query) ||
+      (dev.department || '').toLowerCase().includes(query) ||
+      (dev.type || '').toLowerCase().includes(query) ||
+      (dev.remark || '').toLowerCase().includes(query);
 
-  const completionPct = totalDevices ? Math.round((verifiedDevices / totalDevices) * 100) : 0;
+    const matchesDept = filterDept === 'All' || dev.department === filterDept;
+    const matchesStatus = filterStatus === 'All' || dev.status === filterStatus;
+    const matchesType = filterType === 'All' || dev.type === filterType;
 
-  const totalValuation = safeDevices.reduce((sum, d) => sum + (d?.purchaseCost || 0), 0);
+    return matchesSearch && matchesDept && matchesStatus && matchesType;
+  });
 
-  const formatIDR = (amount) => {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
-  };
-
-  const handleDepartmentFilter = (code) => {
-    if (setSelectedDeptFilter) setSelectedDeptFilter(code);
-    if (setActiveTab) setActiveTab('stocktaking');
-    if (setViewMode) setViewMode('portal');
-  };
-
-  // Export to CSV Function
-  const exportStockTakingCSV = () => {
-    const headers = ["ID Asset", "Asset Tag", "Nama Perangkat", "Kode Departemen", "Kategori", "Lokasi", "Pengguna", "Status Audit", "Kondisi Fisik", "Tgl Audit Terakhir"];
-    const rows = safeDevices.map(d => [
-      d.id || '',
-      d.assetTag || '',
-      `"${(d.name || '').replace(/"/g, '""')}"`,
-      d.departmentCode || d.departmentId || '',
-      d.category || '',
-      `"${d.location || ''}"`,
-      `"${d.assignedTo || ''}"`,
+  // Export to CSV
+  const handleExportCSV = () => {
+    const headers = ["No", "Departemen / Section", "Computer Name", "Type", "User", "Status", "Remark / Keterangan"];
+    const rows = filteredDevices.map((d, index) => [
+      index + 1,
+      d.department || '',
+      d.computerName || '',
+      d.type || '',
+      `"${(d.user || '').replace(/"/g, '""')}"`,
       d.status || '',
-      d.condition || '',
-      d.lastStockTakingDate || 'Belum Opname'
+      `"${(d.remark || '').replace(/"/g, '""')}"`
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ITS_Stock_Taking_Dashboard_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `ITS_Device_Inventory_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const getStatusBadgeClass = (status) => {
+    switch (status) {
+      case 'Online': return 'badge-online';
+      case 'In': return 'badge-in';
+      case 'Out': return 'badge-out';
+      case 'Not Used': return 'badge-not-used';
+      case 'Broken': return 'badge-broken';
+      case 'Disposal': return 'badge-disposal';
+      default: return 'badge-default';
+    }
+  };
+
+  const getTypeIcon = (type) => {
+    switch (type) {
+      case 'Laptop': return <Laptop size={14} className="text-cyan" />;
+      case 'Server': return <Server size={14} className="text-purple" />;
+      case 'Industrial PC': return <Zap size={14} className="text-amber" />;
+      default: return <Monitor size={14} className="text-blue" />;
+    }
+  };
+
   return (
-    <div className="dashboard-view">
-      {/* FEATURED DASHBOARD HERO BANNER WITH PT. TORAY INDUSTRIAL BACKGROUND */}
-      <div className="dashboard-hero-banner">
-        <div className="hero-banner-bg"></div>
-        <div className="hero-banner-content">
-          <div className="hero-top-bar">
-            <div className="hero-live-pill">
-              <span className="live-pulse"></span>
-              <Activity size={14} />
-              <span>PT. INDONESIA TORAY SYNTHETICS • STOCK TAKING COMMAND CENTER</span>
-            </div>
-            <div className="hero-date-badge">
-              <Globe size={14} />
-              <span>Tangerang Plant, Banten</span>
-            </div>
-          </div>
+    <div className="dashboard-container">
+      {/* TOP HEADER TITLE */}
+      <div className="dashboard-title-bar">
+        <div>
+          <h2>Tabel Inventaris Komputer & Device IT</h2>
+          <p className="sub-title-text">
+            PT. Indonesia Toray Synthetics (ITS) Tangerang Plant • Monitoring Status Perangkat per Departemen
+          </p>
+        </div>
 
-          <div className="hero-main-title-row">
-            <div>
-              <h1 className="hero-heading">
-                Stock Taking IT Device Dashboard
-              </h1>
-              <p className="hero-subheading">
-                Sistem Verifikasi Fisik & Opname Inventaris Perangkat IT per Master Departemen (IS, RSN, QATECH, SIS, NFY, PFY)
-              </p>
-            </div>
-
-            <div className="hero-quick-actions">
-              <button className="btn-hero-action primary" onClick={() => { if (setIsStockTakingModalOpen) setIsStockTakingModalOpen(true); }}>
-                <ClipboardCheck size={16} />
-                <span>+ Input Stock Opname</span>
-              </button>
-              <button className="btn-hero-action secondary" onClick={() => { if (setIsQRScannerOpen) setIsQRScannerOpen(true); }}>
-                <QrCode size={16} />
-                <span>Scan QR</span>
-              </button>
-              <button className="btn-hero-action outline" onClick={exportStockTakingCSV}>
-                <FileSpreadsheet size={16} />
-                <span>Export CSV</span>
-              </button>
-            </div>
-          </div>
-
-          {/* PROGRESS BAR PROSES STOCK OPNAME */}
-          <div className="stocktaking-progress-wrapper margin-top-sm">
-            <div className="flex justify-between items-center text-sm font-semibold mb-2">
-              <span>Progress Audit Physical Stock Opname ITS: <strong>{completionPct}% Selesai</strong></span>
-              <span>{verifiedDevices} dari {totalDevices} Perangkat Terverifikasi</span>
-            </div>
-            <div className="progress-bar" style={{ height: '10px' }}>
-              <div className="progress-fill" style={{ width: `${completionPct}%`, background: 'linear-gradient(90deg, #10b981, #00a3e0)' }}></div>
-            </div>
-          </div>
-
-          {/* PLANT TICKER BAR */}
-          <div className="plant-ticker-row margin-top">
-            <div className="ticker-item">
-              <Zap size={14} className="text-cyan" />
-              <span>[IS] Info System: <strong>118 Devices</strong></span>
-            </div>
-            <div className="ticker-item">
-              <Cpu size={14} className="text-emerald" />
-              <span>[RSN] Resin Plant: <strong>124 Devices</strong></span>
-            </div>
-            <div className="ticker-item">
-              <Sparkles size={14} className="text-amber" />
-              <span>[QATECH] QA Tech Lab: <strong>95 Devices</strong></span>
-            </div>
-            <div className="ticker-item">
-              <Server size={14} className="text-purple" />
-              <span>[SIS] System Integration: <strong>62 Devices</strong></span>
-            </div>
-          </div>
+        <div className="title-actions">
+          <button className="btn-secondary" onClick={handleExportCSV}>
+            <FileSpreadsheet size={16} />
+            <span>Export CSV</span>
+          </button>
+          <button className="btn-primary" onClick={openAddModal}>
+            <Plus size={16} />
+            <span>+ Tambah Komputer</span>
+          </button>
         </div>
       </div>
 
-      {/* METRICS KPI GRID */}
-      <div className="kpi-grid margin-top-lg">
-        <div className="kpi-card glowing-card-blue" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('All'); if (setActiveTab) setActiveTab('devices'); if (setViewMode) setViewMode('portal'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Total Asset Perangkat</span>
-            <div className="kpi-icon-box bg-blue-soft"><HardDrive className="text-blue" size={22} /></div>
-          </div>
-          <div className="kpi-value">{totalDevices}</div>
-          <div className="kpi-subtext">
-            <TrendingUp size={14} className="text-emerald" />
-            <span>Terdaftar di Sistem ITS</span>
-          </div>
-          <div className="kpi-mini-bar"><div className="bar-fill blue" style={{ width: '100%' }}></div></div>
+      {/* KPI METRICS BAR: ONLINE, IN, OUT, NOT USED, BROKEN, DISPOSAL */}
+      <div className="kpi-status-bar">
+        <div
+          className={`kpi-status-item total ${filterStatus === 'All' ? 'active' : ''}`}
+          onClick={() => setFilterStatus('All')}
+          title="Klik untuk tampilkan semua status"
+        >
+          <span className="kpi-label">Total Unit</span>
+          <span className="kpi-num">{totalCount}</span>
         </div>
 
-        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Verified'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Terverifikasi (Verified)</span>
-            <div className="kpi-icon-box bg-emerald-soft"><CheckCircle2 className="text-emerald" size={22} /></div>
+        <div
+          className={`kpi-status-item online ${filterStatus === 'Online' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'Online' ? 'All' : 'Online')}
+          title="Klik untuk filter Online"
+        >
+          <div className="kpi-label-row">
+            <span className="live-pulse"></span>
+            <span className="kpi-label">1. Online</span>
           </div>
-          <div className="kpi-value">{verifiedDevices}</div>
-          <div className="kpi-subtext">
-            <span>{completionPct}% dari total asset</span>
-          </div>
-          <div className="kpi-mini-bar"><div className="bar-fill emerald" style={{ width: `${completionPct}%` }}></div></div>
+          <span className="kpi-num text-emerald">{onlineCount}</span>
         </div>
 
-        <div className="kpi-card glowing-card-amber" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Discrepancy'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Ada Selisih (Discrepancy)</span>
-            <div className="kpi-icon-box bg-amber-soft"><AlertTriangle className="text-amber" size={22} /></div>
-          </div>
-          <div className="kpi-value">{discrepancyDevices}</div>
-          <div className="kpi-subtext">Spesifikasi / lokasi berbeda</div>
-          <div className="kpi-mini-bar"><div className="bar-fill amber" style={{ width: '30%' }}></div></div>
+        <div
+          className={`kpi-status-item in ${filterStatus === 'In' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'In' ? 'All' : 'In')}
+          title="Klik untuk filter In"
+        >
+          <span className="kpi-label">2. In</span>
+          <span className="kpi-num text-cyan">{inCount}</span>
         </div>
 
-        <div className="kpi-card glowing-card-purple" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Missing'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Tidak Ditemukan (Missing)</span>
-            <div className="kpi-icon-box bg-purple-soft"><XCircle className="text-rose" size={22} /></div>
-          </div>
-          <div className="kpi-value">{missingDevices}</div>
-          <div className="kpi-subtext">Perlu penelusuran fisik</div>
-          <div className="kpi-mini-bar"><div className="bar-fill purple" style={{ width: '15%' }}></div></div>
+        <div
+          className={`kpi-status-item out ${filterStatus === 'Out' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'Out' ? 'All' : 'Out')}
+          title="Klik untuk filter Out"
+        >
+          <span className="kpi-label">3. Out</span>
+          <span className="kpi-num text-amber">{outCount}</span>
         </div>
 
-        <div className="kpi-card glowing-card-cyan" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Pending Audit'); if (setActiveTab) setActiveTab('devices'); if (setViewMode) setViewMode('portal'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Belum Opname (Pending)</span>
-            <div className="kpi-icon-box bg-cyan-soft"><Clock className="text-cyan" size={22} /></div>
-          </div>
-          <div className="kpi-value">{pendingDevices}</div>
-          <div className="kpi-subtext">Jadwal Opname kuartal ini</div>
-          <div className="kpi-mini-bar"><div className="bar-fill cyan" style={{ width: '45%' }}></div></div>
+        <div
+          className={`kpi-status-item not-used ${filterStatus === 'Not Used' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'Not Used' ? 'All' : 'Not Used')}
+          title="Klik untuk filter Not Used"
+        >
+          <span className="kpi-label">4. Not Used</span>
+          <span className="kpi-num text-muted">{notUsedCount}</span>
         </div>
 
-        <div className="kpi-card highlight-card glowing-card-gold">
-          <div className="kpi-header">
-            <span className="kpi-title">Estimasi Nilai Asset</span>
-            <div className="kpi-icon-box bg-gold-soft"><ShieldCheck className="text-gold" size={22} /></div>
-          </div>
-          <div className="kpi-value format-idr">{formatIDR(totalValuation)}</div>
-          <div className="kpi-subtext">Capital expenditure IT</div>
-          <div className="kpi-mini-bar"><div className="bar-fill gold" style={{ width: '100%' }}></div></div>
+        <div
+          className={`kpi-status-item broken ${filterStatus === 'Broken' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'Broken' ? 'All' : 'Broken')}
+          title="Klik untuk filter Broken"
+        >
+          <span className="kpi-label">5. Broken</span>
+          <span className="kpi-num text-rose">{brokenCount}</span>
+        </div>
+
+        <div
+          className={`kpi-status-item disposal ${filterStatus === 'Disposal' ? 'active' : ''}`}
+          onClick={() => setFilterStatus(filterStatus === 'Disposal' ? 'All' : 'Disposal')}
+          title="Klik untuk filter Disposal"
+        >
+          <span className="kpi-label">6. Disposal</span>
+          <span className="kpi-num text-purple">{disposalCount}</span>
         </div>
       </div>
 
-      {/* MASTER DEPARTEMEN STOCK TAKING ALLOCATION */}
-      <div className="dashboard-two-col margin-top">
-        {/* Master Departemen Opname Distribution */}
-        <div className="dashboard-panel">
-          <div className="panel-header">
-            <div className="panel-title-with-icon">
-              <Building2 size={18} className="text-blue" />
-              <h3>Master Departemen & Status Opname</h3>
-            </div>
-            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('departments'); }}>Detail Master →</button>
-          </div>
-          <div className="departments-widget-list">
-            {safeDepts.map((dept) => {
-              const deptDevices = safeDevices.filter(d => d && (d.departmentId === dept.id || d.departmentCode === dept.code));
-              const verifiedDeptDevices = deptDevices.filter(d => d.status === 'Verified' || d.status === 'In Use').length;
-              const deptPct = deptDevices.length ? Math.round((verifiedDeptDevices / deptDevices.length) * 100) : 0;
-              return (
-                <div key={dept.id} className="dept-widget-item" onClick={() => handleDepartmentFilter(dept.code)}>
-                  <div className="dept-info">
-                    <div className="dept-code-pill font-mono font-bold" style={{ width: '60px', textAlign: 'center' }}>
-                      {dept.code}
-                    </div>
-                    <div>
-                      <div className="dept-name">{dept.name}</div>
-                      <div className="dept-head">Head: {dept.head}</div>
-                    </div>
-                  </div>
-                  <div className="dept-count-right">
-                    <div className="dept-count-badge">
-                      <strong>{verifiedDeptDevices}/{deptDevices.length}</strong> Verified
-                    </div>
-                    <div className="mini-pct">{deptPct}% Selesai</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+      {/* FILTER & SEARCH CONTROLS */}
+      <div className="table-controls-bar">
+        <div className="search-box-wrapper">
+          <Search size={16} className="search-icon" />
+          <input
+            type="text"
+            placeholder="Cari Computer Name, User, Departemen, atau Remark..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="search-input-field"
+          />
+          {searchQuery && (
+            <button className="clear-search-btn" onClick={() => setSearchQuery('')}>×</button>
+          )}
         </div>
 
-        {/* Recent Stock Taking Audit Feed */}
-        <div className="dashboard-panel">
-          <div className="panel-header">
-            <div className="panel-title-with-icon">
-              <Activity size={18} className="text-cyan" />
-              <h3>Aktivitas Audit Stock Opname Terbaru</h3>
-            </div>
-            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>Semua Record →</button>
+        <div className="filter-selects-group">
+          <div className="select-wrapper">
+            <Building2 size={14} className="select-icon" />
+            <select
+              value={filterDept}
+              onChange={(e) => setFilterDept(e.target.value)}
+              className="control-select"
+            >
+              <option value="All">Semua Departemen ({departments.length})</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.code}>
+                  [{d.code}] {d.name}
+                </option>
+              ))}
+            </select>
           </div>
-          <div className="audit-feed-list">
-            {safeStockTakings.slice(0, 5).map((stk) => (
-              <div key={stk.id} className="audit-feed-item">
-                <div className="audit-dot" style={{ background: stk.auditResultStatus === 'Verified' ? '#10b981' : '#f59e0b' }}></div>
-                <div className="audit-content">
-                  <div className="audit-meta">
-                    <strong>[{stk.departmentCode}] {stk.assetTag} - {stk.deviceName}</strong>
-                    <span className="audit-time">{stk.stockTakingDate}</span>
-                  </div>
-                  <p className="audit-details">Hasil: <strong className="text-cyan">{stk.auditResultStatus}</strong> ({stk.physicalCondition}) • {stk.notes}</p>
-                  <div className="audit-user">Auditor: {stk.auditorName}</div>
-                </div>
-              </div>
-            ))}
+
+          <div className="select-wrapper">
+            <Activity size={14} className="select-icon" />
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="control-select"
+            >
+              <option value="All">Semua Status (6)</option>
+              {statusOptions.map((st) => (
+                <option key={st.value} value={st.value}>{st.label}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="select-wrapper">
+            <Monitor size={14} className="select-icon" />
+            <select
+              value={filterType}
+              onChange={(e) => setFilterType(e.target.value)}
+              className="control-select"
+            >
+              <option value="All">Semua Type</option>
+              {typeOptions.map((type) => (
+                <option key={type} value={type}>{type}</option>
+              ))}
+            </select>
+          </div>
+
+          {(filterDept !== 'All' || filterStatus !== 'All' || filterType !== 'All' || searchQuery !== '') && (
+            <button
+              className="btn-reset-filters"
+              onClick={() => {
+                setFilterDept('All');
+                setFilterStatus('All');
+                setFilterType('All');
+                setSearchQuery('');
+              }}
+              title="Reset semua filter ke default"
+            >
+              Reset
+            </button>
+          )}
+
+          <button
+            className="btn-icon-secondary"
+            onClick={() => {
+              if (window.confirm('Reset data tabel kembali ke data awal bawaan ITS?')) {
+                resetToSeedData();
+              }
+            }}
+            title="Reset ke data awal"
+          >
+            <RotateCcw size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* MAIN CLIENT INVENTORY TABLE */}
+      <div className="table-wrapper-card">
+        <div className="table-responsive">
+          <table className="client-inventory-table">
+            <thead>
+              <tr>
+                <th className="col-no">No</th>
+                <th className="col-dept">Departemen / Section</th>
+                <th className="col-comp">Computer Name</th>
+                <th className="col-type">Type</th>
+                <th className="col-user">User</th>
+                <th className="col-status">Status</th>
+                <th className="col-remark">Remark / Keterangan</th>
+                <th className="col-action text-right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredDevices.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="empty-table-cell">
+                    <Monitor size={36} className="text-muted mb-2" />
+                    <p className="font-semibold">Tidak ada komputer yang sesuai dengan filter.</p>
+                    <button
+                      className="btn-secondary-sm margin-top-sm"
+                      onClick={() => {
+                        setFilterDept('All');
+                        setFilterStatus('All');
+                        setFilterType('All');
+                        setSearchQuery('');
+                      }}
+                    >
+                      Reset Semua Filter
+                    </button>
+                  </td>
+                </tr>
+              ) : (
+                filteredDevices.map((device, index) => {
+                  return (
+                    <tr key={device.id} className="table-data-row">
+                      {/* 1. No */}
+                      <td className="col-no text-muted font-mono">{index + 1}</td>
+
+                      {/* 2. Departemen / Section */}
+                      <td className="col-dept">
+                        <span className={`dept-pill-badge dept-${device.department.toLowerCase()}`}>
+                          {device.department}
+                        </span>
+                      </td>
+
+                      {/* 3. Computer Name */}
+                      <td className="col-comp">
+                        <div className="comp-name-wrapper">
+                          <span className="comp-name-text">{device.computerName}</span>
+                        </div>
+                      </td>
+
+                      {/* 4. Type */}
+                      <td className="col-type">
+                        <div className="type-badge-row">
+                          {getTypeIcon(device.type)}
+                          <span>{device.type}</span>
+                        </div>
+                      </td>
+
+                      {/* 5. User */}
+                      <td className="col-user">
+                        <div className="user-text-row">
+                          <User size={13} className="text-muted" />
+                          <strong>{device.user}</strong>
+                        </div>
+                      </td>
+
+                      {/* 6. Status (Online, In, Out, Not Used, Broken, Disposal) */}
+                      <td className="col-status">
+                        <div className="status-select-container">
+                          <select
+                            value={device.status}
+                            onChange={(e) => updateDeviceStatus(device.id, e.target.value)}
+                            className={`status-inline-select ${getStatusBadgeClass(device.status)}`}
+                          >
+                            {statusOptions.map((opt) => (
+                              <option key={opt.value} value={opt.value}>
+                                {opt.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </td>
+
+                      {/* 7. Remark / Keterangan */}
+                      <td className="col-remark">
+                        <span className="remark-text" title={device.remark}>
+                          {device.remark || '-'}
+                        </span>
+                      </td>
+
+                      {/* 8. Aksi */}
+                      <td className="col-action text-right">
+                        <div className="action-btns-row">
+                          <button
+                            className="btn-row-action edit"
+                            onClick={() => openEditModal(device)}
+                            title="Edit data komputer ini"
+                          >
+                            <Edit2 size={14} />
+                          </button>
+                          <button
+                            className="btn-row-action delete"
+                            onClick={() => {
+                              if (window.confirm(`Hapus komputer [${device.computerName}] dari daftar?`)) {
+                                deleteDevice(device.id);
+                              }
+                            }}
+                            title="Hapus komputer ini"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* TABLE FOOTER SUMMARY */}
+        <div className="table-footer-bar">
+          <div className="text-muted text-sm">
+            Menampilkan <strong>{filteredDevices.length}</strong> dari total <strong>{devices.length}</strong> komputer terdaftar di sistem.
+          </div>
+          <div className="text-muted text-xs">
+            PT. Indonesia Toray Synthetics • Device Master Management
           </div>
         </div>
       </div>

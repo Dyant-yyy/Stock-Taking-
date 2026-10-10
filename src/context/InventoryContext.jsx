@@ -1,11 +1,10 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
-  companyProfileData,
   initialDepartments,
-  initialEmployees,
   initialDevices,
-  initialStockTakings,
-  initialLogs
+  initialLogs,
+  statusOptions,
+  typeOptions
 } from '../data/initialData';
 
 const InventoryContext = createContext();
@@ -17,24 +16,12 @@ const safeParseStorage = (key, fallback) => {
     const parsed = JSON.parse(saved);
     return Array.isArray(parsed) ? parsed : fallback;
   } catch (err) {
-    console.warn(`Failed to parse localStorage key ${key}, falling back to initial data`, err);
     return fallback;
   }
 };
 
 export const InventoryProvider = ({ children }) => {
-  // Navigation & View State
-  const [viewMode, setViewMode] = useState('profile'); // 'profile' | 'portal'
-  const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'stocktaking' | 'devices' | 'departments' | 'audit' | 'print'
-  const [theme, setTheme] = useState('dark');
-
-  // Search & Filter State
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
-  const [selectedDeptFilter, setSelectedDeptFilter] = useState('All');
-  const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
-
-  // Data Collections with Safe LocalStorage Fallback
+  // Current Logged-in User
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem('its_current_user');
@@ -43,127 +30,60 @@ export const InventoryProvider = ({ children }) => {
       return null;
     }
   });
-  const [devices, setDevices] = useState(() => safeParseStorage('its_devices', initialDevices));
-  const [stockTakings, setStockTakings] = useState(() => safeParseStorage('its_stock_takings', initialStockTakings));
-  const [departments, setDepartments] = useState(() => safeParseStorage('its_departments', initialDepartments));
-  const [logs, setLogs] = useState(() => safeParseStorage('its_logs', initialLogs));
-  const [employees, setEmployees] = useState(() => safeParseStorage('its_employees', initialEmployees));
 
-  // Modals & Dialog State
-  const [selectedDevice, setSelectedDevice] = useState(null);
-  const [isDeviceFormOpen, setIsDeviceFormOpen] = useState(false);
+  // Devices matching client table specification
+  const [devices, setDevices] = useState(() => {
+    try {
+      const saved = localStorage.getItem('its_devices_v3');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].computerName) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    return initialDevices;
+  });
+
+  // Departments list
+  const [departments, setDepartments] = useState(() => safeParseStorage('its_departments_v3', initialDepartments));
+  const [logs, setLogs] = useState(() => safeParseStorage('its_logs_v3', initialLogs));
+
+  // Filters & Search
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterDept, setFilterDept] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [filterType, setFilterType] = useState('All');
+
+  // Modal State for Add / Edit Device
+  const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
-  const [isDeviceDetailOpen, setIsDeviceDetailOpen] = useState(false);
-  const [isQRScannerOpen, setIsQRScannerOpen] = useState(false);
-  const [isPrintModalOpen, setIsPrintModalOpen] = useState(false);
-  const [isStockTakingModalOpen, setIsStockTakingModalOpen] = useState(false);
-  const [isDeptModalOpen, setIsDeptModalOpen] = useState(false);
-  const [editingDept, setEditingDept] = useState(null);
 
-  // LocalStorage Synchronization
+  // Sync to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('its_devices', JSON.stringify(devices));
-    } catch (e) { console.error(e); }
+      localStorage.setItem('its_devices_v3', JSON.stringify(devices));
+    } catch (e) {}
   }, [devices]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('its_stock_takings', JSON.stringify(stockTakings));
-    } catch (e) { console.error(e); }
-  }, [stockTakings]);
-
-  useEffect(() => {
-    try {
-      localStorage.setItem('its_departments', JSON.stringify(departments));
-    } catch (e) { console.error(e); }
+      localStorage.setItem('its_departments_v3', JSON.stringify(departments));
+    } catch (e) {}
   }, [departments]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('its_logs', JSON.stringify(logs));
-    } catch (e) { console.error(e); }
+      localStorage.setItem('its_logs_v3', JSON.stringify(logs));
+    } catch (e) {}
   }, [logs]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem('its_employees', JSON.stringify(employees));
-    } catch (e) { console.error(e); }
-  }, [employees]);
-
-  // Auth Operations
-  const registerUser = (userData) => {
-    setCurrentUser(userData);
-    try {
-      localStorage.setItem('its_current_user', JSON.stringify(userData));
-    } catch (e) { console.error(e); }
-
-    setEmployees(prev => {
-      const safe = Array.isArray(prev) ? prev : [];
-      if (!safe.some(emp => emp.id === userData.id || emp.email === userData.email)) {
-        return [...safe, {
-          id: userData.id,
-          name: userData.name,
-          deptId: userData.deptId,
-          position: userData.position,
-          email: userData.email
-        }];
-      }
-      return safe;
-    });
-
-    addLog('User Registration', `Pegawai [${userData.deptCode || 'IS'}] ${userData.name} terdaftar sebagai ${userData.position || userData.role}`, 'System', userData.name);
-    setViewMode('portal');
-    setActiveTab('dashboard');
-  };
-
-  const loginUser = (identifier) => {
-    const safeEmps = Array.isArray(employees) ? employees : [];
-    const matched = safeEmps.find(e => 
-      e.id.toLowerCase() === identifier.toLowerCase() || 
-      e.email.toLowerCase() === identifier.toLowerCase() ||
-      e.name.toLowerCase().includes(identifier.toLowerCase())
-    );
-
-    if (matched) {
-      const safeDepts = Array.isArray(departments) ? departments : [];
-      const deptObj = safeDepts.find(d => d.id === matched.deptId || d.code === matched.deptId);
-      const userObj = {
-        id: matched.id,
-        name: matched.name,
-        deptId: matched.deptId,
-        deptCode: deptObj ? deptObj.code : 'IS',
-        position: matched.position,
-        email: matched.email,
-        role: matched.position,
-        loginTime: new Date().toISOString()
-      };
-      setCurrentUser(userObj);
-      try {
-        localStorage.setItem('its_current_user', JSON.stringify(userObj));
-      } catch (e) { console.error(e); }
-      addLog('User Login', `Pegawai [${userObj.deptCode}] ${userObj.name} berhasil masuk ke sesi audit`, 'System', userObj.name);
-      setViewMode('portal');
-      setActiveTab('dashboard');
-      return true;
-    }
-    return false;
-  };
-
-  const logoutUser = () => {
-    addLog('User Logout', `Sesi pegawai ${currentUser?.name || ''} diakhiri`, 'System', currentUser?.name || 'User');
-    setCurrentUser(null);
-    try {
-      localStorage.removeItem('its_current_user');
-    } catch (e) { console.error(e); }
-  };
-
-  // Helper to log system activity
-  const addLog = (action, details, category = 'Stock Taking', user = 'Auditor IT') => {
+  // Activity logger
+  const addLog = (action, details, category = 'General') => {
     const newLog = {
       id: `LOG-${Date.now()}`,
       timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-      user,
+      user: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Admin',
       action,
       details,
       category
@@ -171,172 +91,143 @@ export const InventoryProvider = ({ children }) => {
     setLogs(prev => [newLog, ...(Array.isArray(prev) ? prev : [])]);
   };
 
-  // Stock Taking (Opname) Operations
-  const addStockTaking = (recordData) => {
-    const today = new Date().toISOString().split('T')[0];
-    const newRecord = {
-      id: `STK-2026-${String((Array.isArray(stockTakings) ? stockTakings.length : 0) + 1).padStart(3, '0')}`,
-      ...recordData,
-      stockTakingDate: recordData.stockTakingDate || today
+  // Auth Operations
+  const registerUser = (userData) => {
+    setCurrentUser(userData);
+    try {
+      localStorage.setItem('its_current_user', JSON.stringify(userData));
+    } catch (e) {}
+    addLog('Registrasi', `User ${userData.name} ([${userData.deptCode}]) terdaftar dan masuk ke sesi.`, 'Auth');
+  };
+
+  const loginUser = (identifier) => {
+    const userObj = {
+      id: `USR-${Date.now().toString().slice(-4)}`,
+      name: identifier.trim(),
+      deptCode: 'IS',
+      loginTime: new Date().toISOString()
     };
-
-    setStockTakings(prev => [newRecord, ...(Array.isArray(prev) ? prev : [])]);
-
-    // Update target device audit status & location
-    if (recordData.deviceId) {
-      setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => {
-        if (d.id === recordData.deviceId) {
-          return {
-            ...d,
-            status: recordData.auditResultStatus || 'Verified',
-            condition: recordData.physicalCondition || d.condition,
-            lastStockTakingDate: today,
-            location: recordData.locationStatus === 'Moved' ? recordData.scannedLocation : d.location
-          };
-        }
-        return d;
-      }));
-    }
-
-    addLog('Stock Taking', `Input Stock Opname ${recordData.assetTag} (${recordData.departmentCode}) - Result: ${recordData.auditResultStatus}`, 'Stock Taking', recordData.auditorName);
+    setCurrentUser(userObj);
+    try {
+      localStorage.setItem('its_current_user', JSON.stringify(userObj));
+    } catch (e) {}
+    addLog('Login', `User ${identifier} masuk ke sesi inventory.`, 'Auth');
+    return true;
   };
 
-  // Department Master Operations
-  const addDepartment = (deptData) => {
-    const codeUpper = (deptData.code || 'DEPT').toUpperCase();
-    const newDept = {
-      id: `DEPT-${codeUpper}`,
-      code: codeUpper,
-      name: deptData.name,
-      head: deptData.head || 'Penanggung Jawab',
-      icon: deptData.icon || 'Building2',
-      description: deptData.description || ''
-    };
-    setDepartments(prev => [...(Array.isArray(prev) ? prev : []), newDept]);
-    addLog('Add Master Department', `Added Master Departemen [${codeUpper}] ${deptData.name}`, 'Department');
-  };
-
-  const updateDepartment = (deptData) => {
-    setDepartments(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === deptData.id ? { ...d, ...deptData } : d));
-    addLog('Update Master Department', `Updated Master Departemen info [${deptData.code}]`, 'Department');
-  };
-
-  const deleteDepartment = (id) => {
-    const safeDepts = Array.isArray(departments) ? departments : [];
-    const target = safeDepts.find(d => d.id === id);
-    if (target) {
-      setDepartments(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
-      addLog('Delete Master Department', `Deleted Master Departemen [${target.code}] ${target.name}`, 'Department');
-    }
+  const logoutUser = () => {
+    addLog('Logout', `User ${currentUser?.name || ''} keluar dari sesi.`, 'Auth');
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('its_current_user');
+    } catch (e) {}
   };
 
   // Device CRUD Operations
-  const addDevice = (newDeviceData) => {
-    const safeDevices = Array.isArray(devices) ? devices : [];
-    const id = `DEV-${String(safeDevices.length + 1).padStart(3, '0')}`;
-    const assetTag = newDeviceData.assetTag || `ITS-${(newDeviceData.category || 'PC').substring(0, 3).toUpperCase()}-2026-${String(safeDevices.length + 1).padStart(3, '0')}`;
-    const device = {
-      ...newDeviceData,
-      id,
-      assetTag,
-      status: newDeviceData.status || 'Pending Audit',
-      lastStockTakingDate: null
+  const addDevice = (deviceData) => {
+    const nextId = `DEV-${String((Array.isArray(devices) ? devices.length : 0) + 1).padStart(3, '0')}`;
+    const newDevice = {
+      id: nextId,
+      department: deviceData.department || 'IS',
+      computerName: deviceData.computerName || `ITS-${deviceData.department || 'IS'}-PC${String(devices.length + 1).padStart(2, '0')}`,
+      type: deviceData.type || 'Desktop PC',
+      user: deviceData.user || 'Unassigned',
+      status: deviceData.status || 'In',
+      remark: deviceData.remark || '-'
     };
-    setDevices(prev => [device, ...(Array.isArray(prev) ? prev : [])]);
-    addLog('Add Device', `Added new asset ${assetTag} (${device.name}) for Stock Taking`, 'Device');
+
+    setDevices(prev => [newDevice, ...(Array.isArray(prev) ? prev : [])]);
+    addLog('Tambah Device', `Menambahkan komputer [${newDevice.computerName}] di departemen ${newDevice.department}`, 'Inventory');
   };
 
   const updateDevice = (updatedData) => {
     setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === updatedData.id ? { ...d, ...updatedData } : d));
-    addLog('Update Device', `Updated specification & info for asset ${updatedData.assetTag}`, 'Device');
+    addLog('Update Device', `Mengupdate data komputer [${updatedData.computerName}]`, 'Inventory');
+  };
+
+  const updateDeviceStatus = (id, newStatus) => {
+    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => {
+      if (d.id === id) {
+        addLog('Update Status', `Status komputer ${d.computerName} diubah menjadi ${newStatus}`, 'Status');
+        return { ...d, status: newStatus };
+      }
+      return d;
+    }));
   };
 
   const deleteDevice = (id) => {
-    const safeDevices = Array.isArray(devices) ? devices : [];
-    const target = safeDevices.find(d => d.id === id);
+    const target = (Array.isArray(devices) ? devices : []).find(d => d.id === id);
     if (target) {
       setDevices(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
-      addLog('Delete Device', `Decommissioned asset ${target.assetTag} (${target.name})`, 'Device');
+      addLog('Hapus Device', `Menghapus komputer [${target.computerName}] dari sistem`, 'Inventory');
     }
   };
 
-  // Reset to original mock data
   const resetToSeedData = () => {
-    try {
-      localStorage.clear();
-    } catch (e) { console.error(e); }
+    localStorage.removeItem('its_devices_v3');
+    localStorage.removeItem('its_departments_v3');
+    localStorage.removeItem('its_logs_v3');
     setDevices(initialDevices);
-    setStockTakings(initialStockTakings);
     setDepartments(initialDepartments);
     setLogs(initialLogs);
-    addLog('Reset Data', 'Reset all system data to initial PT. Indonesia Toray Synthetics Stock Taking factory seeds', 'System');
+    setFilterDept('All');
+    setFilterStatus('All');
+    setFilterType('All');
+    setSearchQuery('');
+    addLog('Reset Data', 'Mereset data inventaris ke data awal bawaan ITS', 'System');
   };
 
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+  const openAddModal = () => {
+    setEditingDevice(null);
+    setIsDeviceModalOpen(true);
+  };
+
+  const openEditModal = (device) => {
+    setEditingDevice(device);
+    setIsDeviceModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsDeviceModalOpen(false);
+    setEditingDevice(null);
   };
 
   return (
     <InventoryContext.Provider value={{
-      companyProfileData,
-      viewMode,
-      setViewMode,
-      activeTab,
-      setActiveTab,
-      theme,
-      toggleTheme,
-      searchQuery,
-      setSearchQuery,
-      selectedCategoryFilter,
-      setSelectedCategoryFilter,
-      selectedDeptFilter,
-      setSelectedDeptFilter,
-      selectedStatusFilter,
-      setSelectedStatusFilter,
-      devices: Array.isArray(devices) ? devices : initialDevices,
-      stockTakings: Array.isArray(stockTakings) ? stockTakings : initialStockTakings,
-      departments: Array.isArray(departments) ? departments : initialDepartments,
-      employees: Array.isArray(employees) ? employees : initialEmployees,
-      logs: Array.isArray(logs) ? logs : initialLogs,
-      // Modals
-      selectedDevice,
-      setSelectedDevice,
-      isDeviceFormOpen,
-      setIsDeviceFormOpen,
-      editingDevice,
-      setEditingDevice,
-      isDeviceDetailOpen,
-      setIsDeviceDetailOpen,
-      isQRScannerOpen,
-      setIsQRScannerOpen,
-      isPrintModalOpen,
-      setIsPrintModalOpen,
-      isStockTakingModalOpen,
-      setIsStockTakingModalOpen,
-      isDeptModalOpen,
-      setIsDeptModalOpen,
-      editingDept,
-      setEditingDept,
-      // Methods
       currentUser,
       registerUser,
       loginUser,
       logoutUser,
-      openStockTakingModalForDevice: (dev) => {
-        if (dev) setSelectedDevice(dev);
-        setIsStockTakingModalOpen(true);
-      },
-      addStockTaking,
-      addDepartment,
-      updateDepartment,
-      deleteDepartment,
+      // Data
+      devices: Array.isArray(devices) ? devices : initialDevices,
+      departments: Array.isArray(departments) ? departments : initialDepartments,
+      logs: Array.isArray(logs) ? logs : initialLogs,
+      statusOptions,
+      typeOptions,
+      // Filters
+      searchQuery,
+      setSearchQuery,
+      filterDept,
+      setFilterDept,
+      filterStatus,
+      setFilterStatus,
+      filterType,
+      setFilterType,
+      // Modal
+      isDeviceModalOpen,
+      editingDevice,
+      openAddModal,
+      openEditModal,
+      closeModal,
+      // Methods
       addDevice,
       updateDevice,
+      updateDeviceStatus,
       deleteDevice,
       resetToSeedData,
       addLog
     }}>
-      <div className={theme === 'dark' ? 'theme-dark' : 'theme-light'}>
+      <div className="theme-dark">
         {children}
       </div>
     </InventoryContext.Provider>
