@@ -33,6 +33,8 @@ export const Dashboard = () => {
     setIsQRScannerOpen,
     setIsStockTakingModalOpen,
     setSelectedCategoryFilter,
+    setSelectedDeptFilter,
+    setSelectedStatusFilter,
     setViewMode
   } = useInventory();
 
@@ -58,6 +60,7 @@ export const Dashboard = () => {
   };
 
   const handleDepartmentFilter = (code) => {
+    if (setSelectedDeptFilter) setSelectedDeptFilter(code);
     if (setActiveTab) setActiveTab('stocktaking');
     if (setViewMode) setViewMode('portal');
   };
@@ -167,7 +170,7 @@ export const Dashboard = () => {
 
       {/* METRICS KPI GRID */}
       <div className="kpi-grid margin-top-lg">
-        <div className="kpi-card glowing-card-blue" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
+        <div className="kpi-card glowing-card-blue" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('All'); if (setActiveTab) setActiveTab('devices'); if (setViewMode) setViewMode('portal'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Total Asset Perangkat</span>
             <div className="kpi-icon-box bg-blue-soft"><HardDrive className="text-blue" size={22} /></div>
@@ -180,7 +183,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill blue" style={{ width: '100%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
+        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Verified'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Terverifikasi (Verified)</span>
             <div className="kpi-icon-box bg-emerald-soft"><CheckCircle2 className="text-emerald" size={22} /></div>
@@ -192,7 +195,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill emerald" style={{ width: `${completionPct}%` }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-amber" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
+        <div className="kpi-card glowing-card-amber" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Discrepancy'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Ada Selisih (Discrepancy)</span>
             <div className="kpi-icon-box bg-amber-soft"><AlertTriangle className="text-amber" size={22} /></div>
@@ -202,7 +205,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill amber" style={{ width: '30%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-purple" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
+        <div className="kpi-card glowing-card-purple" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Missing'); if (setActiveTab) setActiveTab('stocktaking'); if (setViewMode) setViewMode('portal'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Tidak Ditemukan (Missing)</span>
             <div className="kpi-icon-box bg-purple-soft"><XCircle className="text-rose" size={22} /></div>
@@ -212,7 +215,7 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill purple" style={{ width: '15%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-cyan" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
+        <div className="kpi-card glowing-card-cyan" onClick={() => { if (setSelectedStatusFilter) setSelectedStatusFilter('Pending Audit'); if (setActiveTab) setActiveTab('devices'); if (setViewMode) setViewMode('portal'); }}>
           <div className="kpi-header">
             <span className="kpi-title">Belum Opname (Pending)</span>
             <div className="kpi-icon-box bg-cyan-soft"><Clock className="text-cyan" size={22} /></div>

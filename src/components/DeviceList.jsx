@@ -42,7 +42,8 @@ export const DeviceList = () => {
     setEditingDevice,
     deleteDevice,
     setIsQRScannerOpen,
-    setIsPrintModalOpen
+    setIsPrintModalOpen,
+    openStockTakingModalForDevice
   } = useInventory();
 
   const [viewStyle, setViewStyle] = useState('table'); // 'table' | 'grid'
@@ -58,7 +59,7 @@ export const DeviceList = () => {
     'Mobile & Handheld'
   ];
 
-  const statuses = ['All', 'In Use', 'Available', 'Maintenance', 'Decommissioned'];
+  const statuses = ['All', 'In Use', 'Available', 'Maintenance', 'Decommissioned', 'Verified', 'Discrepancy', 'Missing', 'Pending Audit'];
 
   // Filtering Logic
   const filteredDevices = devices.filter((device) => {
@@ -72,8 +73,13 @@ export const DeviceList = () => {
       device.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (device.specs?.ipAddress && device.specs.ipAddress.includes(searchQuery));
 
+    const deptObj = departments.find(d => d.id === device.departmentId || d.code === device.departmentCode);
     const matchesCategory = selectedCategoryFilter === 'All' || device.category === selectedCategoryFilter;
-    const matchesDept = selectedDeptFilter === 'All' || device.departmentId === selectedDeptFilter;
+    const matchesDept = selectedDeptFilter === 'All' ||
+      device.departmentId === selectedDeptFilter ||
+      device.departmentCode === selectedDeptFilter ||
+      (deptObj && (deptObj.id === selectedDeptFilter || deptObj.code === selectedDeptFilter));
+
     const matchesStatus = selectedStatusFilter === 'All' || device.status === selectedStatusFilter;
 
     return matchesSearch && matchesCategory && matchesDept && matchesStatus;
@@ -288,6 +294,13 @@ export const DeviceList = () => {
                     <td className="text-right" onClick={(e) => e.stopPropagation()}>
                       <div className="action-buttons-cell">
                         <button
+                          className="btn-icon-action text-cyan"
+                          onClick={() => openStockTakingModalForDevice && openStockTakingModalForDevice(device)}
+                          title="Input Stock Opname Asset Ini"
+                        >
+                          <ClipboardCheck size={16} />
+                        </button>
+                        <button
                           className="btn-icon-action"
                           onClick={() => handleViewDetail(device)}
                           title="Lihat Detail & Spesifikasi"
@@ -355,6 +368,9 @@ export const DeviceList = () => {
                 </div>
 
                 <div className="card-actions-bar" onClick={(e) => e.stopPropagation()}>
+                  <button className="btn-card-action text-cyan font-bold" onClick={() => openStockTakingModalForDevice && openStockTakingModalForDevice(device)}>
+                    <ClipboardCheck size={14} /> + Opname
+                  </button>
                   <button className="btn-card-action" onClick={() => handleViewDetail(device)}>
                     <Eye size={14} /> Detail
                   </button>

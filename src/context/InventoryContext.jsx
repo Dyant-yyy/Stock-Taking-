@@ -35,11 +35,19 @@ export const InventoryProvider = ({ children }) => {
   const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
 
   // Data Collections with Safe LocalStorage Fallback
+  const [currentUser, setCurrentUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem('its_current_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch (e) {
+      return null;
+    }
+  });
   const [devices, setDevices] = useState(() => safeParseStorage('its_devices', initialDevices));
   const [stockTakings, setStockTakings] = useState(() => safeParseStorage('its_stock_takings', initialStockTakings));
   const [departments, setDepartments] = useState(() => safeParseStorage('its_departments', initialDepartments));
   const [logs, setLogs] = useState(() => safeParseStorage('its_logs', initialLogs));
-  const [employees] = useState(initialEmployees);
+  const [employees, setEmployees] = useState(() => safeParseStorage('its_employees', initialEmployees));
 
   // Modals & Dialog State
   const [selectedDevice, setSelectedDevice] = useState(null);
@@ -76,6 +84,79 @@ export const InventoryProvider = ({ children }) => {
       localStorage.setItem('its_logs', JSON.stringify(logs));
     } catch (e) { console.error(e); }
   }, [logs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('its_employees', JSON.stringify(employees));
+    } catch (e) { console.error(e); }
+  }, [employees]);
+
+  // Auth Operations
+  const registerUser = (userData) => {
+    setCurrentUser(userData);
+    try {
+      localStorage.setItem('its_current_user', JSON.stringify(userData));
+    } catch (e) { console.error(e); }
+
+    setEmployees(prev => {
+      const safe = Array.isArray(prev) ? prev : [];
+      if (!safe.some(emp => emp.id === userData.id || emp.email === userData.email)) {
+        return [...safe, {
+          id: userData.id,
+          name: userData.name,
+          deptId: userData.deptId,
+          position: userData.position,
+          email: userData.email
+        }];
+      }
+      return safe;
+    });
+
+    addLog('User Registration', `Pegawai [${userData.deptCode || 'IS'}] ${userData.name} terdaftar sebagai ${userData.position || userData.role}`, 'System', userData.name);
+    setViewMode('portal');
+    setActiveTab('dashboard');
+  };
+
+  const loginUser = (identifier) => {
+    const safeEmps = Array.isArray(employees) ? employees : [];
+    const matched = safeEmps.find(e => 
+      e.id.toLowerCase() === identifier.toLowerCase() || 
+      e.email.toLowerCase() === identifier.toLowerCase() ||
+      e.name.toLowerCase().includes(identifier.toLowerCase())
+    );
+
+    if (matched) {
+      const safeDepts = Array.isArray(departments) ? departments : [];
+      const deptObj = safeDepts.find(d => d.id === matched.deptId || d.code === matched.deptId);
+      const userObj = {
+        id: matched.id,
+        name: matched.name,
+        deptId: matched.deptId,
+        deptCode: deptObj ? deptObj.code : 'IS',
+        position: matched.position,
+        email: matched.email,
+        role: matched.position,
+        loginTime: new Date().toISOString()
+      };
+      setCurrentUser(userObj);
+      try {
+        localStorage.setItem('its_current_user', JSON.stringify(userObj));
+      } catch (e) { console.error(e); }
+      addLog('User Login', `Pegawai [${userObj.deptCode}] ${userObj.name} berhasil masuk ke sesi audit`, 'System', userObj.name);
+      setViewMode('portal');
+      setActiveTab('dashboard');
+      return true;
+    }
+    return false;
+  };
+
+  const logoutUser = () => {
+    addLog('User Logout', `Sesi pegawai ${currentUser?.name || ''} diakhiri`, 'System', currentUser?.name || 'User');
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('its_current_user');
+    } catch (e) { console.error(e); }
+  };
 
   // Helper to log system activity
   const addLog = (action, details, category = 'Stock Taking', user = 'Auditor IT') => {
@@ -237,6 +318,14 @@ export const InventoryProvider = ({ children }) => {
       editingDept,
       setEditingDept,
       // Methods
+      currentUser,
+      registerUser,
+      loginUser,
+      logoutUser,
+      openStockTakingModalForDevice: (dev) => {
+        if (dev) setSelectedDevice(dev);
+        setIsStockTakingModalOpen(true);
+      },
       addStockTaking,
       addDepartment,
       updateDepartment,

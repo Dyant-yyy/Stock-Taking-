@@ -12,11 +12,15 @@ import {
   RotateCcw,
   CheckCircle,
   AlertTriangle,
-  ClipboardCheck
+  ClipboardCheck,
+  LogOut,
+  User
 } from 'lucide-react';
 
 export const Header = () => {
   const {
+    currentUser,
+    logoutUser,
     viewMode,
     setViewMode,
     theme,
@@ -183,6 +187,26 @@ export const Header = () => {
             </div>
           )}
         </div>
+
+        {/* Logged in User Profile Badge */}
+        {currentUser && (
+          <div className="current-user-pill">
+            <div className="user-avatar-circle">
+              {currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U'}
+            </div>
+            <div className="user-pill-text">
+              <span className="user-pill-name">{currentUser.name}</span>
+              <span className="user-pill-dept">[{currentUser.deptCode || 'IS'}] {currentUser.role || currentUser.position || 'Auditor'}</span>
+            </div>
+            <button
+              className="btn-pill-logout"
+              onClick={logoutUser}
+              title="Keluar / Ganti Akun Registrasi"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
+        )}
 
         {/* Theme Toggle */}
         <button

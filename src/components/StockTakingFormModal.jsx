@@ -8,42 +8,67 @@ export const StockTakingFormModal = () => {
     setIsStockTakingModalOpen,
     devices,
     departments,
+    selectedDevice,
+    currentUser,
+    setIsDeviceFormOpen,
+    setEditingDevice,
     addStockTaking
   } = useInventory();
 
   const safeDevices = Array.isArray(devices) ? devices : [];
   const safeDepts = Array.isArray(departments) ? departments : [];
 
-  const initialForm = {
+  const defaultAuditor = currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Ahmad Rizky (IS)';
+
+  const [formData, setFormData] = useState({
     stockTakingDate: new Date().toISOString().split('T')[0],
-    auditorName: 'Ahmad Rizky (IS)',
+    auditorName: defaultAuditor,
     departmentId: safeDepts.length > 0 ? safeDepts[0].id : 'DEPT-IS',
-    deviceId: safeDevices.length > 0 ? safeDevices[0].id : '',
-    assetTag: safeDevices.length > 0 ? safeDevices[0].assetTag : '',
-    deviceName: safeDevices.length > 0 ? safeDevices[0].name : '',
-    expectedLocation: safeDevices.length > 0 ? safeDevices[0].location : '',
-    scannedLocation: safeDevices.length > 0 ? safeDevices[0].location : '',
+    deviceId: '',
+    assetTag: '',
+    deviceName: '',
+    expectedLocation: '',
+    scannedLocation: '',
     locationStatus: 'Verified',
     physicalCondition: 'Good',
     auditResultStatus: 'Verified',
     notes: 'Perangkat terverifikasi fisik secara lengkap di lokasi.'
-  };
-
-  const [formData, setFormData] = useState(initialForm);
+  });
 
   useEffect(() => {
-    if (safeDevices.length > 0 && !formData.deviceId) {
+    if (!isStockTakingModalOpen) return;
+
+    if (currentUser) {
+      setFormData(prev => ({
+        ...prev,
+        auditorName: `${currentUser.name} (${currentUser.deptCode || 'IS'})`
+      }));
+    }
+
+    if (selectedDevice) {
+      setFormData(prev => ({
+        ...prev,
+        deviceId: selectedDevice.id,
+        assetTag: selectedDevice.assetTag,
+        deviceName: selectedDevice.name,
+        departmentId: selectedDevice.departmentId || safeDepts[0]?.id || 'DEPT-IS',
+        expectedLocation: selectedDevice.location || '',
+        scannedLocation: selectedDevice.location || '',
+        physicalCondition: selectedDevice.condition || 'Good'
+      }));
+    } else if (safeDevices.length > 0) {
       const first = safeDevices[0];
       setFormData(prev => ({
         ...prev,
         deviceId: first.id,
         assetTag: first.assetTag,
         deviceName: first.name,
-        expectedLocation: first.location,
-        scannedLocation: first.location
+        departmentId: first.departmentId || safeDepts[0]?.id || 'DEPT-IS',
+        expectedLocation: first.location || '',
+        scannedLocation: first.location || ''
       }));
     }
-  }, [safeDevices]);
+  }, [isStockTakingModalOpen, selectedDevice, safeDevices, safeDepts]);
 
   if (!isStockTakingModalOpen) return null;
 
@@ -55,8 +80,9 @@ export const StockTakingFormModal = () => {
         deviceId: targetDev.id,
         assetTag: targetDev.assetTag,
         deviceName: targetDev.name,
-        expectedLocation: targetDev.location,
-        scannedLocation: targetDev.location,
+        departmentId: targetDev.departmentId || prev.departmentId,
+        expectedLocation: targetDev.location || '',
+        scannedLocation: targetDev.location || '',
         physicalCondition: targetDev.condition || 'Good'
       }));
     }
@@ -133,7 +159,20 @@ export const StockTakingFormModal = () => {
               </div>
 
               <div className="form-group">
-                <label>Pilih Asset Perangkat Diaudit *:</label>
+                <div className="flex justify-between items-center mb-1">
+                  <label>Pilih Asset Perangkat Diaudit *:</label>
+                  <button
+                    type="button"
+                    className="btn-link text-xs font-semibold text-cyan cursor-pointer"
+                    onClick={() => {
+                      setIsStockTakingModalOpen(false);
+                      if (setEditingDevice) setEditingDevice(null);
+                      if (setIsDeviceFormOpen) setIsDeviceFormOpen(true);
+                    }}
+                  >
+                    + Tambah Asset Device Baru
+                  </button>
+                </div>
                 <select
                   required
                   value={formData.deviceId}

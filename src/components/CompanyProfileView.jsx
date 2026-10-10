@@ -16,7 +16,8 @@ import {
   Globe,
   Flame,
   Zap,
-  Server
+  Server,
+  Wrench
 } from 'lucide-react';
 
 export const CompanyProfileView = () => {
@@ -24,6 +25,7 @@ export const CompanyProfileView = () => {
     companyProfileData = {},
     setViewMode,
     setActiveTab,
+    setSelectedDeptFilter,
     devices = [],
     stockTakings = [],
     setIsQRScannerOpen
@@ -34,7 +36,8 @@ export const CompanyProfileView = () => {
   const safeStats = Array.isArray(companyProfileData?.stats) ? companyProfileData.stats : [];
   const safePlants = Array.isArray(companyProfileData?.plants) ? companyProfileData.plants : [];
 
-  const handleLaunchPortal = (tab = 'dashboard') => {
+  const handleLaunchPortal = (tab = 'dashboard', deptCode = null) => {
+    if (deptCode && setSelectedDeptFilter) setSelectedDeptFilter(deptCode);
     if (setActiveTab) setActiveTab(tab);
     if (setViewMode) setViewMode('portal');
   };
@@ -138,7 +141,7 @@ export const CompanyProfileView = () => {
                 </div>
                 <button
                   className="btn-plant-action"
-                  onClick={() => handleLaunchPortal('stocktaking')}
+                  onClick={() => handleLaunchPortal('stocktaking', plant.id.toUpperCase())}
                 >
                   Audit Opname <ArrowRight size={14} />
                 </button>

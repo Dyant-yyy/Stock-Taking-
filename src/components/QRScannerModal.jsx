@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
-import { X, QrCode, Search, CheckCircle2, Cpu, ArrowRight } from 'lucide-react';
+import { X, QrCode, Search, CheckCircle2, Cpu, ArrowRight, ClipboardCheck } from 'lucide-react';
 
 export const QRScannerModal = () => {
   const {
@@ -8,7 +8,8 @@ export const QRScannerModal = () => {
     setIsQRScannerOpen,
     devices,
     setSelectedDevice,
-    setIsDeviceDetailOpen
+    setIsDeviceDetailOpen,
+    openStockTakingModalForDevice
   } = useInventory();
 
   const [scanInput, setScanInput] = useState('');
@@ -31,6 +32,13 @@ export const QRScannerModal = () => {
       setSelectedDevice(scannedDevice);
       setIsQRScannerOpen(false);
       setIsDeviceDetailOpen(true);
+    }
+  };
+
+  const handleOpenScannedStockTaking = () => {
+    if (scannedDevice) {
+      setIsQRScannerOpen(false);
+      openStockTakingModalForDevice(scannedDevice);
     }
   };
 
@@ -108,10 +116,16 @@ export const QRScannerModal = () => {
                 <div><strong>Status:</strong> {scannedDevice.status} ({scannedDevice.condition})</div>
               </div>
 
-              <button className="btn-primary full-width margin-top" onClick={handleOpenScannedDetail}>
-                <span>Buka Detail & Spesifikasi Perangkat</span>
-                <ArrowRight size={16} />
-              </button>
+              <div className="flex gap-2 margin-top">
+                <button className="btn-primary full-width" onClick={handleOpenScannedStockTaking}>
+                  <ClipboardCheck size={16} />
+                  <span>+ Stock Opname Asset Ini</span>
+                </button>
+                <button className="btn-secondary full-width" onClick={handleOpenScannedDetail}>
+                  <span>Detail Asset</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
             </div>
           )}
         </div>

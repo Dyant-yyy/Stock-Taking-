@@ -9,7 +9,9 @@ import {
   Briefcase,
   Plus,
   Edit2,
-  Trash2
+  Trash2,
+  ClipboardCheck,
+  HardDrive
 } from 'lucide-react';
 
 export const DepartmentUserManagement = () => {
@@ -19,7 +21,10 @@ export const DepartmentUserManagement = () => {
     devices = [],
     setIsDeptModalOpen,
     setEditingDept,
-    deleteDepartment
+    deleteDepartment,
+    setSelectedDeptFilter,
+    setActiveTab,
+    setIsStockTakingModalOpen
   } = useInventory();
 
   const safeDepts = Array.isArray(departments) ? departments : [];
@@ -46,6 +51,16 @@ export const DepartmentUserManagement = () => {
     }
   };
 
+  const handleFilterDeptDevices = (code) => {
+    if (setSelectedDeptFilter) setSelectedDeptFilter(code);
+    if (setActiveTab) setActiveTab('devices');
+  };
+
+  const handleInputStockTakingDept = (code) => {
+    if (setSelectedDeptFilter) setSelectedDeptFilter(code);
+    if (setIsStockTakingModalOpen) setIsStockTakingModalOpen(true);
+  };
+
   return (
     <div className="dept-user-view">
       <div className="view-header">
@@ -67,7 +82,7 @@ export const DepartmentUserManagement = () => {
       <div className="section-title-sm">Master Departemen Operasional (IS, RSN, QATECH, SIS, NFY, PFY)</div>
       <div className="dept-cards-grid">
         {safeDepts.map((dept) => {
-          const deptDevices = safeDevices.filter(d => d && (d.departmentId === dept.id || d.departmentId?.includes(dept.code)));
+          const deptDevices = safeDevices.filter(d => d && (d.departmentId === dept.id || d.departmentCode === dept.code || d.departmentId?.includes(dept.code)));
           return (
             <div key={dept.id} className="dept-card">
               <div className="dept-card-header">
@@ -88,11 +103,21 @@ export const DepartmentUserManagement = () => {
                 <UserCheck size={14} />
                 <span>Head: <strong>{dept.head}</strong></span>
               </div>
-              <div className="dept-card-footer">
-                <div className="stat-pill">
-                  <Cpu size={14} />
-                  <span><strong>{deptDevices.length}</strong> Perangkat Alokasi</span>
-                </div>
+              <div className="dept-card-footer flex justify-between items-center margin-top-sm">
+                <button
+                  className="btn-card-action text-cyan"
+                  onClick={() => handleFilterDeptDevices(dept.code)}
+                  title="Lihat katalog perangkat departemen ini"
+                >
+                  <HardDrive size={13} /> {deptDevices.length} Asset
+                </button>
+                <button
+                  className="btn-card-action primary"
+                  onClick={() => handleInputStockTakingDept(dept.code)}
+                  title="Input Stock Opname fisik untuk departemen ini"
+                >
+                  <ClipboardCheck size={13} /> + Stock Opname
+                </button>
               </div>
             </div>
           );

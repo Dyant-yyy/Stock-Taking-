@@ -3,6 +3,7 @@ import { InventoryProvider, useInventory } from './context/InventoryContext';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { CompanyProfileView } from './components/CompanyProfileView';
+import { RegistrationView } from './components/RegistrationView';
 import { Dashboard } from './components/Dashboard';
 import { DeviceList } from './components/DeviceList';
 import { CheckoutManagement } from './components/CheckoutManagement';
@@ -19,7 +20,12 @@ import { StockTakingFormModal } from './components/StockTakingFormModal';
 import { DepartmentFormModal } from './components/DepartmentFormModal';
 
 const MainAppContent = () => {
-  const { viewMode, activeTab } = useInventory();
+  const { viewMode, activeTab, currentUser } = useInventory();
+
+  // If user is not authenticated or in registration mode, display Registration View at the start
+  if (!currentUser || viewMode === 'register') {
+    return <RegistrationView />;
+  }
 
   const renderActivePortalTab = () => {
     switch (activeTab) {
