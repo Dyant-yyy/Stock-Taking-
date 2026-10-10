@@ -3073,3 +3073,499 @@ input, select, textarea {
   color: var(--toray-cyan);
   font-weight: 600;
 }
+
+/* ==========================================================================
+   IP ADDRESS BADGE & BARCODE ACTIONS IN TABLE
+   ========================================================================== */
+.comp-ip-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.73rem;
+  font-weight: 600;
+  color: #38bdf8;
+  background: rgba(0, 163, 224, 0.12);
+  border: 1px solid rgba(0, 163, 224, 0.25);
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-top: 3px;
+  width: fit-content;
+}
+
+.comp-ip-badge.none {
+  color: #64748b;
+  background: rgba(100, 116, 139, 0.1);
+  border-color: rgba(100, 116, 139, 0.2);
+}
+
+.ip-icon {
+  color: #38bdf8;
+}
+
+.btn-row-action.barcode:hover {
+  color: var(--toray-cyan);
+  border-color: var(--toray-cyan);
+  background: rgba(0, 163, 224, 0.15);
+}
+
+.scan-header-btn:hover {
+  border-color: var(--toray-cyan);
+  color: #fff;
+}
+
+/* ==========================================================================
+   BARCODE & QR SCANNER / VERIFICATION MODAL
+   ========================================================================== */
+.modal-lg {
+  max-width: 680px;
+  width: 95%;
+}
+
+.scanner-camera-frame {
+  position: relative;
+  height: 180px;
+  background: linear-gradient(180deg, #020617 0%, #091322 100%);
+  border: 2px dashed rgba(0, 163, 224, 0.4);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 24px rgba(0, 64, 152, 0.4);
+}
+
+.scanner-laser-line {
+  position: absolute;
+  top: 0;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #00a3e0 50%, #38bdf8 70%, transparent 100%);
+  box-shadow: 0 0 12px #00a3e0, 0 0 4px #fff;
+  animation: scanLaser 2.2s infinite ease-in-out alternate;
+  z-index: 3;
+}
+
+@keyframes scanLaser {
+  0% { top: 8%; opacity: 0.3; }
+  50% { opacity: 1; }
+  100% { top: 90%; opacity: 0.3; }
+}
+
+.scanner-overlay-grid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  z-index: 2;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.qr-scanner-icon {
+  color: rgba(0, 163, 224, 0.6);
+  animation: pulseScanner 2s infinite ease-in-out;
+}
+
+@keyframes pulseScanner {
+  0% { transform: scale(0.96); opacity: 0.6; }
+  50% { transform: scale(1.04); opacity: 1; }
+  100% { transform: scale(0.96); opacity: 0.6; }
+}
+
+.scanner-instruction {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  max-width: 380px;
+  line-height: 1.4;
+}
+
+.barcode-input-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.code-font {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.btn-primary-sm {
+  padding: 8px 14px;
+  background: linear-gradient(135deg, var(--toray-blue) 0%, #0056c7 100%);
+  border: 1px solid rgba(0, 163, 224, 0.4);
+  color: #fff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.btn-primary-sm:hover {
+  background: var(--toray-blue);
+  box-shadow: 0 0 12px rgba(0, 163, 224, 0.4);
+}
+
+.scanner-quick-select {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(11, 19, 41, 0.6);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.scanner-quick-select select {
+  flex: 1;
+}
+
+.verified-result-card {
+  background: linear-gradient(180deg, rgba(11, 23, 48, 0.95) 0%, rgba(6, 12, 26, 0.98) 100%);
+  border: 1px solid rgba(0, 163, 224, 0.4);
+  border-radius: 12px;
+  padding: 18px 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), 0 0 16px rgba(0, 163, 224, 0.1);
+}
+
+.verified-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.verified-status-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.specs-grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .specs-grid-two {
+    grid-template-columns: 1fr;
+  }
+}
+
+.verified-info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.quick-verify-status-section {
+  background: rgba(5, 10, 20, 0.7);
+  border: 1px solid rgba(0, 163, 224, 0.25);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.quick-status-buttons-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+@media (max-width: 540px) {
+  .quick-status-buttons-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.btn-quick-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-quick-status:hover {
+  background: rgba(0, 163, 224, 0.15);
+  border-color: var(--toray-cyan);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.btn-quick-status.current {
+  background: rgba(0, 163, 224, 0.3);
+  border-color: var(--toray-cyan);
+  color: var(--toray-cyan);
+  font-weight: 700;
+  box-shadow: 0 0 10px rgba(0, 163, 224, 0.3);
+}
+
+/* ==========================================================================
+   PHYSICAL ASSET STICKER (BARCODE & QR PRINT LABEL)
+   ========================================================================== */
+.physical-barcode-sticker {
+  background: #ffffff;
+  color: #0b1329;
+  border: 2px solid #00255b;
+  border-radius: 8px;
+  padding: 16px;
+  max-width: 380px;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  text-align: left;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.sticker-header {
+  border-bottom: 2px solid #00255b;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.sticker-toray-badge {
+  font-size: 0.8rem;
+  font-weight: 900;
+  color: #00255b;
+  letter-spacing: 0.05em;
+}
+
+.sticker-plant {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.sticker-body {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.sticker-qr-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  padding: 4px;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+}
+
+.sticker-qr-image {
+  width: 90px;
+  height: 90px;
+  display: block;
+}
+
+.sticker-scan-hint {
+  font-size: 0.6rem;
+  font-weight: 800;
+  color: #00255b;
+  margin-top: 2px;
+  letter-spacing: 0.08em;
+}
+
+.sticker-info-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sticker-comp-name {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: #00255b;
+  letter-spacing: -0.02em;
+  border-bottom: 1px dashed #cbd5e1;
+  padding-bottom: 3px;
+}
+
+.sticker-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.72rem;
+}
+
+.sticker-lbl {
+  font-weight: 700;
+  color: #64748b;
+  min-width: 38px;
+}
+
+.sticker-val {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.sticker-barcode-bars {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  padding: 8px 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.barcode-lines-svg {
+  display: flex;
+  align-items: stretch;
+  height: 38px;
+  gap: 2px;
+  width: 100%;
+  justify-content: center;
+}
+
+.barcode-line {
+  background: #000;
+  border-radius: 1px;
+}
+
+.barcode-line.w-1 { width: 2px; }
+.barcode-line.w-2 { width: 3.5px; }
+.barcode-line.w-3 { width: 5px; }
+.barcode-line.w-4 { width: 7px; }
+
+.barcode-digits-text {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #0b1329;
+  letter-spacing: 0.15em;
+  margin-top: 4px;
+}
+
+.sticker-footer-note {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: #64748b;
+  text-align: center;
+  border-top: 1px solid #e2e8f0;
+  padding-top: 5px;
+  letter-spacing: 0.05em;
+}
+
+/* ==========================================================================
+   AUTH SCAN DETECTED BANNER
+   ========================================================================== */
+.auth-scan-detected-card {
+  background: linear-gradient(135deg, rgba(0, 64, 152, 0.45) 0%, rgba(0, 163, 224, 0.25) 100%);
+  border: 1px solid var(--toray-cyan);
+  border-radius: 14px;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 24px rgba(0, 163, 224, 0.25);
+  flex-wrap: wrap;
+}
+
+.scan-detected-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.scan-pulse-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(0, 163, 224, 0.15);
+  border: 1px solid rgba(0, 163, 224, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.scan-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.code-highlight {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  color: var(--toray-cyan);
+  font-weight: 800;
+}
+
+.scan-desc {
+  font-size: 0.8rem;
+  color: #cbd5e1;
+  margin-top: 2px;
+}
+
+.btn-quick-scan-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: linear-gradient(135deg, #00a3e0 0%, #004098 100%);
+  border: none;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 163, 224, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-quick-scan-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 163, 224, 0.6);
+}
+
+/* ==========================================================================
+   PRINT RULES FOR BARCODE STICKER
+   ========================================================================== */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #printable-sticker, #printable-sticker * {
+    visibility: visible;
+  }
+  #printable-sticker {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    box-shadow: none;
+    border: 2px solid #000;
+  }
+}

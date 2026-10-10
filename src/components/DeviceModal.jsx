@@ -17,6 +17,7 @@ export const DeviceModal = () => {
   const [formData, setFormData] = useState({
     department: 'IS',
     computerName: '',
+    ipAddress: '',
     type: 'Desktop PC',
     user: '',
     status: 'In',
@@ -28,6 +29,7 @@ export const DeviceModal = () => {
       setFormData({
         department: editingDevice.department || 'IS',
         computerName: editingDevice.computerName || '',
+        ipAddress: editingDevice.ipAddress || '',
         type: editingDevice.type || 'Desktop PC',
         user: editingDevice.user || '',
         status: editingDevice.status || 'In',
@@ -37,6 +39,7 @@ export const DeviceModal = () => {
       setFormData({
         department: 'IS',
         computerName: '',
+        ipAddress: '',
         type: 'Desktop PC',
         user: '',
         status: 'In',
@@ -128,6 +131,20 @@ export const DeviceModal = () => {
                 />
               </div>
 
+              {/* IP Address */}
+              <div className="form-group">
+                <label>IP Address (Jaringan):</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: 192.168.10.25 atau DHCP"
+                  value={formData.ipAddress}
+                  onChange={(e) => setFormData(prev => ({ ...prev, ipAddress: e.target.value }))}
+                  className="form-input code-font"
+                />
+              </div>
+            </div>
+
+            <div className="form-grid-two margin-top-sm">
               {/* User */}
               <div className="form-group">
                 <label>User (Nama Pengguna / Pegawai) *:</label>
@@ -140,23 +157,23 @@ export const DeviceModal = () => {
                   className="form-input"
                 />
               </div>
-            </div>
 
-            {/* Status */}
-            <div className="form-group margin-top-sm">
-              <label>Status Operasional *:</label>
-              <select
-                required
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                className="form-select"
-              >
-                {statusOptions.map((st) => (
-                  <option key={st.value} value={st.value}>
-                    {st.label}
-                  </option>
-                ))}
-              </select>
+              {/* Status */}
+              <div className="form-group">
+                <label>Status Operasional *:</label>
+                <select
+                  required
+                  value={formData.status}
+                  onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                  className="form-select"
+                >
+                  {statusOptions.map((st) => (
+                    <option key={st.value} value={st.value}>
+                      {st.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
 
             {/* Remark / Keterangan */}

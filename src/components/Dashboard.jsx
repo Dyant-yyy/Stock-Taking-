@@ -20,7 +20,9 @@ import {
   Laptop,
   Server,
   Zap,
-  Activity
+  Activity,
+  QrCode,
+  Wifi
 } from 'lucide-react';
 
 export const Dashboard = () => {
@@ -39,6 +41,8 @@ export const Dashboard = () => {
     setFilterType,
     openAddModal,
     openEditModal,
+    openScannerModal,
+    openBarcodePrint,
     updateDeviceStatus,
     deleteDevice,
     resetToSeedData
@@ -59,6 +63,7 @@ export const Dashboard = () => {
     const matchesSearch =
       query === '' ||
       (dev.computerName || '').toLowerCase().includes(query) ||
+      (dev.ipAddress || '').toLowerCase().includes(query) ||
       (dev.user || '').toLowerCase().includes(query) ||
       (dev.department || '').toLowerCase().includes(query) ||
       (dev.type || '').toLowerCase().includes(query) ||
@@ -73,11 +78,12 @@ export const Dashboard = () => {
 
   // Export to CSV
   const handleExportCSV = () => {
-    const headers = ["No", "Departemen / Section", "Computer Name", "Type", "User", "Status", "Remark / Keterangan"];
+    const headers = ["No", "Departemen / Section", "Computer Name", "IP Address", "Type", "User", "Status", "Remark / Keterangan"];
     const rows = filteredDevices.map((d, index) => [
       index + 1,
       d.department || '',
       d.computerName || '',
+      d.ipAddress || '',
       d.type || '',
       `"${(d.user || '').replace(/"/g, '""')}"`,
       d.status || '',
@@ -127,6 +133,10 @@ export const Dashboard = () => {
         </div>
 
         <div className="title-actions">
+          <button className="btn-secondary scan-btn" onClick={() => openScannerModal()}>
+            <QrCode size={16} className="text-cyan" />
+            <span>Scan Barcode / QR</span>
+          </button>
           <button className="btn-secondary" onClick={handleExportCSV}>
             <FileSpreadsheet size={16} />
             <span>Export CSV</span>
@@ -213,7 +223,7 @@ export const Dashboard = () => {
           <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Cari Computer Name, User, Departemen, atau Remark..."
+            placeholder="Cari Computer Name, IP Address, User, Departemen, atau Remark..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="search-input-field"
@@ -346,10 +356,20 @@ export const Dashboard = () => {
                         </span>
                       </td>
 
-                      {/* 3. Computer Name */}
+                      {/* 3. Computer Name & IP Address */}
                       <td className="col-comp">
                         <div className="comp-name-wrapper">
                           <span className="comp-name-text">{device.computerName}</span>
+                          {device.ipAddress ? (
+                            <span className="comp-ip-badge" title="IP Address Jaringan ITS">
+                              <Wifi size={11} className="ip-icon" />
+                              <span>{device.ipAddress}</span>
+                            </span>
+                          ) : (
+                            <span className="comp-ip-badge none" title="Belum ada IP Address">
+                              <span>No IP</span>
+                            </span>
+                          )}
                         </div>
                       </td>
 
@@ -396,6 +416,13 @@ export const Dashboard = () => {
                       {/* 8. Aksi */}
                       <td className="col-action text-right">
                         <div className="action-btns-row">
+                          <button
+                            className="btn-row-action barcode"
+                            onClick={() => openBarcodePrint(device)}
+                            title="Cetak & Lihat Label Barcode / QR Komputer ini"
+                          >
+                            <QrCode size={14} />
+                          </button>
                           <button
                             className="btn-row-action edit"
                             onClick={() => openEditModal(device)}

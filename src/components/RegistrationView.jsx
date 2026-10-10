@@ -14,7 +14,8 @@ import {
   Globe,
   Flame,
   Sparkles,
-  Zap
+  Zap,
+  QrCode
 } from 'lucide-react';
 
 export const RegistrationView = () => {
@@ -25,6 +26,9 @@ export const RegistrationView = () => {
     setViewMode,
     setActiveTab
   } = useInventory();
+
+  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+  const scanParam = urlParams ? (urlParams.get('scan') || urlParams.get('device')) : null;
 
   const [activeTab, setAuthTab] = useState('register'); // 'register' | 'login'
 
@@ -148,6 +152,47 @@ export const RegistrationView = () => {
             <span>Tangerang Plant, Banten</span>
           </div>
         </div>
+
+        {/* SCAN DEEP LINK BANNER */}
+        {scanParam && (
+          <div className="auth-scan-detected-card">
+            <div className="scan-detected-left">
+              <div className="scan-pulse-icon">
+                <QrCode size={22} className="text-cyan animate-pulse" />
+              </div>
+              <div>
+                <div className="scan-title">
+                  Barcode Terdeteksi: <span className="code-highlight">[{scanParam}]</span>
+                </div>
+                <p className="scan-desc">
+                  Perangkat fisik di-scan. Masuk sekarang untuk memverifikasi dan memperbarui statusnya.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              className="btn-quick-scan-login"
+              onClick={() => {
+                if (registerUser) {
+                  registerUser({
+                    id: `SCAN-OP-${Date.now().toString().slice(-4)}`,
+                    name: 'Operator Barcode Scanner',
+                    deptId: 'DEPT-IS',
+                    deptCode: 'IS',
+                    position: 'Petugas Scan Lapangan',
+                    email: 'scanner.field@toray.co.id',
+                    role: 'Auditor Stock Opname',
+                    loginTime: new Date().toISOString()
+                  });
+                }
+              }}
+            >
+              <Zap size={15} />
+              <span>Masuk Langsung & Verifikasi Status</span>
+              <ArrowRight size={15} />
+            </button>
+          </div>
+        )}
 
         {/* MAIN AUTH CARD */}
         <div className="auth-main-card">

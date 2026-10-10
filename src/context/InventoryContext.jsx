@@ -59,6 +59,14 @@ export const InventoryProvider = ({ children }) => {
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
 
+  // Barcode Scanner & Verification Modal State
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedDevice, setScannedDevice] = useState(null);
+
+  // Barcode / QR Print Sticker Modal State
+  const [isBarcodePrintOpen, setIsBarcodePrintOpen] = useState(false);
+  const [barcodeDevice, setBarcodeDevice] = useState(null);
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -130,6 +138,7 @@ export const InventoryProvider = ({ children }) => {
       id: nextId,
       department: deviceData.department || 'IS',
       computerName: deviceData.computerName || `ITS-${deviceData.department || 'IS'}-PC${String(devices.length + 1).padStart(2, '0')}`,
+      ipAddress: deviceData.ipAddress || '192.168.1.100',
       type: deviceData.type || 'Desktop PC',
       user: deviceData.user || 'Unassigned',
       status: deviceData.status || 'In',
@@ -137,7 +146,7 @@ export const InventoryProvider = ({ children }) => {
     };
 
     setDevices(prev => [newDevice, ...(Array.isArray(prev) ? prev : [])]);
-    addLog('Tambah Device', `Menambahkan komputer [${newDevice.computerName}] di departemen ${newDevice.department}`, 'Inventory');
+    addLog('Tambah Device', `Menambahkan komputer [${newDevice.computerName}] (IP: ${newDevice.ipAddress})`, 'Inventory');
   };
 
   const updateDevice = (updatedData) => {
@@ -148,7 +157,7 @@ export const InventoryProvider = ({ children }) => {
   const updateDeviceStatus = (id, newStatus) => {
     setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => {
       if (d.id === id) {
-        addLog('Update Status', `Status komputer ${d.computerName} diubah menjadi ${newStatus}`, 'Status');
+        addLog('Update Status', `Status komputer ${d.computerName} diverifikasi menjadi ${newStatus}`, 'Status');
         return { ...d, status: newStatus };
       }
       return d;
@@ -192,6 +201,28 @@ export const InventoryProvider = ({ children }) => {
     setEditingDevice(null);
   };
 
+  // Barcode Scanner Controls
+  const openScannerModal = (preselected = null) => {
+    setScannedDevice(preselected);
+    setIsScannerOpen(true);
+  };
+
+  const closeScannerModal = () => {
+    setIsScannerOpen(false);
+    setScannedDevice(null);
+  };
+
+  // Barcode Sticker Print Controls
+  const openBarcodePrint = (device) => {
+    setBarcodeDevice(device);
+    setIsBarcodePrintOpen(true);
+  };
+
+  const closeBarcodePrint = () => {
+    setIsBarcodePrintOpen(false);
+    setBarcodeDevice(null);
+  };
+
   return (
     <InventoryContext.Provider value={{
       currentUser,
@@ -213,12 +244,22 @@ export const InventoryProvider = ({ children }) => {
       setFilterStatus,
       filterType,
       setFilterType,
-      // Modal
+      // Modals
       isDeviceModalOpen,
       editingDevice,
       openAddModal,
       openEditModal,
       closeModal,
+      // Scanner & Barcode Print
+      isScannerOpen,
+      openScannerModal,
+      closeScannerModal,
+      scannedDevice,
+      setScannedDevice,
+      isBarcodePrintOpen,
+      barcodeDevice,
+      openBarcodePrint,
+      closeBarcodePrint,
       // Methods
       addDevice,
       updateDevice,
