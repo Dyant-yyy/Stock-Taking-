@@ -4,13 +4,13 @@ export const companyProfileData = {
   established: 1971,
   location: "Tangerang, Banten, Indonesia",
   parentGroup: "Toray Industries, Inc. (Japan)",
-  description: "PT. Indonesia Toray Synthetics (ITS) adalah produsen serat sintetis terkemuka di Indonesia yang memproduksi Polyester Staple Fiber (PSF), Polyester Filament Yarn (PFY), Nylon Filament Yarn (NFY), dan Resin (RSN) berkualitas dunia dengan standar teknologi Jepang. Terletak di kawasan industri Tangerang, ITS didukung oleh infrastruktur IT dan otomatisasi industri mutakhir.",
+  description: "PT. Indonesia Toray Synthetics (ITS) adalah produsen serat sintetis terkemuka di Indonesia yang memproduksi Polyester Staple Fiber (PSF), Polyester Filament Yarn (PFY), Nylon Filament Yarn (NFY), dan Resin (RSN) berkualitas dunia. Sistem Stock Taking Device ini digunakan untuk audit verifikasi fisik aset IT di seluruh unit pabrik Tangerang.",
   stats: [
     { label: "Luas Area Pabrik", value: "35 Hektar", icon: "Factory" },
     { label: "Kapasitas Produksi", value: "120,000 Ton/Tahun", icon: "Boxes" },
     { label: "Tenaga Kerja & Staf", value: "1,500+ Karyawan", icon: "Users" },
     { label: "Perangkat IT Terkelola", value: "450+ Asset", icon: "Cpu" },
-    { label: "Unit Operasional", value: "6 Divisi Utama", icon: "Building2" },
+    { label: "Master Departemen", value: "6 Divisi Utama", icon: "Building2" },
     { label: "Standar Sertifikasi", value: "ISO 9001 / 14001 / 45001", icon: "ShieldCheck" }
   ],
   plants: [
@@ -86,13 +86,15 @@ export const initialDevices = [
     model: "PowerEdge R750",
     serialNumber: "DELL-SRV-98421-ITS",
     departmentId: "DEPT-IS",
+    departmentCode: "IS",
     location: "Main HQ - Server Room Rack 02",
     assignedTo: "Ahmad Rizky",
     purchaseDate: "2024-03-15",
     purchaseCost: 85000000,
     warrantyExpiry: "2027-03-15",
-    status: "In Use",
+    status: "Verified",
     condition: "Good",
+    lastStockTakingDate: "2026-10-09",
     specs: {
       cpu: "Dual Intel Xeon Silver 4314 (32 Cores)",
       ram: "128 GB DDR4 ECC",
@@ -101,7 +103,7 @@ export const initialDevices = [
       ipAddress: "192.168.10.15",
       macAddress: "00:1A:2B:3C:4D:5E"
     },
-    notes: "Main ERP & Production Database Secondary Node."
+    notes: "Main ERP & Production Database Secondary Node. Verified pada Opname."
   },
   {
     id: "DEV-002",
@@ -112,13 +114,15 @@ export const initialDevices = [
     model: "TPC-1782H Touch",
     serialNumber: "ADV-IPC-4412-ITS",
     departmentId: "DEPT-RSN",
+    departmentCode: "RSN",
     location: "RSN Plant - Control Room Desk A",
     assignedTo: "Ir. Agus Rahardjo",
     purchaseDate: "2024-01-20",
     purchaseCost: 32000000,
     warrantyExpiry: "2026-01-20",
-    status: "In Use",
+    status: "Verified",
     condition: "Good",
+    lastStockTakingDate: "2026-10-08",
     specs: {
       cpu: "Intel Core i5-1145GRE Industrial",
       ram: "16 GB DDR4 Industrial Grade",
@@ -138,13 +142,15 @@ export const initialDevices = [
     model: "ThinkPad X1 Carbon",
     serialNumber: "PF-4421X-ITS",
     departmentId: "DEPT-IS",
+    departmentCode: "IS",
     location: "Main Office - IS Management Room",
     assignedTo: "Budi Santoso",
     purchaseDate: "2025-02-10",
     purchaseCost: 28500000,
     warrantyExpiry: "2028-02-10",
-    status: "In Use",
+    status: "Verified",
     condition: "Good",
+    lastStockTakingDate: "2026-10-07",
     specs: {
       cpu: "Intel Core i7-1365U vPro",
       ram: "32 GB LPDDR5",
@@ -164,13 +170,15 @@ export const initialDevices = [
     model: "Latitude 5440",
     serialNumber: "DL-LAT-8812-ITS",
     departmentId: "DEPT-FIN",
+    departmentCode: "FIN",
     location: "Main HQ - Finance Office",
     assignedTo: "Dedi Kurniawan",
     purchaseDate: "2024-11-05",
     purchaseCost: 18500000,
     warrantyExpiry: "2027-11-05",
-    status: "Available",
+    status: "Pending Audit",
     condition: "Good",
+    lastStockTakingDate: null,
     specs: {
       cpu: "Intel Core i5-1335U",
       ram: "16 GB DDR4",
@@ -179,7 +187,7 @@ export const initialDevices = [
       ipAddress: "192.168.1.88",
       macAddress: "70:B5:E8:44:55:66"
     },
-    notes: "Backup laptop ready for business trips or finance audit."
+    notes: "Menunggu pelaksanaan Stock Opname jadwal kuartal ini."
   },
   {
     id: "DEV-005",
@@ -190,13 +198,15 @@ export const initialDevices = [
     model: "EliteDesk 800 G9",
     serialNumber: "HP-ED-3391-ITS",
     departmentId: "DEPT-QATECH",
+    departmentCode: "QATECH",
     location: "QATECH Lab - Spectrometry Unit",
     assignedTo: "Dr. Retno Astuti",
     purchaseDate: "2023-08-12",
     purchaseCost: 16800000,
     warrantyExpiry: "2026-08-12",
-    status: "In Use",
+    status: "Verified",
     condition: "Good",
+    lastStockTakingDate: "2026-10-09",
     specs: {
       cpu: "Intel Core i7-12700",
       ram: "32 GB DDR5",
@@ -205,7 +215,7 @@ export const initialDevices = [
       ipAddress: "192.168.30.50",
       macAddress: "B8:27:EB:77:88:99"
     },
-    notes: "Connected to Fourier-Transform Infrared Spectrometer."
+    notes: "Terhubung ke instrumen FTIR. Terverifikasi oleh auditor QATECH."
   },
   {
     id: "DEV-006",
@@ -216,13 +226,15 @@ export const initialDevices = [
     model: "ZT411 300dpi Thermal",
     serialNumber: "ZEB-ZT411-901-ITS",
     departmentId: "DEPT-NFY",
+    departmentCode: "NFY",
     location: "NFY Packing & Warehouse Gate B",
     assignedTo: "Bambang Supriadi",
     purchaseDate: "2024-04-18",
     purchaseCost: 24000000,
     warrantyExpiry: "2026-04-18",
-    status: "Maintenance",
+    status: "Discrepancy",
     condition: "Under Repair",
+    lastStockTakingDate: "2026-10-05",
     specs: {
       cpu: "32-bit ARM Processor",
       ram: "256 MB Flash / 512 MB RAM",
@@ -231,7 +243,7 @@ export const initialDevices = [
       ipAddress: "192.168.40.12",
       macAddress: "00:07:4D:11:22:33"
     },
-    notes: "Printhead thermal ribbon feeder replacement ongoing."
+    notes: "Catatan Opname: Thermal printhead aus, sedang perbaikan teknisi SIS."
   },
   {
     id: "DEV-007",
@@ -242,13 +254,15 @@ export const initialDevices = [
     model: "C9300-48P-A",
     serialNumber: "FOC2411L0XX",
     departmentId: "DEPT-SIS",
+    departmentCode: "SIS",
     location: "PFY / SIS - IDF Rack Cabinet 01",
     assignedTo: "Hendra Wijaya",
     purchaseDate: "2024-06-01",
     purchaseCost: 65000000,
     warrantyExpiry: "2029-06-01",
-    status: "In Use",
+    status: "Verified",
     condition: "Good",
+    lastStockTakingDate: "2026-10-08",
     specs: {
       cpu: "x86 1.8GHz",
       ram: "16 GB DRAM",
@@ -268,13 +282,15 @@ export const initialDevices = [
     model: "TC57x Handheld Scanner",
     serialNumber: "ZEB-TC57-4412",
     departmentId: "DEPT-PFY",
+    departmentCode: "PFY",
     location: "PFY Finished Goods Storage Area",
     assignedTo: "Dewi Lestari",
     purchaseDate: "2025-01-15",
     purchaseCost: 14500000,
     warrantyExpiry: "2027-01-15",
-    status: "In Use",
+    status: "Pending Audit",
     condition: "Good",
+    lastStockTakingDate: null,
     specs: {
       cpu: "Qualcomm Snapdragon 660 Octa-Core",
       ram: "4 GB RAM",
@@ -284,78 +300,6 @@ export const initialDevices = [
       macAddress: "94:B4:0F:33:22:11"
     },
     notes: "Handheld barcode scanner for pallet dispatch stock."
-  }
-];
-
-export const initialCheckouts = [
-  {
-    id: "CHK-101",
-    deviceId: "DEV-004",
-    assetTag: "ITS-LPT-2025-088",
-    deviceName: "Dell Latitude 5440 Corporate",
-    borrowerName: "Dedi Kurniawan",
-    department: "Finance & Accounting (FIN)",
-    purpose: "Business Audit Trip to Toray HQ Jakarta",
-    checkoutDate: "2026-10-01",
-    expectedReturnDate: "2026-10-15",
-    actualReturnDate: null,
-    status: "Active",
-    conditionOnCheckout: "Good",
-    notes: "Handed over with power adapter and laptop bag."
-  }
-];
-
-export const initialMaintenance = [
-  {
-    id: "MNT-501",
-    deviceId: "DEV-006",
-    assetTag: "ITS-PRN-2024-004",
-    deviceName: "Zebra ZT411 Industrial Barcode Printer",
-    reportedBy: "Bambang Supriadi (NFY)",
-    issueCategory: "Hardware Malfunction",
-    description: "Thermal printhead wearing out causing faint barcode scans on pallet labels.",
-    reportDate: "2026-10-05",
-    technician: "Hendra Wijaya (SIS)",
-    status: "In Progress",
-    costEstimate: 3500000,
-    partsReplaced: "Zebra ZT411 Printhead 300dpi Kit",
-    notes: "Replacement printhead ordered from vendor Zebra Indonesia."
-  }
-];
-
-export const initialSpareParts = [
-  {
-    id: "SPR-001",
-    partNumber: "RAM-DDR4-16GB-ECC",
-    name: "Samsung 16GB DDR4 3200MHz ECC Server Memory",
-    category: "RAM",
-    stockQuantity: 8,
-    minThreshold: 3,
-    unitCost: 1400000,
-    location: "IS Server Room Spare Cabinet A2",
-    compatibility: "Dell PowerEdge R750 / HP ProLiant"
-  },
-  {
-    id: "SPR-002",
-    partNumber: "SSD-NVME-1TB-ENT",
-    name: "Samsung PM9A1 1TB NVMe Enterprise SSD",
-    category: "Storage",
-    stockQuantity: 2,
-    minThreshold: 4,
-    unitCost: 2200000,
-    location: "IS Spare Shelf B1",
-    compatibility: "Desktops, Laptops & Workstations"
-  },
-  {
-    id: "SPR-003",
-    partNumber: "TNR-ZEB-ZT411",
-    name: "Zebra Thermal Ribbon Wax/Resin 110mm x 450m",
-    category: "Printer Consumables",
-    stockQuantity: 15,
-    minThreshold: 5,
-    unitCost: 320000,
-    location: "NFY Packing Office Store",
-    compatibility: "Zebra ZT411 / ZT421 Industrial Printers"
   }
 ];
 
@@ -391,16 +335,32 @@ export const initialStockTakings = [
     physicalCondition: "Good",
     auditResultStatus: "Verified",
     notes: "Terhubung ke instrumen FTIR, spesifikasi RAM 32GB terverifikasi."
+  },
+  {
+    id: "STK-2026-003",
+    stockTakingDate: "2026-10-09",
+    auditorName: "Ahmad Rizky (IS)",
+    departmentId: "DEPT-IS",
+    departmentCode: "IS",
+    deviceId: "DEV-001",
+    assetTag: "ITS-SRV-2025-001",
+    deviceName: "Dell PowerEdge R750 Rack Server",
+    expectedLocation: "Main HQ - Server Room Rack 02",
+    scannedLocation: "Main HQ - Server Room Rack 02",
+    locationStatus: "Verified",
+    physicalCondition: "Good",
+    auditResultStatus: "Verified",
+    notes: "Server room suhu 18°C, RAID 10 NVMe terverifikasi normal."
   }
 ];
 
 export const initialLogs = [
   {
     id: "LOG-901",
-    timestamp: "2026-10-10 02:00:00",
+    timestamp: "2026-10-10 15:00:00",
     user: "Budi Santoso (IS)",
-    action: "Master Departemen Updated",
-    details: "Diperbarui Master Departemen resmi ITS: IS, RSN, QATECH, SIS, NFY, PFY, PSF, HRGA, FIN.",
+    action: "System Focused to Stock Taking",
+    details: "Sistem difokuskan secara khusus pada Manajemen & Input Stock Taking Device PT. Indonesia Toray Synthetics.",
     category: "System"
   },
   {
@@ -408,7 +368,7 @@ export const initialLogs = [
     timestamp: "2026-10-09 14:00:00",
     user: "Ahmad Rizky (IS)",
     action: "Input Stock Taking",
-    details: "Pelaksanaan Stock Opname fisik perangkat ITS-IPC-2024-012 di RSN Plant.",
+    details: "Pelaksanaan Stock Opname fisik perangkat ITS-SRV-2025-001 di Data Center HQ.",
     category: "Stock Taking"
   }
 ];

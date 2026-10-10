@@ -28,19 +28,17 @@ export const Header = () => {
     setEditingDevice,
     setIsStockTakingModalOpen,
     resetToSeedData,
-    maintenance = [],
-    spareParts = [],
+    devices = [],
     setActiveTab
   } = useInventory();
 
   const [showNotifications, setShowNotifications] = useState(false);
 
-  const safeSpareParts = Array.isArray(spareParts) ? spareParts : [];
-  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+  const safeDevices = Array.isArray(devices) ? devices : [];
 
-  const lowStockParts = safeSpareParts.filter(p => (p?.stockQuantity || 0) <= (p?.minThreshold || 0));
-  const pendingMaintenance = safeMaintenance.filter(m => m?.status === 'In Progress');
-  const totalNotifications = lowStockParts.length + pendingMaintenance.length;
+  const discrepancyDevices = safeDevices.filter(d => d?.status === 'Discrepancy');
+  const missingDevices = safeDevices.filter(d => d?.status === 'Missing');
+  const totalNotifications = discrepancyDevices.length + missingDevices.length;
 
   const handleCreateNewDevice = () => {
     if (setEditingDevice) setEditingDevice(null);
@@ -64,7 +62,7 @@ export const Header = () => {
           </div>
           <div className="brand-text">
             <div className="company-title">PT. Indonesia Toray Synthetics</div>
-            <div className="sub-title">ITS Device Inventory System</div>
+            <div className="sub-title">ITS Device Stock Taking System</div>
           </div>
         </div>
 
@@ -81,8 +79,8 @@ export const Header = () => {
             className={`view-btn ${viewMode === 'portal' ? 'active' : ''}`}
             onClick={() => setViewMode && setViewMode('portal')}
           >
-            <Cpu size={16} />
-            <span>IT Inventory Portal</span>
+            <ClipboardCheck size={16} />
+            <span>Stock Opname Portal</span>
           </button>
         </div>
       </div>
@@ -117,16 +115,16 @@ export const Header = () => {
         </button>
 
         <button
-          className="header-action-btn secondary"
+          className="header-action-btn primary"
           onClick={handleInputStockTaking}
           title="Input Stock Taking (Opname)"
         >
           <ClipboardCheck size={18} />
-          <span className="btn-text">+ Stock Taking</span>
+          <span className="btn-text">+ Stock Opname</span>
         </button>
 
         <button
-          className="header-action-btn primary"
+          className="header-action-btn secondary"
           onClick={handleCreateNewDevice}
           title="Tambah Perangkat Baru"
         >
@@ -139,7 +137,7 @@ export const Header = () => {
           <button
             className="header-icon-btn"
             onClick={() => setShowNotifications(!showNotifications)}
-            title="Notifikasi & System Alert"
+            title="Notifikasi Stock Opname Alert"
           >
             <Bell size={20} />
             {totalNotifications > 0 && (
@@ -150,32 +148,32 @@ export const Header = () => {
           {showNotifications && (
             <div className="notification-popover">
               <div className="popover-header">
-                <h4>Peringatan Sistem ({totalNotifications})</h4>
+                <h4>Temuan Stock Opname ({totalNotifications})</h4>
                 <button onClick={() => setShowNotifications(false)}>×</button>
               </div>
               <div className="popover-body">
                 {totalNotifications === 0 ? (
                   <div className="empty-notif">
                     <CheckCircle size={24} className="text-success" />
-                    <p>Semua perangkat & stok dalam kondisi optimal.</p>
+                    <p>Semua perangkat fisik terverifikasi lengkap.</p>
                   </div>
                 ) : (
                   <>
-                    {lowStockParts.map(part => (
-                      <div key={part.id} className="notif-item warning" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('spareparts'); setShowNotifications(false); }}>
+                    {discrepancyDevices.map(d => (
+                      <div key={d.id} className="notif-item warning" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('devices'); setShowNotifications(false); }}>
                         <AlertTriangle size={18} className="icon-warning" />
                         <div>
-                          <strong>Stok Sparepart Menipis!</strong>
-                          <p>{part.name} sisa <strong>{part.stockQuantity}</strong> (Min: {part.minThreshold})</p>
+                          <strong>Temuan Selisih (Discrepancy)</strong>
+                          <p>{d.assetTag} ({d.name}): {d.notes}</p>
                         </div>
                       </div>
                     ))}
-                    {pendingMaintenance.map(item => (
-                      <div key={item.id} className="notif-item danger" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('maintenance'); setShowNotifications(false); }}>
+                    {missingDevices.map(d => (
+                      <div key={d.id} className="notif-item danger" onClick={() => { if (setViewMode) setViewMode('portal'); if (setActiveTab) setActiveTab('devices'); setShowNotifications(false); }}>
                         <AlertTriangle size={18} className="icon-danger" />
                         <div>
-                          <strong>Perbaikan Berjalan!</strong>
-                          <p>{item.assetTag}: {item.description}</p>
+                          <strong>Perangkat Hilang (Missing)</strong>
+                          <p>{d.assetTag} ({d.name}) belum ditemukan di lokasi.</p>
                         </div>
                       </div>
                     ))}
@@ -199,7 +197,7 @@ export const Header = () => {
         <button
           className="header-icon-btn danger-hover"
           onClick={() => {
-            if (window.confirm('Apakah Anda yakin ingin mereset seluruh data inventaris ke data bawaan pabrik ITS Tangerang?')) {
+            if (window.confirm('Apakah Anda yakin ingin mereset seluruh data inventaris ke data awal Stock Opname ITS?')) {
               if (resetToSeedData) resetToSeedData();
             }
           }}

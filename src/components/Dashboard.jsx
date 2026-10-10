@@ -4,9 +4,8 @@ import {
   HardDrive,
   CheckCircle2,
   Clock,
-  Wrench,
   AlertTriangle,
-  DollarSign,
+  XCircle,
   Plus,
   QrCode,
   FileSpreadsheet,
@@ -14,98 +13,76 @@ import {
   TrendingUp,
   Cpu,
   Server,
-  Monitor,
-  Printer,
-  Wifi,
-  Tablet,
   Activity,
   ShieldCheck,
   Zap,
   Globe,
-  Sparkles
+  Sparkles,
+  ClipboardCheck
 } from 'lucide-react';
 
 export const Dashboard = () => {
   const {
     devices = [],
-    checkouts = [],
-    maintenance = [],
+    stockTakings = [],
     logs = [],
     departments = [],
     setActiveTab,
     setIsDeviceFormOpen,
     setEditingDevice,
     setIsQRScannerOpen,
-    setIsReportMaintenanceOpen,
+    setIsStockTakingModalOpen,
     setSelectedCategoryFilter,
     setViewMode
   } = useInventory();
 
   // Safe Arrays
   const safeDevices = Array.isArray(devices) ? devices : [];
-  const safeCheckouts = Array.isArray(checkouts) ? checkouts : [];
-  const safeMaintenance = Array.isArray(maintenance) ? maintenance : [];
+  const safeStockTakings = Array.isArray(stockTakings) ? stockTakings : [];
   const safeLogs = Array.isArray(logs) ? logs : [];
   const safeDepts = Array.isArray(departments) ? departments : [];
 
   // Metrics
   const totalDevices = safeDevices.length;
-  const inUseDevices = safeDevices.filter(d => d && d.status === 'In Use').length;
-  const availableDevices = safeDevices.filter(d => d && d.status === 'Available').length;
-  const maintenanceDevices = safeDevices.filter(d => d && d.status === 'Maintenance').length;
-  const activeCheckouts = safeCheckouts.filter(c => c && c.status === 'Active').length;
+  const verifiedDevices = safeDevices.filter(d => d && (d.status === 'Verified' || d.status === 'In Use')).length;
+  const discrepancyDevices = safeDevices.filter(d => d && d.status === 'Discrepancy').length;
+  const missingDevices = safeDevices.filter(d => d && d.status === 'Missing').length;
+  const pendingDevices = safeDevices.filter(d => d && (d.status === 'Pending Audit' || !d.status)).length;
+
+  const completionPct = totalDevices ? Math.round((verifiedDevices / totalDevices) * 100) : 0;
 
   const totalValuation = safeDevices.reduce((sum, d) => sum + (d?.purchaseCost || 0), 0);
-
-  // Warranty Warning Count (Expiring within 2026)
-  const expiringWarrantyCount = safeDevices.filter(d => d?.warrantyExpiry && String(d.warrantyExpiry).startsWith('2026')).length;
 
   const formatIDR = (amount) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
   };
 
-  // Categories Count
-  const categories = [
-    { name: 'Server', icon: Server, color: 'text-purple', bg: 'bg-purple-soft' },
-    { name: 'Industrial PC', icon: Cpu, color: 'text-amber', bg: 'bg-amber-soft' },
-    { name: 'Laptop', icon: Monitor, color: 'text-blue', bg: 'bg-blue-soft' },
-    { name: 'Desktop PC', icon: Monitor, color: 'text-cyan', bg: 'bg-cyan-soft' },
-    { name: 'Printer & Scanner', icon: Printer, color: 'text-emerald', bg: 'bg-emerald-soft' },
-    { name: 'Network Equipment', icon: Wifi, color: 'text-indigo', bg: 'bg-purple-soft' },
-    { name: 'Mobile & Handheld', icon: Tablet, color: 'text-pink', bg: 'bg-gold-soft' },
-  ];
-
-  const getCategoryCount = (catName) => safeDevices.filter(d => d && d.category === catName).length;
-
-  const handleCategoryQuickFilter = (catName) => {
-    if (setSelectedCategoryFilter) setSelectedCategoryFilter(catName);
-    if (setActiveTab) setActiveTab('devices');
+  const handleDepartmentFilter = (code) => {
+    if (setActiveTab) setActiveTab('stocktaking');
     if (setViewMode) setViewMode('portal');
   };
 
   // Export to CSV Function
-  const exportToCSV = () => {
-    const headers = ["ID Asset", "Asset Tag", "Nama Perangkat", "Kategori", "Merk/Model", "Serial Number", "Departemen", "Lokasi", "Pengguna", "Status", "Kondisi", "Harga Beli (IDR)"];
+  const exportStockTakingCSV = () => {
+    const headers = ["ID Asset", "Asset Tag", "Nama Perangkat", "Kode Departemen", "Kategori", "Lokasi", "Pengguna", "Status Audit", "Kondisi Fisik", "Tgl Audit Terakhir"];
     const rows = safeDevices.map(d => [
       d.id || '',
       d.assetTag || '',
       `"${(d.name || '').replace(/"/g, '""')}"`,
+      d.departmentCode || d.departmentId || '',
       d.category || '',
-      `"${d.brand || ''} ${d.model || ''}"`,
-      d.serialNumber || '',
-      d.departmentId || '',
       `"${d.location || ''}"`,
       `"${d.assignedTo || ''}"`,
       d.status || '',
       d.condition || '',
-      d.purchaseCost || 0
+      d.lastStockTakingDate || 'Belum Opname'
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `ITS_Device_Inventory_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `ITS_Stock_Taking_Dashboard_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -121,7 +98,7 @@ export const Dashboard = () => {
             <div className="hero-live-pill">
               <span className="live-pulse"></span>
               <Activity size={14} />
-              <span>PT. INDONESIA TORAY SYNTHETICS • COMMAND CENTER ONLINE</span>
+              <span>PT. INDONESIA TORAY SYNTHETICS • STOCK TAKING COMMAND CENTER</span>
             </div>
             <div className="hero-date-badge">
               <Globe size={14} />
@@ -132,46 +109,57 @@ export const Dashboard = () => {
           <div className="hero-main-title-row">
             <div>
               <h1 className="hero-heading">
-                IT Device Infrastructure Dashboard
+                Stock Taking IT Device Dashboard
               </h1>
               <p className="hero-subheading">
-                Sistem Pengawasan & Management Asset IT Terpadu Unit Operasional PT. Indonesia Toray Synthetics
+                Sistem Verifikasi Fisik & Opname Inventaris Perangkat IT per Master Departemen (IS, RSN, QATECH, SIS, NFY, PFY)
               </p>
             </div>
 
             <div className="hero-quick-actions">
-              <button className="btn-hero-action primary" onClick={() => { if (setEditingDevice) setEditingDevice(null); if (setIsDeviceFormOpen) setIsDeviceFormOpen(true); }}>
-                <Plus size={16} />
-                <span>+ Asset Baru</span>
+              <button className="btn-hero-action primary" onClick={() => { if (setIsStockTakingModalOpen) setIsStockTakingModalOpen(true); }}>
+                <ClipboardCheck size={16} />
+                <span>+ Input Stock Opname</span>
               </button>
               <button className="btn-hero-action secondary" onClick={() => { if (setIsQRScannerOpen) setIsQRScannerOpen(true); }}>
                 <QrCode size={16} />
                 <span>Scan QR</span>
               </button>
-              <button className="btn-hero-action outline" onClick={exportToCSV}>
+              <button className="btn-hero-action outline" onClick={exportStockTakingCSV}>
                 <FileSpreadsheet size={16} />
                 <span>Export CSV</span>
               </button>
             </div>
           </div>
 
+          {/* PROGRESS BAR PROSES STOCK OPNAME */}
+          <div className="stocktaking-progress-wrapper margin-top-sm">
+            <div className="flex justify-between items-center text-sm font-semibold mb-2">
+              <span>Progress Audit Physical Stock Opname ITS: <strong>{completionPct}% Selesai</strong></span>
+              <span>{verifiedDevices} dari {totalDevices} Perangkat Terverifikasi</span>
+            </div>
+            <div className="progress-bar" style={{ height: '10px' }}>
+              <div className="progress-fill" style={{ width: `${completionPct}%`, background: 'linear-gradient(90deg, #10b981, #00a3e0)' }}></div>
+            </div>
+          </div>
+
           {/* PLANT TICKER BAR */}
-          <div className="plant-ticker-row">
+          <div className="plant-ticker-row margin-top">
             <div className="ticker-item">
               <Zap size={14} className="text-cyan" />
-              <span>Plant 1 Polymerization: <strong>124 Devices</strong></span>
+              <span>[IS] Info System: <strong>118 Devices</strong></span>
             </div>
             <div className="ticker-item">
               <Cpu size={14} className="text-emerald" />
-              <span>Plant 2 Filament Yarn: <strong>148 Devices</strong></span>
+              <span>[RSN] Resin Plant: <strong>124 Devices</strong></span>
             </div>
             <div className="ticker-item">
-              <Wrench size={14} className="text-amber" />
-              <span>Power & Utility Center: <strong>62 Devices</strong></span>
+              <Sparkles size={14} className="text-amber" />
+              <span>[QATECH] QA Tech Lab: <strong>95 Devices</strong></span>
             </div>
             <div className="ticker-item">
               <Server size={14} className="text-purple" />
-              <span>Main Office & Data Center: <strong>118 Devices</strong></span>
+              <span>[SIS] System Integration: <strong>62 Devices</strong></span>
             </div>
           </div>
         </div>
@@ -181,7 +169,7 @@ export const Dashboard = () => {
       <div className="kpi-grid margin-top-lg">
         <div className="kpi-card glowing-card-blue" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
           <div className="kpi-header">
-            <span className="kpi-title">Total Asset IT</span>
+            <span className="kpi-title">Total Asset Perangkat</span>
             <div className="kpi-icon-box bg-blue-soft"><HardDrive className="text-blue" size={22} /></div>
           </div>
           <div className="kpi-value">{totalDevices}</div>
@@ -192,54 +180,52 @@ export const Dashboard = () => {
           <div className="kpi-mini-bar"><div className="bar-fill blue" style={{ width: '100%' }}></div></div>
         </div>
 
-        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
+        <div className="kpi-card glowing-card-emerald" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
           <div className="kpi-header">
-            <span className="kpi-title">Perangkat Aktif (In Use)</span>
+            <span className="kpi-title">Terverifikasi (Verified)</span>
             <div className="kpi-icon-box bg-emerald-soft"><CheckCircle2 className="text-emerald" size={22} /></div>
           </div>
-          <div className="kpi-value">{inUseDevices}</div>
+          <div className="kpi-value">{verifiedDevices}</div>
           <div className="kpi-subtext">
-            <span>{Math.round((inUseDevices / (totalDevices || 1)) * 100)}% dari total perangkat</span>
+            <span>{completionPct}% dari total asset</span>
           </div>
-          <div className="kpi-mini-bar"><div className="bar-fill emerald" style={{ width: `${Math.round((inUseDevices / (totalDevices || 1)) * 100)}%` }}></div></div>
+          <div className="kpi-mini-bar"><div className="bar-fill emerald" style={{ width: `${completionPct}%` }}></div></div>
+        </div>
+
+        <div className="kpi-card glowing-card-amber" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
+          <div className="kpi-header">
+            <span className="kpi-title">Ada Selisih (Discrepancy)</span>
+            <div className="kpi-icon-box bg-amber-soft"><AlertTriangle className="text-amber" size={22} /></div>
+          </div>
+          <div className="kpi-value">{discrepancyDevices}</div>
+          <div className="kpi-subtext">Spesifikasi / lokasi berbeda</div>
+          <div className="kpi-mini-bar"><div className="bar-fill amber" style={{ width: '30%' }}></div></div>
+        </div>
+
+        <div className="kpi-card glowing-card-purple" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>
+          <div className="kpi-header">
+            <span className="kpi-title">Tidak Ditemukan (Missing)</span>
+            <div className="kpi-icon-box bg-purple-soft"><XCircle className="text-rose" size={22} /></div>
+          </div>
+          <div className="kpi-value">{missingDevices}</div>
+          <div className="kpi-subtext">Perlu penelusuran fisik</div>
+          <div className="kpi-mini-bar"><div className="bar-fill purple" style={{ width: '15%' }}></div></div>
         </div>
 
         <div className="kpi-card glowing-card-cyan" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
           <div className="kpi-header">
-            <span className="kpi-title">Stok Tersedia (Stock)</span>
-            <div className="kpi-icon-box bg-cyan-soft"><ShieldCheck className="text-cyan" size={22} /></div>
+            <span className="kpi-title">Belum Opname (Pending)</span>
+            <div className="kpi-icon-box bg-cyan-soft"><Clock className="text-cyan" size={22} /></div>
           </div>
-          <div className="kpi-value">{availableDevices}</div>
-          <div className="kpi-subtext">Siap dialokasikan cepat</div>
-          <div className="kpi-mini-bar"><div className="bar-fill cyan" style={{ width: `${Math.round((availableDevices / (totalDevices || 1)) * 100)}%` }}></div></div>
-        </div>
-
-        <div className="kpi-card glowing-card-amber" onClick={() => { if (setActiveTab) setActiveTab('maintenance'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Perbaikan & Service</span>
-            <div className="kpi-icon-box bg-amber-soft"><Wrench className="text-amber" size={22} /></div>
-          </div>
-          <div className="kpi-value">{maintenanceDevices}</div>
-          <div className="kpi-subtext">
-            <span className="text-amber"><strong>{safeMaintenance.filter(m => m?.status === 'In Progress').length}</strong> Ticket aktif</span>
-          </div>
-          <div className="kpi-mini-bar"><div className="bar-fill amber" style={{ width: '40%' }}></div></div>
-        </div>
-
-        <div className="kpi-card glowing-card-purple" onClick={() => { if (setActiveTab) setActiveTab('checkout'); }}>
-          <div className="kpi-header">
-            <span className="kpi-title">Peminjaman Sementara</span>
-            <div className="kpi-icon-box bg-purple-soft"><Clock className="text-purple" size={22} /></div>
-          </div>
-          <div className="kpi-value">{activeCheckouts}</div>
-          <div className="kpi-subtext">Perangkat luar kantor</div>
-          <div className="kpi-mini-bar"><div className="bar-fill purple" style={{ width: '60%' }}></div></div>
+          <div className="kpi-value">{pendingDevices}</div>
+          <div className="kpi-subtext">Jadwal Opname kuartal ini</div>
+          <div className="kpi-mini-bar"><div className="bar-fill cyan" style={{ width: '45%' }}></div></div>
         </div>
 
         <div className="kpi-card highlight-card glowing-card-gold">
           <div className="kpi-header">
             <span className="kpi-title">Estimasi Nilai Asset</span>
-            <div className="kpi-icon-box bg-gold-soft"><DollarSign className="text-gold" size={22} /></div>
+            <div className="kpi-icon-box bg-gold-soft"><ShieldCheck className="text-gold" size={22} /></div>
           </div>
           <div className="kpi-value format-idr">{formatIDR(totalValuation)}</div>
           <div className="kpi-subtext">Capital expenditure IT</div>
@@ -247,75 +233,28 @@ export const Dashboard = () => {
         </div>
       </div>
 
-      {/* WARNING ALERT BANNER FOR EXPIRING WARRANTIES */}
-      {expiringWarrantyCount > 0 && (
-        <div className="warranty-alert-card">
-          <div className="w-alert-left">
-            <AlertTriangle size={24} className="icon-amber-pulse" />
-            <div>
-              <h4>Peringatan Masa Garansi Asset Terdeteksi!</h4>
-              <p>Terdapat <strong>{expiringWarrantyCount} perangkat</strong> yang masa garansinya berakhir di tahun 2026. Pertimbangkan perpanjangan garansi vendor atau peremajaan perangkat.</p>
-            </div>
-          </div>
-          <button className="btn-secondary-sm" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>
-            Periksa Garansi Perangkat →
-          </button>
-        </div>
-      )}
-
-      {/* CATEGORY & DISTRIBUTION ROW */}
+      {/* MASTER DEPARTEMEN STOCK TAKING ALLOCATION */}
       <div className="dashboard-two-col margin-top">
-        {/* Categories Breakdown */}
-        <div className="dashboard-panel">
-          <div className="panel-header">
-            <div className="panel-title-with-icon">
-              <Sparkles size={18} className="text-cyan" />
-              <h3>Kategori Perangkat & Akses Cepat</h3>
-            </div>
-            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('devices'); }}>Lihat Semua Katalog →</button>
-          </div>
-          <div className="categories-list">
-            {categories.map((cat, idx) => {
-              const Icon = cat.icon;
-              const count = getCategoryCount(cat.name);
-              const pct = totalDevices ? Math.round((count / totalDevices) * 100) : 0;
-              return (
-                <div key={idx} className="category-item" onClick={() => handleCategoryQuickFilter(cat.name)}>
-                  <div className="cat-icon-name">
-                    <div className={`cat-icon-badge ${cat.bg}`}>
-                      <Icon size={16} className={cat.color} />
-                    </div>
-                    <span>{cat.name}</span>
-                  </div>
-                  <div className="cat-progress-wrapper">
-                    <div className="progress-bar">
-                      <div className="progress-fill" style={{ width: `${pct}%` }}></div>
-                    </div>
-                    <span className="cat-count-pill">{count} unit ({pct}%)</span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Department Asset Allocation */}
+        {/* Master Departemen Opname Distribution */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <div className="panel-title-with-icon">
               <Building2 size={18} className="text-blue" />
-              <h3>Distribusi Asset per Departemen ITS</h3>
+              <h3>Master Departemen & Status Opname</h3>
             </div>
-            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('departments'); }}>Detail Unit →</button>
+            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('departments'); }}>Detail Master →</button>
           </div>
           <div className="departments-widget-list">
             {safeDepts.map((dept) => {
-              const deptDevices = safeDevices.filter(d => d && d.departmentId === dept.id);
-              const pct = totalDevices ? Math.round((deptDevices.length / totalDevices) * 100) : 0;
+              const deptDevices = safeDevices.filter(d => d && (d.departmentId === dept.id || d.departmentCode === dept.code));
+              const verifiedDeptDevices = deptDevices.filter(d => d.status === 'Verified' || d.status === 'In Use').length;
+              const deptPct = deptDevices.length ? Math.round((verifiedDeptDevices / deptDevices.length) * 100) : 0;
               return (
-                <div key={dept.id} className="dept-widget-item">
+                <div key={dept.id} className="dept-widget-item" onClick={() => handleDepartmentFilter(dept.code)}>
                   <div className="dept-info">
-                    <div className="dept-icon-mini"><Building2 size={16} className="text-cyan" /></div>
+                    <div className="dept-code-pill font-mono font-bold" style={{ width: '60px', textAlign: 'center' }}>
+                      {dept.code}
+                    </div>
                     <div>
                       <div className="dept-name">{dept.name}</div>
                       <div className="dept-head">Head: {dept.head}</div>
@@ -323,78 +262,36 @@ export const Dashboard = () => {
                   </div>
                   <div className="dept-count-right">
                     <div className="dept-count-badge">
-                      <strong>{deptDevices.length}</strong> Perangkat
+                      <strong>{verifiedDeptDevices}/{deptDevices.length}</strong> Verified
                     </div>
-                    <div className="mini-pct">{pct}% dari total</div>
+                    <div className="mini-pct">{deptPct}% Selesai</div>
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
-      </div>
 
-      {/* BOTTOM ROW: RECENT ACTIVITY & MAINTENANCE TICKETS */}
-      <div className="dashboard-two-col">
-        {/* Maintenance Tickets & Alerts */}
-        <div className="dashboard-panel">
-          <div className="panel-header">
-            <div className="panel-title-with-icon">
-              <Wrench size={18} className="text-amber" />
-              <h3>Status Service & Maintenance Ticket</h3>
-            </div>
-            <button className="btn-secondary-sm" onClick={() => { if (setIsReportMaintenanceOpen) setIsReportMaintenanceOpen(true); }}>+ Laporkan Rusak</button>
-          </div>
-          <div className="maintenance-alerts-list">
-            {safeMaintenance.length === 0 ? (
-              <div className="empty-state-sm">
-                <CheckCircle2 size={32} className="text-emerald" />
-                <p>Tidak ada ticket perbaikan aktif saat ini.</p>
-              </div>
-            ) : (
-              safeMaintenance.slice(0, 4).map((ticket) => {
-                const statusClass = ticket?.status ? ticket.status.toLowerCase().replace(/\s+/g, '-') : 'available';
-                return (
-                  <div key={ticket.id} className="maintenance-card-sm">
-                    <div className="m-card-header">
-                      <span className={`status-badge status-${statusClass}`}>
-                        {ticket.status || 'Active'}
-                      </span>
-                      <span className="m-date">{ticket.reportDate || ''}</span>
-                    </div>
-                    <h4 className="m-title">{ticket.assetTag || ''} - {ticket.deviceName || ''}</h4>
-                    <p className="m-desc">{ticket.description || ''}</p>
-                    <div className="m-footer">
-                      <span>Pelapor: <strong>{ticket.reportedBy || ''}</strong></span>
-                      <span>Teknisi: <strong>{ticket.technician || ''}</strong></span>
-                    </div>
-                  </div>
-                );
-              })
-            )}
-          </div>
-        </div>
-
-        {/* Audit Log Feed */}
+        {/* Recent Stock Taking Audit Feed */}
         <div className="dashboard-panel">
           <div className="panel-header">
             <div className="panel-title-with-icon">
               <Activity size={18} className="text-cyan" />
-              <h3>Aktivitas Sistem & Audit Trail</h3>
+              <h3>Aktivitas Audit Stock Opname Terbaru</h3>
             </div>
-            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('audit'); }}>Semua Audit Log →</button>
+            <button className="btn-link" onClick={() => { if (setActiveTab) setActiveTab('stocktaking'); }}>Semua Record →</button>
           </div>
           <div className="audit-feed-list">
-            {safeLogs.slice(0, 5).map((log) => (
-              <div key={log.id} className="audit-feed-item">
-                <div className="audit-dot"></div>
+            {safeStockTakings.slice(0, 5).map((stk) => (
+              <div key={stk.id} className="audit-feed-item">
+                <div className="audit-dot" style={{ background: stk.auditResultStatus === 'Verified' ? '#10b981' : '#f59e0b' }}></div>
                 <div className="audit-content">
                   <div className="audit-meta">
-                    <strong>{log.action || ''}</strong>
-                    <span className="audit-time">{log.timestamp || ''}</span>
+                    <strong>[{stk.departmentCode}] {stk.assetTag} - {stk.deviceName}</strong>
+                    <span className="audit-time">{stk.stockTakingDate}</span>
                   </div>
-                  <p className="audit-details">{log.details || ''}</p>
-                  <div className="audit-user">Oleh: {log.user || ''}</div>
+                  <p className="audit-details">Hasil: <strong className="text-cyan">{stk.auditResultStatus}</strong> ({stk.physicalCondition}) • {stk.notes}</p>
+                  <div className="audit-user">Auditor: {stk.auditorName}</div>
                 </div>
               </div>
             ))}
