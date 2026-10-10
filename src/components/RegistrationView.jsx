@@ -4,9 +4,7 @@ import {
   Building2,
   Cpu,
   User,
-  Mail,
   Lock,
-  BadgeCheck,
   ShieldCheck,
   ArrowRight,
   LogIn,
@@ -30,13 +28,10 @@ export const RegistrationView = () => {
 
   const [activeTab, setAuthTab] = useState('register'); // 'register' | 'login'
 
-  // Registration Form State
+  // Registration Form State (simplified: Nama, Departemen, Password)
   const [regForm, setRegForm] = useState({
     name: '',
-    employeeId: '',
     departmentCode: 'IS',
-    position: 'Auditor Stock Opname IT',
-    email: '',
     password: '',
     agreeSOP: true
   });
@@ -57,28 +52,21 @@ export const RegistrationView = () => {
     setErrorMessage('');
 
     if (!regForm.name.trim()) {
-      setErrorMessage('Silakan isi Nama Lengkap Pegawai.');
-      return;
-    }
-    if (!regForm.employeeId.trim()) {
-      setErrorMessage('Silakan isi NIK / ID Karyawan ITS.');
-      return;
-    }
-    if (!regForm.email.trim()) {
-      setErrorMessage('Silakan isi Email Korporat Toray.');
+      setErrorMessage('Silakan isi Nama Lengkap Pegawai / Auditor.');
       return;
     }
 
     const deptObj = safeDepts.find(d => d.code === regForm.departmentCode);
+    const generatedId = `ITS-USR-${Date.now().toString().slice(-4)}`;
 
     const userData = {
-      id: regForm.employeeId.toUpperCase(),
-      name: regForm.name,
+      id: generatedId,
+      name: regForm.name.trim(),
       deptId: deptObj ? deptObj.id : `DEPT-${regForm.departmentCode}`,
       deptCode: regForm.departmentCode,
-      position: regForm.position,
-      email: regForm.email,
-      role: regForm.position,
+      position: 'Auditor Stock Opname',
+      email: `${regForm.name.toLowerCase().replace(/\s+/g, '.')}@toray.co.id`,
+      role: 'Auditor Stock Opname',
       loginTime: new Date().toISOString()
     };
 
@@ -205,35 +193,18 @@ export const RegistrationView = () => {
                 </div>
               </div>
 
-              <div className="auth-grid-two">
-                <div className="form-group">
-                  <label>Nama Lengkap Pegawai / Auditor *:</label>
-                  <div className="input-with-icon">
-                    <User size={16} className="field-icon" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: Muhammad Farhan"
-                      value={regForm.name}
-                      onChange={(e) => setRegForm(prev => ({ ...prev, name: e.target.value }))}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>NIK / ID Karyawan ITS *:</label>
-                  <div className="input-with-icon">
-                    <BadgeCheck size={16} className="field-icon" />
-                    <input
-                      type="text"
-                      required
-                      placeholder="Contoh: ITS-EMP-1092"
-                      value={regForm.employeeId}
-                      onChange={(e) => setRegForm(prev => ({ ...prev, employeeId: e.target.value }))}
-                      className="form-input"
-                    />
-                  </div>
+              <div className="form-group">
+                <label>Nama Lengkap Pegawai / Auditor *:</label>
+                <div className="input-with-icon">
+                  <User size={16} className="field-icon" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Contoh: Muhammad Farhan"
+                    value={regForm.name}
+                    onChange={(e) => setRegForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="form-input"
+                  />
                 </div>
               </div>
 
@@ -253,38 +224,6 @@ export const RegistrationView = () => {
                         </option>
                       ))}
                     </select>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Jabatan / Peran Operasional *:</label>
-                  <select
-                    value={regForm.position}
-                    onChange={(e) => setRegForm(prev => ({ ...prev, position: e.target.value }))}
-                    className="form-select"
-                  >
-                    <option value="Auditor Stock Opname IT">Auditor Stock Opname IT</option>
-                    <option value="IT Support & Infrastructure">IT Support & Infrastructure</option>
-                    <option value="PIC Asset Departemen">PIC Asset Departemen</option>
-                    <option value="Plant Maintenance Engineer">Plant Maintenance Engineer</option>
-                    <option value="Department Manager">Department Manager</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="auth-grid-two margin-top-sm">
-                <div className="form-group">
-                  <label>Email Korporat Toray *:</label>
-                  <div className="input-with-icon">
-                    <Mail size={16} className="field-icon" />
-                    <input
-                      type="email"
-                      required
-                      placeholder="nama.pegawai@toray.co.id"
-                      value={regForm.email}
-                      onChange={(e) => setRegForm(prev => ({ ...prev, email: e.target.value }))}
-                      className="form-input"
-                    />
                   </div>
                 </div>
 
@@ -331,18 +270,18 @@ export const RegistrationView = () => {
                 <LogIn size={20} className="text-cyan" />
                 <div>
                   <strong>Masuk ke Sesi Stock Taking Terdaftar</strong>
-                  <p>Masukkan NIK Karyawan atau Email Toray Anda untuk melanjutkan pekerjaan audit.</p>
+                  <p>Masukkan Nama Pegawai atau Akun Anda untuk melanjutkan pekerjaan audit.</p>
                 </div>
               </div>
 
               <div className="form-group margin-top-sm">
-                <label>NIK Karyawan atau Email Toray *:</label>
+                <label>Nama Pegawai / Akun Terdaftar *:</label>
                 <div className="input-with-icon">
                   <User size={16} className="field-icon" />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: ahmad.rizky@toray.co.id atau EMP-002"
+                    placeholder="Contoh: Ahmad Rizky atau Budi Santoso"
                     value={loginForm.identifier}
                     onChange={(e) => setLoginForm(prev => ({ ...prev, identifier: e.target.value }))}
                     className="form-input"
