@@ -22,10 +22,15 @@ import {
   Zap,
   Activity,
   QrCode,
-  Wifi
+  Wifi,
+  LayoutGrid,
+  LayoutList,
+  Smartphone
 } from 'lucide-react';
 
 export const Dashboard = () => {
+  const [viewMode, setViewMode] = React.useState('auto'); // 'auto' | 'cards' | 'table'
+
   const {
     devices = [],
     departments = [],
@@ -304,151 +309,300 @@ export const Dashboard = () => {
           >
             <RotateCcw size={16} />
           </button>
+
+          {/* VIEW MODE TOGGLE (TABEL / KARTU MOBILE) */}
+          <div className="view-mode-toggle-group">
+            <button
+              type="button"
+              className={`btn-view-toggle ${viewMode === 'table' ? 'active' : ''}`}
+              onClick={() => setViewMode(viewMode === 'table' ? 'auto' : 'table')}
+              title="Paksa Tampilan Tabel"
+            >
+              <LayoutList size={14} />
+              <span className="toggle-text">Tabel</span>
+            </button>
+            <button
+              type="button"
+              className={`btn-view-toggle ${viewMode === 'cards' ? 'active' : ''}`}
+              onClick={() => setViewMode(viewMode === 'cards' ? 'auto' : 'cards')}
+              title="Tampilan Kartu Mobile"
+            >
+              <Smartphone size={14} />
+              <span className="toggle-text">Mobile Card</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* MAIN CLIENT INVENTORY TABLE */}
+      {/* MAIN INVENTORY CONTAINER (DESKTOP TABLE & MOBILE CARDS) */}
       <div className="table-wrapper-card">
-        <div className="table-responsive">
-          <table className="client-inventory-table">
-            <thead>
-              <tr>
-                <th className="col-no">No</th>
-                <th className="col-dept">Departemen / Section</th>
-                <th className="col-comp">Computer Name</th>
-                <th className="col-type">Type</th>
-                <th className="col-user">User</th>
-                <th className="col-status">Status</th>
-                <th className="col-remark">Remark / Keterangan</th>
-                <th className="col-action text-right">Aksi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredDevices.length === 0 ? (
+        {/* 1. DESKTOP TABLE VIEW */}
+        <div className={`desktop-table-container ${viewMode === 'cards' ? 'is-hidden' : ''} ${viewMode === 'table' ? 'is-forced' : ''}`}>
+          <div className="table-responsive">
+            <table className="client-inventory-table">
+              <thead>
                 <tr>
-                  <td colSpan={8} className="empty-table-cell">
-                    <Monitor size={36} className="text-muted mb-2" />
-                    <p className="font-semibold">Tidak ada komputer yang sesuai dengan filter.</p>
-                    <button
-                      className="btn-secondary-sm margin-top-sm"
-                      onClick={() => {
-                        setFilterDept('All');
-                        setFilterStatus('All');
-                        setFilterType('All');
-                        setSearchQuery('');
-                      }}
-                    >
-                      Reset Semua Filter
-                    </button>
-                  </td>
+                  <th className="col-no">No</th>
+                  <th className="col-dept">Departemen / Section</th>
+                  <th className="col-comp">Computer Name</th>
+                  <th className="col-type">Type</th>
+                  <th className="col-user">User</th>
+                  <th className="col-status">Status</th>
+                  <th className="col-remark">Remark / Keterangan</th>
+                  <th className="col-action text-right">Aksi</th>
                 </tr>
-              ) : (
-                filteredDevices.map((device, index) => {
-                  return (
-                    <tr key={device.id} className="table-data-row">
-                      {/* 1. No */}
-                      <td className="col-no text-muted font-mono">{index + 1}</td>
+              </thead>
+              <tbody>
+                {filteredDevices.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="empty-table-cell">
+                      <Monitor size={36} className="text-muted mb-2" />
+                      <p className="font-semibold">Tidak ada komputer yang sesuai dengan filter.</p>
+                      <button
+                        className="btn-secondary-sm margin-top-sm"
+                        onClick={() => {
+                          setFilterDept('All');
+                          setFilterStatus('All');
+                          setFilterType('All');
+                          setSearchQuery('');
+                        }}
+                      >
+                        Reset Semua Filter
+                      </button>
+                    </td>
+                  </tr>
+                ) : (
+                  filteredDevices.map((device, index) => {
+                    return (
+                      <tr key={device.id} className="table-data-row">
+                        {/* 1. No */}
+                        <td className="col-no text-muted font-mono">{index + 1}</td>
 
-                      {/* 2. Departemen / Section */}
-                      <td className="col-dept">
-                        <span className={`dept-pill-badge dept-${device.department.toLowerCase()}`}>
-                          {device.department}
-                        </span>
-                      </td>
+                        {/* 2. Departemen / Section */}
+                        <td className="col-dept">
+                          <span className={`dept-pill-badge dept-${device.department.toLowerCase()}`}>
+                            {device.department}
+                          </span>
+                        </td>
 
-                      {/* 3. Computer Name & IP Address */}
-                      <td className="col-comp">
-                        <div className="comp-name-wrapper">
-                          <span className="comp-name-text">{device.computerName}</span>
-                          {device.ipAddress ? (
-                            <span className="comp-ip-badge" title="IP Address Jaringan ITS">
-                              <Wifi size={11} className="ip-icon" />
-                              <span>{device.ipAddress}</span>
-                            </span>
-                          ) : (
-                            <span className="comp-ip-badge none" title="Belum ada IP Address">
-                              <span>No IP</span>
-                            </span>
-                          )}
-                        </div>
-                      </td>
+                        {/* 3. Computer Name & IP Address */}
+                        <td className="col-comp">
+                          <div className="comp-name-wrapper">
+                            <span className="comp-name-text">{device.computerName}</span>
+                            {device.ipAddress ? (
+                              <span className="comp-ip-badge" title="IP Address Jaringan ITS">
+                                <Wifi size={11} className="ip-icon" />
+                                <span>{device.ipAddress}</span>
+                              </span>
+                            ) : (
+                              <span className="comp-ip-badge none" title="Belum ada IP Address">
+                                <span>No IP</span>
+                              </span>
+                            )}
+                          </div>
+                        </td>
 
-                      {/* 4. Type */}
-                      <td className="col-type">
-                        <div className="type-badge-row">
-                          {getTypeIcon(device.type)}
-                          <span>{device.type}</span>
-                        </div>
-                      </td>
+                        {/* 4. Type */}
+                        <td className="col-type">
+                          <div className="type-badge-row">
+                            {getTypeIcon(device.type)}
+                            <span>{device.type}</span>
+                          </div>
+                        </td>
 
-                      {/* 5. User */}
-                      <td className="col-user">
-                        <div className="user-text-row">
-                          <User size={13} className="text-muted" />
-                          <strong>{device.user}</strong>
-                        </div>
-                      </td>
+                        {/* 5. User */}
+                        <td className="col-user">
+                          <div className="user-text-row">
+                            <User size={13} className="text-muted" />
+                            <strong>{device.user}</strong>
+                          </div>
+                        </td>
 
-                      {/* 6. Status (Online, In, Out, Not Used, Broken, Disposal) */}
-                      <td className="col-status">
-                        <div className="status-select-container">
-                          <select
-                            value={device.status}
-                            onChange={(e) => updateDeviceStatus(device.id, e.target.value)}
-                            className={`status-inline-select ${getStatusBadgeClass(device.status)}`}
-                          >
-                            {statusOptions.map((opt) => (
-                              <option key={opt.value} value={opt.value}>
-                                {opt.label}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                      </td>
+                        {/* 6. Status (Online, In, Out, Not Used, Broken, Disposal) */}
+                        <td className="col-status">
+                          <div className="status-select-container">
+                            <select
+                              value={device.status}
+                              onChange={(e) => updateDeviceStatus(device.id, e.target.value)}
+                              className={`status-inline-select ${getStatusBadgeClass(device.status)}`}
+                            >
+                              {statusOptions.map((opt) => (
+                                <option key={opt.value} value={opt.value}>
+                                  {opt.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </td>
 
-                      {/* 7. Remark / Keterangan */}
-                      <td className="col-remark">
-                        <span className="remark-text" title={device.remark}>
-                          {device.remark || '-'}
-                        </span>
-                      </td>
+                        {/* 7. Remark / Keterangan */}
+                        <td className="col-remark">
+                          <span className="remark-text" title={device.remark}>
+                            {device.remark || '-'}
+                          </span>
+                        </td>
 
-                      {/* 8. Aksi */}
-                      <td className="col-action text-right">
-                        <div className="action-btns-row">
-                          <button
-                            className="btn-row-action barcode"
-                            onClick={() => openBarcodePrint(device)}
-                            title="Cetak & Lihat Label Barcode / QR Komputer ini"
-                          >
-                            <QrCode size={14} />
-                          </button>
-                          <button
-                            className="btn-row-action edit"
-                            onClick={() => openEditModal(device)}
-                            title="Edit data komputer ini"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            className="btn-row-action delete"
-                            onClick={() => {
-                              if (window.confirm(`Hapus komputer [${device.computerName}] dari daftar?`)) {
-                                deleteDevice(device.id);
-                              }
-                            }}
-                            title="Hapus komputer ini"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+                        {/* 8. Aksi */}
+                        <td className="col-action text-right">
+                          <div className="action-btns-row">
+                            <button
+                              className="btn-row-action barcode"
+                              onClick={() => openBarcodePrint(device)}
+                              title="Cetak & Lihat Label Barcode / QR Komputer ini"
+                            >
+                              <QrCode size={14} />
+                            </button>
+                            <button
+                              className="btn-row-action edit"
+                              onClick={() => openEditModal(device)}
+                              title="Edit data komputer ini"
+                            >
+                              <Edit2 size={14} />
+                            </button>
+                            <button
+                              className="btn-row-action delete"
+                              onClick={() => {
+                                if (window.confirm(`Hapus komputer [${device.computerName}] dari daftar?`)) {
+                                  deleteDevice(device.id);
+                                }
+                              }}
+                              title="Hapus komputer ini"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* 2. MOBILE TOUCH CARDS VIEW */}
+        <div className={`mobile-cards-container ${viewMode === 'table' ? 'is-hidden' : ''} ${viewMode === 'cards' ? 'is-forced' : ''}`}>
+          {filteredDevices.length === 0 ? (
+            <div className="empty-cards-box">
+              <Monitor size={36} className="text-muted mb-2" />
+              <p className="font-semibold text-white">Tidak ada komputer yang sesuai dengan filter.</p>
+              <button
+                className="btn-secondary-sm margin-top-sm"
+                onClick={() => {
+                  setFilterDept('All');
+                  setFilterStatus('All');
+                  setFilterType('All');
+                  setSearchQuery('');
+                }}
+              >
+                Reset Semua Filter
+              </button>
+            </div>
+          ) : (
+            <div className="mobile-cards-grid">
+              {filteredDevices.map((device, index) => (
+                <div key={device.id} className="mobile-device-card">
+                  {/* CARD TOP HEADER */}
+                  <div className="card-top-header">
+                    <div className="card-comp-info">
+                      <div className="card-type-avatar">
+                        {getTypeIcon(device.type)}
+                      </div>
+                      <div className="card-name-group">
+                        <span className="card-comp-name">{device.computerName}</span>
+                        {device.ipAddress ? (
+                          <span className="comp-ip-badge">
+                            <Wifi size={10} className="ip-icon" />
+                            <span>{device.ipAddress}</span>
+                          </span>
+                        ) : (
+                          <span className="comp-ip-badge none">No IP</span>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="card-dept-badge-group">
+                      <span className="card-seq-num font-mono">#{index + 1}</span>
+                      <span className={`dept-pill-badge dept-${device.department.toLowerCase()}`}>
+                        {device.department}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* CARD SPECS MATRIX */}
+                  <div className="card-specs-body">
+                    <div className="card-spec-row">
+                      <span className="spec-lbl">User:</span>
+                      <span className="spec-val font-bold">
+                        <User size={12} className="inline-icon text-muted" />
+                        {device.user}
+                      </span>
+                    </div>
+                    <div className="card-spec-row">
+                      <span className="spec-lbl">Tipe Unit:</span>
+                      <span className="spec-val text-slate-300">{device.type}</span>
+                    </div>
+                    {device.remark && (
+                      <div className="card-spec-row full">
+                        <span className="spec-lbl">Remark:</span>
+                        <span className="spec-val text-muted text-xs">{device.remark}</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* CARD STATUS & QUICK ACTION CONTROLS */}
+                  <div className="card-footer-controls">
+                    <div className="card-status-control">
+                      <span className="status-ctrl-lbl">Status:</span>
+                      <select
+                        value={device.status}
+                        onChange={(e) => updateDeviceStatus(device.id, e.target.value)}
+                        className={`status-inline-select mobile ${getStatusBadgeClass(device.status)}`}
+                      >
+                        {statusOptions.map((opt) => (
+                          <option key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div className="card-action-buttons">
+                      <button
+                        type="button"
+                        className="btn-card-action barcode"
+                        onClick={() => openBarcodePrint(device)}
+                        title="Cetak Barcode / QR Label"
+                      >
+                        <QrCode size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-card-action edit"
+                        onClick={() => openEditModal(device)}
+                        title="Edit Data Komputer"
+                      >
+                        <Edit2 size={15} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-card-action delete"
+                        onClick={() => {
+                          if (window.confirm(`Hapus [${device.computerName}] dari daftar?`)) {
+                            deleteDevice(device.id);
+                          }
+                        }}
+                        title="Hapus Komputer"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* TABLE FOOTER SUMMARY */}
@@ -460,6 +614,28 @@ export const Dashboard = () => {
             PT. Indonesia Toray Synthetics • Device Master Management
           </div>
         </div>
+      </div>
+
+      {/* MOBILE FLOATING ACTION BAR (FAB) */}
+      <div className="mobile-floating-bar">
+        <button
+          type="button"
+          className="mobile-fab-btn scan"
+          onClick={() => openScannerModal()}
+          title="Scan Barcode / QR dengan Kamera HP"
+        >
+          <QrCode size={18} />
+          <span>Scan Barcode</span>
+        </button>
+        <button
+          type="button"
+          className="mobile-fab-btn add"
+          onClick={openAddModal}
+          title="Tambah Komputer Baru"
+        >
+          <Plus size={18} />
+          <span>+ Tambah</span>
+        </button>
       </div>
     </div>
   );

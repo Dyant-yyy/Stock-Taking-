@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import {
   X,
@@ -14,7 +14,9 @@ import {
   Clock,
   ArrowRight,
   ShieldCheck,
-  Check
+  Check,
+  Camera,
+  CameraOff
 } from 'lucide-react';
 
 export const BarcodeScannerModal = () => {
@@ -31,12 +33,54 @@ export const BarcodeScannerModal = () => {
   const [barcodeInput, setBarcodeInput] = useState('');
   const [selectedDevice, setSelectedDevice] = useState(null);
   const [verificationFeedback, setVerificationFeedback] = useState(null);
+  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [cameraError, setCameraError] = useState(null);
+
+  const videoRef = useRef(null);
+  const streamRef = useRef(null);
 
   useEffect(() => {
     if (scannedDevice) {
       setSelectedDevice(scannedDevice);
     }
   }, [scannedDevice]);
+
+  // Clean up camera on unmount or modal close
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraActive(false);
+  };
+
+  const startCamera = async () => {
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setIsCameraActive(true);
+    } catch (err) {
+      console.warn('Camera error:', err);
+      setCameraError('Kamera tidak dapat diakses atau izin ditolak browser.');
+    }
+  };
+
+  const handleClose = () => {
+    stopCamera();
+    closeScannerModal();
+  };
+
+  useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
 
   if (!isScannerOpen) return null;
 
@@ -96,7 +140,7 @@ export const BarcodeScannerModal = () => {
   };
 
   return (
-    <div className="modal-backdrop" onClick={closeScannerModal}>
+    <div className="modal-backdrop" onClick={handleClose}>
       <div className="modal-container modal-lg" onClick={(e) => e.stopPropagation()}>
         {/* HEADER */}
         <div className="modal-header">
@@ -109,7 +153,7 @@ export const BarcodeScannerModal = () => {
               <p className="modal-sub-text">Integrasi Barcode Fisik ke Database Web PT. Indonesia Toray Synthetics</p>
             </div>
           </div>
-          <button className="btn-modal-close" onClick={closeScannerModal}>
+          <button className="btn-modal-close" onClick={handleClose}>
             <X size={20} />
           </button>
         </div>
@@ -117,13 +161,39 @@ export const BarcodeScannerModal = () => {
         <div className="modal-body">
           {/* CAMERA / SCANNER SIMULATION FRAME */}
           <div className="scanner-camera-frame">
+            {isCameraActive ? (
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className="scanner-live-video"
+              />
+            ) : null}
             <div className="scanner-laser-line"></div>
-            <div className="scanner-overlay-grid">
-              <QrCode size={80} className="qr-scanner-icon" />
-              <p className="scanner-instruction">
-                Arahkan Barcode / QR Code Asset Tag pada Komputer atau Gunakan Barcode Scanner Gun
-              </p>
-            </div>
+            {!isCameraActive && (
+              <div className="scanner-overlay-grid">
+                <QrCode size={70} className="qr-scanner-icon" />
+                <p className="scanner-instruction">
+                  Arahkan Barcode / QR Code Asset Tag pada Komputer atau Gunakan Barcode Gun
+                </p>
+              </div>
+            )}
+          </div>
+
+          {/* MOBILE CAMERA TOGGLE */}
+          <div className="camera-toggle-row margin-top-sm">
+            <button
+              type="button"
+              className={`btn-camera-toggle ${isCameraActive ? 'active' : ''}`}
+              onClick={isCameraActive ? stopCamera : startCamera}
+            >
+              {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
+              <span>{isCameraActive ? 'Matikan Kamera HP' : '📷 Buka Kamera HP / Scanner'}</span>
+            </button>
+            {cameraError && (
+              <span className="camera-err-msg">{cameraError}</span>
+            )}
           </div>
 
           {/* INPUT BARCODE FIELD (AUTO-TRIGGER FROM BARCODE GUN) */}
@@ -257,7 +327,7 @@ export const BarcodeScannerModal = () => {
         </div>
 
         <div className="modal-footer">
-          <button className="btn-secondary" onClick={closeScannerModal}>
+          <button className="btn-secondary" onClick={handleClose}>
             Tutup Scanner
           </button>
         </div>
