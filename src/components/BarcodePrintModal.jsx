@@ -1,5 +1,6 @@
 import React from 'react';
 import { useInventory } from '../context/InventoryContext';
+import torayLogo from '../assets/toray-logo.jpg';
 import { X, Printer, QrCode, Monitor, Building2, User, Globe, Cpu } from 'lucide-react';
 
 export const BarcodePrintModal = () => {
@@ -46,8 +47,13 @@ export const BarcodePrintModal = () => {
           <div className="physical-barcode-sticker" id="printable-sticker">
             {/* STICKER TOP HEADER */}
             <div className="sticker-header">
-              <div className="sticker-toray-badge">PT. INDONESIA TORAY SYNTHETICS</div>
-              <div className="sticker-plant">TANGERANG PLANT</div>
+              <div className="sticker-toray-brand-row">
+                <img src={torayLogo} alt="Toray Logo" className="sticker-toray-logo-img" />
+                <div className="sticker-toray-company-info">
+                  <div className="sticker-toray-badge">PT. INDONESIA TORAY SYNTHETICS</div>
+                  <div className="sticker-plant">TANGERANG PLANT • ASSET TAG</div>
+                </div>
+              </div>
             </div>
 
             {/* STICKER BODY */}

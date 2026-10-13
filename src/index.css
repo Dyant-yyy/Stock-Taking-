@@ -178,6 +178,29 @@ input, select, textarea {
   box-shadow: 0 4px 14px rgba(0, 64, 152, 0.4);
 }
 
+.header-toray-capsule {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 163, 224, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  transition: transform 0.2s ease;
+}
+
+.header-toray-capsule:hover {
+  transform: translateY(-1px);
+}
+
+.header-toray-img {
+  height: 24px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
 .company-title {
   font-family: var(--font-heading);
   font-weight: 800;
@@ -2270,65 +2293,198 @@ input, select, textarea {
 
 .auth-container {
   width: 100%;
-  max-width: 720px;
+  max-width: 760px;
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.auth-header-card {
+/* ==========================================================================
+   GRAND TORAY CORPORATE WELCOME HERO (TAMPILAN AWAL KEREN & ELEGAN)
+   ========================================================================== */
+.auth-hero-branding {
+  position: relative;
+  background: linear-gradient(135deg, rgba(8, 16, 36, 0.95) 0%, rgba(3, 8, 20, 0.98) 100%);
+  border: 1px solid rgba(0, 163, 224, 0.45);
+  border-radius: 24px;
+  padding: 32px 36px;
+  box-shadow: 
+    0 24px 50px rgba(0, 0, 0, 0.7),
+    0 0 35px rgba(0, 64, 152, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  backdrop-filter: blur(20px);
+}
+
+.auth-hero-glow {
+  position: absolute;
+  top: -60px;
+  right: -40px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 163, 224, 0.3) 0%, rgba(0, 64, 152, 0.12) 60%, transparent 80%);
+  pointer-events: none;
+  filter: blur(35px);
+}
+
+.auth-hero-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
-  background: rgba(15, 23, 42, 0.92);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(0, 163, 224, 0.35);
-  border-radius: 16px;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
-}
-
-.auth-logo-badge {
-  display: flex;
-  align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+  position: relative;
+  z-index: 2;
 }
 
-.brand-icon.lg {
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--toray-blue), #0056cb);
-  display: flex;
+.toray-logo-showcase-box {
+  background: #ffffff;
+  padding: 10px 22px;
+  border-radius: 14px;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0, 64, 152, 0.5);
+  box-shadow: 
+    0 8px 24px rgba(0, 40, 120, 0.35),
+    0 0 18px rgba(0, 163, 224, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.auth-corporate-name {
-  font-family: var(--font-heading);
-  font-size: 0.9rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  color: var(--toray-cyan);
+.toray-logo-showcase-box:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 
+    0 12px 32px rgba(0, 40, 120, 0.45),
+    0 0 25px rgba(0, 163, 224, 0.5);
 }
 
-.auth-app-name {
-  font-size: 0.8rem;
-  color: #94a3b8;
+.toray-official-logo-img {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.auth-hero-tags {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .auth-plant-tag {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
+  padding: 6px 14px;
   background: rgba(0, 163, 224, 0.12);
-  border: 1px solid rgba(0, 163, 224, 0.3);
+  border: 1px solid rgba(0, 163, 224, 0.35);
   border-radius: 20px;
   font-size: 0.75rem;
   color: var(--toray-cyan);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.auth-iso-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  border-radius: 20px;
+  font-size: 0.75rem;
+  color: #34d399;
+  font-weight: 700;
+}
+
+.auth-hero-text-block {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 20px;
+}
+
+.auth-plant-subtitle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.73rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--toray-cyan);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.auth-main-headline {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.25;
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+  background: linear-gradient(180deg, #ffffff 30%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-hero-description {
+  font-size: 0.88rem;
+  color: #94a3b8;
+  line-height: 1.55;
+  max-width: 620px;
+}
+
+.auth-feature-pills {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 2;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.feature-pill-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  background: rgba(11, 19, 41, 0.7);
+  border: 1px solid rgba(0, 163, 224, 0.2);
+  border-radius: 20px;
+  font-size: 0.75rem;
   font-weight: 600;
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+}
+
+.feature-pill-item:hover {
+  border-color: var(--toray-cyan);
+  color: #ffffff;
+  background: rgba(0, 163, 224, 0.15);
+}
+
+.feature-pill-item.live {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+  color: #a7f3d0;
+}
+
+@media (max-width: 640px) {
+  .auth-hero-branding {
+    padding: 24px 20px;
+  }
+  .auth-main-headline {
+    font-size: 1.45rem;
+  }
+  .toray-official-logo-img {
+    height: 38px;
+  }
 }
 
 .auth-main-card {
@@ -3345,16 +3501,32 @@ input, select, textarea {
   border-bottom: 2px solid #00255b;
   padding-bottom: 6px;
   margin-bottom: 12px;
+}
+
+.sticker-toray-brand-row {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+
+.sticker-toray-logo-img {
+  height: 28px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
+
+.sticker-toray-company-info {
+  display: flex;
+  flex-direction: column;
 }
 
 .sticker-toray-badge {
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 900;
   color: #00255b;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
 }
 
 .sticker-plant {

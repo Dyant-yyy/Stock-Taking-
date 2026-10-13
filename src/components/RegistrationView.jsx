@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
+import torayLogo from '../assets/toray-logo.jpg';
 import {
   Building2,
   Cpu,
@@ -15,7 +16,8 @@ import {
   Flame,
   Sparkles,
   Zap,
-  QrCode
+  QrCode,
+  Check
 } from 'lucide-react';
 
 export const RegistrationView = () => {
@@ -136,20 +138,58 @@ export const RegistrationView = () => {
   return (
     <div className="auth-portal-page">
       <div className="auth-container">
-        {/* BRANDING HEADER */}
-        <div className="auth-header-card">
-          <div className="auth-logo-badge">
-            <div className="brand-icon lg">
-              <Cpu size={24} className="icon-toray" />
+        {/* GRAND TORAY CORPORATE WELCOME HERO */}
+        <div className="auth-hero-branding">
+          <div className="auth-hero-glow"></div>
+          
+          <div className="auth-hero-top">
+            <div className="toray-logo-showcase-box">
+              <img 
+                src={torayLogo} 
+                alt="TORAY Innovation by Chemistry" 
+                className="toray-official-logo-img" 
+              />
             </div>
-            <div>
-              <div className="auth-corporate-name">PT. INDONESIA TORAY SYNTHETICS</div>
-              <div className="auth-app-name">ITS IT Device Stock Taking & Audit System</div>
+            
+            <div className="auth-hero-tags">
+              <div className="auth-plant-tag">
+                <Globe size={13} />
+                <span>Tangerang Plant, Banten</span>
+              </div>
+              <div className="auth-iso-tag">
+                <ShieldCheck size={13} />
+                <span>ISO 9001:2015</span>
+              </div>
             </div>
           </div>
-          <div className="auth-plant-tag">
-            <Globe size={14} />
-            <span>Tangerang Plant, Banten</span>
+
+          <div className="auth-hero-text-block">
+            <div className="auth-plant-subtitle">
+              <Sparkles size={13} className="text-cyan" />
+              <span>PT. INDONESIA TORAY SYNTHETICS • INFORMATION SYSTEM DIVISION</span>
+            </div>
+            <h1 className="auth-main-headline">
+              IT Device Stock Taking & Audit System
+            </h1>
+            <p className="auth-hero-description">
+              Portal inventarisasi master komputer, laptop, & perangkat IT terintegrasi barcode scanner untuk verifikasi fisik dan monitoring status departemen pabrik.
+            </p>
+          </div>
+
+          {/* 3 ELEGANT FEATURE PILLS */}
+          <div className="auth-feature-pills">
+            <div className="feature-pill-item live">
+              <span className="live-pulse"></span>
+              <span>Stock Opname Fisik</span>
+            </div>
+            <div className="feature-pill-item">
+              <Cpu size={13} className="text-cyan" />
+              <span>Spesifikasi IP Address</span>
+            </div>
+            <div className="feature-pill-item">
+              <QrCode size={13} className="text-cyan" />
+              <span>Scan Barcode & QR Status</span>
+            </div>
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { useInventory } from '../context/InventoryContext';
+import torayLogo from '../assets/toray-logo.jpg';
 import {
   Monitor,
   Plus,
@@ -21,8 +22,8 @@ export const Header = () => {
     <header className="header-bar">
       <div className="header-left">
         <div className="brand-logo">
-          <div className="brand-icon">
-            <Cpu size={20} className="icon-toray" />
+          <div className="header-toray-capsule">
+            <img src={torayLogo} alt="Toray Logo" className="header-toray-img" />
           </div>
           <div className="brand-text">
             <div className="company-title">PT. INDONESIA TORAY SYNTHETICS</div>
