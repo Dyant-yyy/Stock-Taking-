@@ -3,6 +3,10 @@ import {
   initialDepartments,
   initialDevices,
   initialLogs,
+  initialMonthlyInspections,
+  monthOptions,
+  physicalConditionOptions,
+  inspectionResultOptions,
   statusOptions,
   typeOptions
 } from '../data/initialData';
@@ -49,6 +53,11 @@ export const InventoryProvider = ({ children }) => {
   const [departments, setDepartments] = useState(() => safeParseStorage('its_departments_v3', initialDepartments));
   const [logs, setLogs] = useState(() => safeParseStorage('its_logs_v3', initialLogs));
 
+  // Monthly Device Inspections & Physical Audit Logs
+  const [monthlyInspections, setMonthlyInspections] = useState(() => 
+    safeParseStorage('its_monthly_inspections_v1', initialMonthlyInspections)
+  );
+
   // Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDept, setFilterDept] = useState('All');
@@ -85,6 +94,12 @@ export const InventoryProvider = ({ children }) => {
       localStorage.setItem('its_logs_v3', JSON.stringify(logs));
     } catch (e) {}
   }, [logs]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('its_monthly_inspections_v1', JSON.stringify(monthlyInspections));
+    } catch (e) {}
+  }, [monthlyInspections]);
 
   // Activity logger
   const addLog = (action, details, category = 'General') => {
@@ -176,14 +191,81 @@ export const InventoryProvider = ({ children }) => {
     localStorage.removeItem('its_devices_v3');
     localStorage.removeItem('its_departments_v3');
     localStorage.removeItem('its_logs_v3');
+    localStorage.removeItem('its_monthly_inspections_v1');
     setDevices(initialDevices);
     setDepartments(initialDepartments);
     setLogs(initialLogs);
+    setMonthlyInspections(initialMonthlyInspections);
     setFilterDept('All');
     setFilterStatus('All');
     setFilterType('All');
     setSearchQuery('');
     addLog('Reset Data', 'Mereset data inventaris ke data awal bawaan ITS', 'System');
+  };
+
+  // Monthly Inspection CRUD Operations
+  const addMonthlyInspection = (inspectionData) => {
+    const yr = inspectionData.year || 2026;
+    const mo = String(inspectionData.month || 10).padStart(2, '0');
+    const nextId = `INSP-${yr}-${mo}-${String((Array.isArray(monthlyInspections) ? monthlyInspections.length : 0) + 1).padStart(3, '0')}`;
+    const newRecord = {
+      id: nextId,
+      ...inspectionData,
+      inspectionDate: inspectionData.inspectionDate || new Date().toISOString().split('T')[0]
+    };
+
+    setMonthlyInspections(prev => [newRecord, ...(Array.isArray(prev) ? prev : [])]);
+    addLog('Input Pemeriksaan', `Mencatat pemeriksaan perangkat [${inspectionData.computerName}] periode ${inspectionData.periodName}`, 'Inspection');
+    return newRecord;
+  };
+
+  const updateMonthlyInspection = (updatedData) => {
+    setMonthlyInspections(prev => (Array.isArray(prev) ? prev : []).map(r => r.id === updatedData.id ? { ...r, ...updatedData } : r));
+    addLog('Update Pemeriksaan', `Mengupdate pemeriksaan [${updatedData.computerName}] periode ${updatedData.periodName}`, 'Inspection');
+  };
+
+  const deleteMonthlyInspection = (id) => {
+    const target = (Array.isArray(monthlyInspections) ? monthlyInspections : []).find(r => r.id === id);
+    if (target) {
+      setMonthlyInspections(prev => (Array.isArray(prev) ? prev : []).filter(r => r.id !== id));
+      addLog('Hapus Pemeriksaan', `Menghapus record audit [${target.computerName}] periode ${target.periodName}`, 'Inspection');
+    }
+  };
+
+  const quickVerifyMonthlyInspection = (device, month, year) => {
+    const periodLabel = `${monthOptions.find(m => m.value === Number(month))?.label || `Bulan ${month}`} ${year}`;
+    const existingIndex = (Array.isArray(monthlyInspections) ? monthlyInspections : []).findIndex(
+      r => (r.deviceId === device.id || r.computerName === device.computerName) && Number(r.month) === Number(month) && Number(r.year) === Number(year)
+    );
+
+    if (existingIndex >= 0) {
+      const existing = monthlyInspections[existingIndex];
+      const nextStatus = existing.inspectionResult === 'Verified (Sesuai)' ? 'Pending (Belum Diperiksa)' : 'Verified (Sesuai)';
+      updateMonthlyInspection({
+        ...existing,
+        inspectionResult: nextStatus,
+        inspectionDate: new Date().toISOString().split('T')[0],
+        auditorName: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Auditor IT'
+      });
+    } else {
+      addMonthlyInspection({
+        deviceId: device.id,
+        year: Number(year),
+        month: Number(month),
+        periodName: periodLabel,
+        computerName: device.computerName,
+        ipAddress: device.ipAddress,
+        department: device.department,
+        user: device.user,
+        type: device.type,
+        inspectionDate: new Date().toISOString().split('T')[0],
+        auditorName: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Auditor IT',
+        physicalCondition: 'Baik / Normal',
+        status: device.status || 'In',
+        inspectionResult: 'Verified (Sesuai)',
+        notes: `Pemeriksaan rutin berkala ${periodLabel} terverifikasi.`
+      });
+    }
   };
 
   const openAddModal = () => {
@@ -233,6 +315,11 @@ export const InventoryProvider = ({ children }) => {
       devices: Array.isArray(devices) ? devices : initialDevices,
       departments: Array.isArray(departments) ? departments : initialDepartments,
       logs: Array.isArray(logs) ? logs : initialLogs,
+      monthlyInspections: Array.isArray(monthlyInspections) ? monthlyInspections : initialMonthlyInspections,
+      setMonthlyInspections,
+      monthOptions,
+      physicalConditionOptions,
+      inspectionResultOptions,
       statusOptions,
       typeOptions,
       // Filters
@@ -266,6 +353,10 @@ export const InventoryProvider = ({ children }) => {
       updateDeviceStatus,
       deleteDevice,
       resetToSeedData,
+      addMonthlyInspection,
+      updateMonthlyInspection,
+      deleteMonthlyInspection,
+      quickVerifyMonthlyInspection,
       addLog
     }}>
       <div className="theme-dark">

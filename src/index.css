@@ -1,22 +1,23 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* ==========================================================================
    DESIGN SYSTEM TOKENS & VARIABLES
    ========================================================================== */
 :root {
-  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-heading: 'Outfit', 'Inter', sans-serif;
+  --font-primary: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
   /* Toray Corporate Brand Colors */
-  --toray-blue: #004098;
-  --toray-blue-hover: #00337a;
-  --toray-cyan: #00a3e0;
-  --toray-navy: #050a14;
-  --toray-sky: #e0f2fe;
+  --toray-blue: #163cc3;
+  --toray-blue-hover: #0f268a;
+  --toray-royal: #1844d6;
+  --toray-cyan: #38bdf8;
+  --toray-navy: #081248;
+  --toray-sky: #dbeafe;
 
   /* Accent Colors */
-  --accent-emerald: #10b981;
+  --accent-emerald: #3b82f6;
   --accent-amber: #f59e0b;
   --accent-rose: #ef4444;
   --accent-purple: #8b5cf6;
@@ -24,51 +25,51 @@
 }
 
 .theme-dark {
-  --bg-app: #050a14;
-  --bg-surface: #0b1329;
-  --bg-card: rgba(15, 23, 42, 0.92);
-  --bg-card-hover: rgba(30, 41, 59, 0.95);
-  --bg-header: rgba(11, 19, 41, 0.9);
-  --bg-sidebar: #070d1e;
+  --bg-app: #071033;
+  --bg-surface: rgba(14, 30, 85, 0.72);
+  --bg-card: rgba(14, 30, 85, 0.65);
+  --bg-card-hover: rgba(22, 48, 130, 0.78);
+  --bg-header: rgba(10, 22, 66, 0.9);
+  --bg-sidebar: rgba(7, 16, 49, 0.96);
   
-  --border-color: #1e293b;
-  --border-subtle: #0f172a;
+  --border-color: rgba(96, 165, 250, 0.18);
+  --border-subtle: rgba(96, 165, 250, 0.08);
   
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-subtle: #64748b;
   
-  --input-bg: #0b1329;
-  --input-border: #334155;
+  --input-bg: rgba(9, 20, 60, 0.75);
+  --input-border: rgba(96, 165, 250, 0.22);
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 14px rgba(0,0,0,0.5);
-  --shadow-lg: 0 16px 36px rgba(0,0,0,0.7);
-  --glass-bg: rgba(15, 23, 42, 0.85);
+  --shadow-sm: 0 1px 3px rgba(2, 6, 23, 0.4);
+  --shadow-md: 0 6px 18px rgba(2, 6, 23, 0.5);
+  --shadow-lg: 0 16px 38px rgba(2, 6, 23, 0.65);
+  --glass-bg: rgba(14, 30, 85, 0.7);
 }
 
 .theme-light {
-  --bg-app: #080f1e; /* Keep dark industrial backdrop for corporate elegance */
-  --bg-surface: #0f172a;
-  --bg-card: rgba(15, 23, 42, 0.92);
-  --bg-card-hover: rgba(30, 41, 59, 0.95);
-  --bg-header: rgba(11, 19, 41, 0.92);
-  --bg-sidebar: #070d1e;
+  --bg-app: #071033;
+  --bg-surface: rgba(14, 30, 85, 0.72);
+  --bg-card: rgba(14, 30, 85, 0.65);
+  --bg-card-hover: rgba(22, 48, 130, 0.78);
+  --bg-header: rgba(10, 22, 66, 0.9);
+  --bg-sidebar: rgba(7, 16, 49, 0.96);
   
-  --border-color: #1e293b;
-  --border-subtle: #0f172a;
+  --border-color: rgba(96, 165, 250, 0.18);
+  --border-subtle: rgba(96, 165, 250, 0.08);
   
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-subtle: #64748b;
   
-  --input-bg: #0b1329;
-  --input-border: #334155;
+  --input-bg: rgba(9, 20, 60, 0.75);
+  --input-border: rgba(96, 165, 250, 0.22);
 
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.5);
-  --shadow-md: 0 4px 14px rgba(0,0,0,0.5);
-  --shadow-lg: 0 16px 36px rgba(0,0,0,0.7);
-  --glass-bg: rgba(15, 23, 42, 0.85);
+  --shadow-sm: 0 1px 3px rgba(2, 6, 23, 0.4);
+  --shadow-md: 0 6px 18px rgba(2, 6, 23, 0.5);
+  --shadow-lg: 0 16px 38px rgba(2, 6, 23, 0.65);
+  --glass-bg: rgba(14, 30, 85, 0.7);
 }
 
 /* ==========================================================================
@@ -81,11 +82,13 @@
 }
 
 html, body {
-  background-color: #050a14 !important;
-  background-image: radial-gradient(circle at 50% 0%, #00255b 0%, #050a14 70%), url('./assets/factory-bg.svg') !important;
-  background-size: cover, cover !important;
-  background-position: center, center !important;
-  background-attachment: fixed, fixed !important;
+  background-color: #071033 !important;
+  background-image: 
+    radial-gradient(ellipse 75% 45% at 50% -8%, rgba(26, 68, 220, 0.42) 0%, transparent 65%),
+    radial-gradient(circle 900px at 10% 25%, rgba(18, 52, 180, 0.3) 0%, transparent 60%),
+    radial-gradient(circle 850px at 90% 75%, rgba(12, 30, 115, 0.35) 0%, transparent 65%),
+    linear-gradient(150deg, #0d1e57 0%, #08133b 45%, #04091e 100%) !important;
+  background-attachment: fixed !important;
   color: #f8fafc !important;
   font-family: var(--font-primary);
   line-height: 1.5;

@@ -38,10 +38,7 @@ const MainAppContent = () => {
   // 2. Main Executive View: First Dashboard Table
   return (
     <div className="app-shell">
-      <Header />
-      <main className="client-dashboard-main">
-        <Dashboard />
-      </main>
+      <Dashboard />
       <DeviceModal />
       <BarcodeScannerModal />
       <BarcodePrintModal />

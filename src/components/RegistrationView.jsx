@@ -1,48 +1,12 @@
 import React, { useState } from 'react';
 import { useInventory } from '../context/InventoryContext';
 import torayLogo from '../assets/toray-logo.jpg';
-import {
-  Building2,
-  Cpu,
-  User,
-  Lock,
-  ShieldCheck,
-  ArrowRight,
-  LogIn,
-  UserPlus,
-  CheckCircle2,
-  Factory,
-  Globe,
-  Flame,
-  Sparkles,
-  Zap,
-  QrCode,
-  Check
-} from 'lucide-react';
+import './RegistrationView.css';
 
 export const RegistrationView = () => {
-  const {
-    registerUser,
-    loginUser,
-    departments = [],
-    setViewMode,
-    setActiveTab
-  } = useInventory();
+  const { loginUser } = useInventory();
 
-  const urlParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
-  const scanParam = urlParams ? (urlParams.get('scan') || urlParams.get('device')) : null;
-
-  const [activeTab, setAuthTab] = useState('register'); // 'register' | 'login'
-
-  // Registration Form State (simplified: Nama, Departemen, Password)
-  const [regForm, setRegForm] = useState({
-    name: '',
-    departmentCode: 'IS',
-    password: '',
-    agreeSOP: true
-  });
-
-  // Login Form State
+  // Login credentials state
   const [loginForm, setLoginForm] = useState({
     identifier: '',
     password: ''
@@ -50,383 +14,225 @@ export const RegistrationView = () => {
 
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
-
-  const safeDepts = Array.isArray(departments) ? departments : [];
-
-  const handleRegisterSubmit = (e) => {
-    e.preventDefault();
-    setErrorMessage('');
-
-    if (!regForm.name.trim()) {
-      setErrorMessage('Silakan isi Nama Lengkap Pegawai / Auditor.');
-      return;
-    }
-
-    const deptObj = safeDepts.find(d => d.code === regForm.departmentCode);
-    const generatedId = `ITS-USR-${Date.now().toString().slice(-4)}`;
-
-    const userData = {
-      id: generatedId,
-      name: regForm.name.trim(),
-      deptId: deptObj ? deptObj.id : `DEPT-${regForm.departmentCode}`,
-      deptCode: regForm.departmentCode,
-      position: 'Auditor Stock Opname',
-      email: `${regForm.name.toLowerCase().replace(/\s+/g, '.')}@toray.co.id`,
-      role: 'Auditor Stock Opname',
-      loginTime: new Date().toISOString()
-    };
-
-    if (registerUser) {
-      registerUser(userData);
-      setSuccessMessage('Registrasi berhasil! Membuka Dashboard Stock Taking...');
-    }
-  };
+  const [isHelpOpen, setIsHelpOpen] = useState(false);
 
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     setErrorMessage('');
+    setSuccessMessage('');
 
-    if (!loginForm.identifier.trim()) {
-      setErrorMessage('Silakan masukkan NIK atau Email terdaftar.');
+    const identifier = loginForm.identifier.trim();
+    if (!identifier) {
+      setErrorMessage('Silakan masukkan Nama, NIK, atau Email terdaftar.');
       return;
     }
 
     if (loginUser) {
-      const success = loginUser(loginForm.identifier);
-      if (!success) {
-        setErrorMessage('Akun tidak ditemukan. Silakan registrasi terlebih dahulu atau gunakan Akses Demo.');
+      const ok = loginUser(identifier);
+      if (ok) {
+        setSuccessMessage(`Berhasil masuk sebagai ${identifier}. Membuka Dashboard...`);
       }
     }
   };
 
-  const handleQuickDemoLogin = (demoUser) => {
-    if (registerUser) {
-      registerUser(demoUser);
+  const handleQuickDemo = (name, dept) => {
+    if (loginUser) {
+      loginUser(`${name} (${dept})`);
     }
   };
 
-  const demoAccounts = [
-    {
-      id: 'EMP-002',
-      name: 'Ahmad Rizky',
-      deptId: 'DEPT-IS',
-      deptCode: 'IS',
-      position: 'Auditor Stock Opname (IS)',
-      email: 'ahmad.rizky@toray.co.id',
-      role: 'Auditor IT'
-    },
-    {
-      id: 'EMP-003',
-      name: 'Ir. Agus Rahardjo',
-      deptId: 'DEPT-RSN',
-      deptCode: 'RSN',
-      position: 'RSN Plant Superintendent',
-      email: 'agus.rahardjo@toray.co.id',
-      role: 'PIC Unit RSN'
-    },
-    {
-      id: 'EMP-004',
-      name: 'Dr. Retno Astuti',
-      deptId: 'DEPT-QATECH',
-      deptCode: 'QATECH',
-      position: 'QA Technical Lead',
-      email: 'retno.astuti@toray.co.id',
-      role: 'Auditor QA Tech'
-    }
-  ];
-
   return (
-    <div className="auth-portal-page">
-      <div className="auth-container">
-        {/* GRAND TORAY CORPORATE WELCOME HERO */}
-        <div className="auth-hero-branding">
-          <div className="auth-hero-glow"></div>
-          
-          <div className="auth-hero-top">
-            <div className="toray-logo-showcase-box">
-              <img 
-                src={torayLogo} 
-                alt="TORAY Innovation by Chemistry" 
-                className="toray-official-logo-img" 
-              />
-            </div>
-            
-            <div className="auth-hero-tags">
-              <div className="auth-plant-tag">
-                <Globe size={13} />
-                <span>Tangerang Plant, Banten</span>
-              </div>
-              <div className="auth-iso-tag">
-                <ShieldCheck size={13} />
-                <span>ISO 9001:2015</span>
-              </div>
-            </div>
-          </div>
+    <div className="saleskip-auth-wrapper">
+      {/* ====================================================================
+          LEFT HERO PANE: VIBRANT COBALT BLUE WITH GEOMETRIC WIREFRAME & EMBLEM
+          ==================================================================== */}
+      <section className="saleskip-hero-pane" aria-label="Hero Showcase">
+        {/* Concentric angled wireframe SVG background matching screenshot */}
+        <svg
+          className="saleskip-geometric-bg"
+          viewBox="0 0 1000 1000"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <g transform="translate(680, 320) rotate(26)">
+            <rect x="-190" y="-190" width="380" height="380" rx="38" stroke="rgba(255,255,255,0.18)" strokeWidth="1.5" />
+            <rect x="-250" y="-250" width="500" height="500" rx="48" stroke="rgba(255,255,255,0.14)" strokeWidth="1.5" />
+            <rect x="-310" y="-310" width="620" height="620" rx="58" stroke="rgba(255,255,255,0.11)" strokeWidth="1.5" />
+            <rect x="-370" y="-370" width="740" height="740" rx="68" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
+            <rect x="-430" y="-430" width="860" height="860" rx="78" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
+          </g>
+        </svg>
 
-          <div className="auth-hero-text-block">
-            <div className="auth-plant-subtitle">
-              <Sparkles size={13} className="text-cyan" />
-              <span>PT. INDONESIA TORAY SYNTHETICS • INFORMATION SYSTEM DIVISION</span>
-            </div>
-            <h1 className="auth-main-headline">
-              IT Device Stock Taking & Audit System
-            </h1>
-            <p className="auth-hero-description">
-              Portal inventarisasi master komputer, laptop, & perangkat IT terintegrasi barcode scanner untuk verifikasi fisik dan monitoring status departemen pabrik.
-            </p>
-          </div>
-
-          {/* 3 ELEGANT FEATURE PILLS */}
-          <div className="auth-feature-pills">
-            <div className="feature-pill-item live">
-              <span className="live-pulse"></span>
-              <span>Stock Opname Fisik</span>
-            </div>
-            <div className="feature-pill-item">
-              <Cpu size={13} className="text-cyan" />
-              <span>Spesifikasi IP Address</span>
-            </div>
-            <div className="feature-pill-item">
-              <QrCode size={13} className="text-cyan" />
-              <span>Scan Barcode & QR Status</span>
-            </div>
-          </div>
+        {/* 8-pointed star / asterisk logo icon from screenshot */}
+        <div className="saleskip-asterisk-icon">
+          <svg
+            className="saleskip-asterisk-svg"
+            viewBox="0 0 64 64"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <line x1="32" y1="7" x2="32" y2="57" stroke="white" strokeWidth="8" strokeLinecap="round" />
+            <line x1="7" y1="32" x2="57" y2="32" stroke="white" strokeWidth="8" strokeLinecap="round" />
+            <line x1="14.3" y1="14.3" x2="49.7" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
+            <line x1="49.7" y1="14.3" x2="14.3" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
+          </svg>
         </div>
 
-        {/* SCAN DEEP LINK BANNER */}
-        {scanParam && (
-          <div className="auth-scan-detected-card">
-            <div className="scan-detected-left">
-              <div className="scan-pulse-icon">
-                <QrCode size={22} className="text-cyan animate-pulse" />
-              </div>
-              <div>
-                <div className="scan-title">
-                  Barcode Terdeteksi: <span className="code-highlight">[{scanParam}]</span>
-                </div>
-                <p className="scan-desc">
-                  Perangkat fisik di-scan. Masuk sekarang untuk memverifikasi dan memperbarui statusnya.
-                </p>
-              </div>
+        {/* Center Main Headline & Description */}
+        <div className="saleskip-hero-center">
+          <h1 className="saleskip-hero-title">
+            Hello<br />
+            Toray! <span className="saleskip-hand-emoji">👋</span>
+          </h1>
+          <p className="saleskip-hero-subtitle">
+            IT Device Stock Taking & Audit System. Kelola inventarisasi komputer, barcode scanner audit,
+            dan verifikasi fisik perangkat IT dengan cepat, akurat, dan transparan.
+          </p>
+        </div>
+
+        {/* Bottom Copyright Footer */}
+        <footer className="saleskip-hero-footer">
+          © 2026 PT. Indonesia Toray Synthetics. All rights reserved.
+        </footer>
+      </section>
+
+      {/* ====================================================================
+          RIGHT FORM PANE: PURE MINIMAL WHITE WITH TORAY LOGO & CLEAN INPUTS
+          ==================================================================== */}
+      <main className="saleskip-form-pane">
+        {/* Top Brand Area with Large Official Toray Logo */}
+        <header className="saleskip-top-nav">
+          <div className="toray-brand-header">
+            <img
+              src={torayLogo}
+              alt="TORAY 'Innovation by Chemistry'"
+              className="toray-official-logo"
+            />
+            <div className="toray-brand-divider"></div>
+            <div className="toray-brand-text">
+              <span className="toray-sub-name">IT DEVICE STOCK TAKING</span>
+              <span className="toray-plant-name">PT. Indonesia Toray Synthetics</span>
             </div>
-            <button
-              type="button"
-              className="btn-quick-scan-login"
-              onClick={() => {
-                if (registerUser) {
-                  registerUser({
-                    id: `SCAN-OP-${Date.now().toString().slice(-4)}`,
-                    name: 'Operator Barcode Scanner',
-                    deptId: 'DEPT-IS',
-                    deptCode: 'IS',
-                    position: 'Petugas Scan Lapangan',
-                    email: 'scanner.field@toray.co.id',
-                    role: 'Auditor Stock Opname',
-                    loginTime: new Date().toISOString()
-                  });
-                }
-              }}
-            >
-              <Zap size={15} />
-              <span>Masuk Langsung & Verifikasi Status</span>
-              <ArrowRight size={15} />
-            </button>
           </div>
-        )}
+        </header>
 
-        {/* MAIN AUTH CARD */}
-        <div className="auth-main-card">
-          {/* TAB SWITCHER */}
-          <div className="auth-tab-nav">
-            <button
-              className={`auth-tab-btn ${activeTab === 'register' ? 'active' : ''}`}
-              onClick={() => { setAuthTab('register'); setErrorMessage(''); }}
-            >
-              <UserPlus size={18} />
-              <span>Form Registrasi Pegawai / Auditor</span>
-            </button>
-            <button
-              className={`auth-tab-btn ${activeTab === 'login' ? 'active' : ''}`}
-              onClick={() => { setAuthTab('login'); setErrorMessage(''); }}
-            >
-              <LogIn size={18} />
-              <span>Masuk (Login Sesi)</span>
-            </button>
-          </div>
-
+        {/* Main Login Form Card */}
+        <div className="saleskip-form-card">
           {errorMessage && (
-            <div className="auth-alert error">
-              <span>{errorMessage}</span>
+            <div className="saleskip-alert error" role="alert">
+              {errorMessage}
             </div>
           )}
-
           {successMessage && (
-            <div className="auth-alert success">
-              <CheckCircle2 size={16} />
-              <span>{successMessage}</span>
+            <div className="saleskip-alert success" role="alert">
+              {successMessage}
             </div>
           )}
 
-          {/* TAB CONTENT 1: REGISTRATION FORM */}
-          {activeTab === 'register' && (
-            <form onSubmit={handleRegisterSubmit} className="auth-form">
-              <div className="form-info-banner">
-                <ShieldCheck size={20} className="text-cyan" />
-                <div>
-                  <strong>Registrasi Akun Baru Tim Auditor & PIC Unit ITS</strong>
-                  <p>Daftarkan profil Anda untuk mencatat verifikasi fisik dan Stock Opname inventaris IT.</p>
-                </div>
-              </div>
+          <form onSubmit={handleLoginSubmit} noValidate>
+            <h2 className="saleskip-form-heading">Welcome Back!</h2>
+            <p className="saleskip-form-subtext">
+              Silakan masukkan kredensial akun Anda untuk mengakses sistem stock taking & audit perangkat IT.
+            </p>
 
-              <div className="form-group">
-                <label>Nama Lengkap Pegawai / Auditor *:</label>
-                <div className="input-with-icon">
-                  <User size={16} className="field-icon" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: Muhammad Farhan"
-                    value={regForm.name}
-                    onChange={(e) => setRegForm(prev => ({ ...prev, name: e.target.value }))}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="auth-grid-two margin-top-sm">
-                <div className="form-group">
-                  <label>Master Departemen ITS *:</label>
-                  <div className="input-with-icon">
-                    <Building2 size={16} className="field-icon" />
-                    <select
-                      value={regForm.departmentCode}
-                      onChange={(e) => setRegForm(prev => ({ ...prev, departmentCode: e.target.value }))}
-                      className="form-select"
-                    >
-                      {safeDepts.map(d => (
-                        <option key={d.id} value={d.code}>
-                          [{d.code}] - {d.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label>Password / PIN Keamanan *:</label>
-                  <div className="input-with-icon">
-                    <Lock size={16} className="field-icon" />
-                    <input
-                      type="password"
-                      required
-                      placeholder="Minimal 6 karakter"
-                      value={regForm.password}
-                      onChange={(e) => setRegForm(prev => ({ ...prev, password: e.target.value }))}
-                      className="form-input"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="auth-checkbox-row margin-top-sm">
+            {/* Email / Username / NIK input field with screenshot underline style */}
+            <div className="saleskip-input-group">
+              <label htmlFor="saleskip-identifier-input" className="saleskip-input-label">
+                Username / NIK / Email:
+              </label>
+              <div className="saleskip-input-box">
                 <input
-                  type="checkbox"
-                  id="agreeSOP"
-                  checked={regForm.agreeSOP}
-                  onChange={(e) => setRegForm(prev => ({ ...prev, agreeSOP: e.target.checked }))}
+                  type="text"
+                  id="saleskip-identifier-input"
+                  className="saleskip-input active-field"
+                  value={loginForm.identifier}
+                  onChange={(e) =>
+                    setLoginForm((prev) => ({ ...prev, identifier: e.target.value }))
+                  }
+                  placeholder="Contoh: hisalim.ux@gmail.com atau Ahmad Rizky"
+                  autoComplete="username"
+                  required
                 />
-                <label htmlFor="agreeSOP">
-                  Saya menyetujui SOP Audit Fisik & Akurasi Stock Taking PT. Indonesia Toray Synthetics (ISO 9001:2015).
-                </label>
               </div>
-
-              <button type="submit" className="btn-auth-submit margin-top">
-                <UserPlus size={18} />
-                <span>Daftar & Masuk ke Dashboard ITS</span>
-                <ArrowRight size={18} />
-              </button>
-            </form>
-          )}
-
-          {/* TAB CONTENT 2: LOGIN FORM */}
-          {activeTab === 'login' && (
-            <form onSubmit={handleLoginSubmit} className="auth-form">
-              <div className="form-info-banner">
-                <LogIn size={20} className="text-cyan" />
-                <div>
-                  <strong>Masuk ke Sesi Stock Taking Terdaftar</strong>
-                  <p>Masukkan Nama Pegawai atau Akun Anda untuk melanjutkan pekerjaan audit.</p>
-                </div>
-              </div>
-
-              <div className="form-group margin-top-sm">
-                <label>Nama Pegawai / Akun Terdaftar *:</label>
-                <div className="input-with-icon">
-                  <User size={16} className="field-icon" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Contoh: Ahmad Rizky atau Budi Santoso"
-                    value={loginForm.identifier}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, identifier: e.target.value }))}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <div className="form-group margin-top-sm">
-                <label>Password / PIN *:</label>
-                <div className="input-with-icon">
-                  <Lock size={16} className="field-icon" />
-                  <input
-                    type="password"
-                    placeholder="Masukkan password Anda"
-                    value={loginForm.password}
-                    onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                    className="form-input"
-                  />
-                </div>
-              </div>
-
-              <button type="submit" className="btn-auth-submit margin-top">
-                <LogIn size={18} />
-                <span>Masuk Portal Stock Opname</span>
-                <ArrowRight size={18} />
-              </button>
-            </form>
-          )}
-
-          {/* QUICK DEMO LOGIN SHORTCUTS */}
-          <div className="auth-demo-section margin-top-lg">
-            <div className="demo-section-title">
-              <Sparkles size={16} className="text-cyan" />
-              <span>Akses Cepat Penguji (One-Click Demo Login):</span>
             </div>
-            <div className="demo-buttons-grid">
-              {demoAccounts.map((demo) => (
+
+            {/* Password input field */}
+            <div className="saleskip-input-group">
+              <label htmlFor="saleskip-password-input" className="saleskip-input-label">
+                Password / PIN:
+              </label>
+              <div className="saleskip-input-box">
+                <input
+                  type="password"
+                  id="saleskip-password-input"
+                  className="saleskip-input"
+                  value={loginForm.password}
+                  onChange={(e) =>
+                    setLoginForm((prev) => ({ ...prev, password: e.target.value }))
+                  }
+                  placeholder="Password"
+                  autoComplete="current-password"
+                />
+              </div>
+            </div>
+
+            {/* Solid Matte Black Login Button matching screenshot */}
+            <button type="submit" className="saleskip-btn-primary">
+              Login Now
+            </button>
+
+            {/* Forget Password link */}
+            <div className="saleskip-forget-password-box">
+              Lupa password?{' '}
+              <button
+                type="button"
+                className="saleskip-inline-link"
+                onClick={() => setIsHelpOpen(!isHelpOpen)}
+              >
+                Click here
+              </button>
+            </div>
+
+            {isHelpOpen && (
+              <div className="saleskip-help-notice">
+                Untuk reset password atau pendaftaran akun audit baru, silakan hubungi <strong>Information System (IS) Division Ext. 204</strong> atau kirim email ke <code>its-admin@toray.co.id</code>.
+              </div>
+            )}
+
+            {/* Quick Access Demo Accounts for testing */}
+            <div className="saleskip-demo-switcher">
+              <span className="saleskip-demo-label">Akses Cepat Penguji (Demo):</span>
+              <div className="saleskip-demo-chips">
                 <button
-                  key={demo.id}
                   type="button"
-                  className="btn-demo-account"
-                  onClick={() => handleQuickDemoLogin(demo)}
+                  className="saleskip-demo-chip"
+                  onClick={() => handleQuickDemo('Ahmad Rizky', 'IS')}
                 >
-                  <div className="demo-dept-pill">[{demo.deptCode}]</div>
-                  <div className="demo-user-meta">
-                    <strong>{demo.name}</strong>
-                    <span>{demo.position}</span>
-                  </div>
-                  <ArrowRight size={14} className="demo-arrow" />
+                  Ahmad Rizky [IS]
                 </button>
-              ))}
+                <button
+                  type="button"
+                  className="saleskip-demo-chip"
+                  onClick={() => handleQuickDemo('Ir. Agus Rahardjo', 'RSN')}
+                >
+                  Ir. Agus [RSN]
+                </button>
+                <button
+                  type="button"
+                  className="saleskip-demo-chip"
+                  onClick={() => handleQuickDemo('Dr. Retno Astuti', 'QATECH')}
+                >
+                  Dr. Retno [QA]
+                </button>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
 
-        {/* FOOTER */}
-        <div className="auth-footer-text">
-          PT. Indonesia Toray Synthetics • Information System (IS) Division • Tangerang Plant
-        </div>
-      </div>
+        {/* Bottom spacing anchor */}
+        <div style={{ height: '24px' }}></div>
+      </main>
     </div>
   );
 };

@@ -1,0 +1,473 @@
+/* ==========================================================================
+   TORAY IT DEVICE STOCK TAKING - AUTHENTIC LOGIN PORTAL
+   Aesthetic derived with 1:1 precision from the high-agency reference design
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+.saleskip-auth-wrapper {
+  min-height: 100vh;
+  min-height: 100dvh;
+  width: 100%;
+  display: flex;
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: #ffffff;
+  color: #111827;
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* --------------------------------------------------------------------------
+   LEFT COLUMN: VIBRANT COBALT BLUE HERO WITH TORAY PLANT PHOTO GRADIENT
+   -------------------------------------------------------------------------- */
+.saleskip-hero-pane {
+  flex: 1.15;
+  background-color: #0b1b54;
+  background-image: 
+    linear-gradient(140deg, rgba(22, 60, 195, 0.82) 0%, rgba(15, 38, 138, 0.88) 50%, rgba(8, 18, 72, 0.94) 100%),
+    url('../assets/toray-plant-bg.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 60px 70px 50px 75px;
+  color: #ffffff;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Geometric concentric wireframe outlines with soft overlay blend */
+.saleskip-geometric-bg {
+  position: absolute;
+  top: -15%;
+  right: -25%;
+  width: 140%;
+  height: 140%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.65;
+  mix-blend-mode: overlay;
+}
+
+/* 8-pointed star / asterisk emblem */
+.saleskip-asterisk-icon {
+  position: relative;
+  z-index: 2;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 40px;
+}
+
+.saleskip-asterisk-svg {
+  width: 58px;
+  height: 58px;
+  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.3));
+}
+
+/* Hero Center Content */
+.saleskip-hero-center {
+  position: relative;
+  z-index: 2;
+  max-width: 490px;
+  margin-top: auto;
+  margin-bottom: auto;
+  padding: 40px 0;
+}
+
+.saleskip-hero-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 56px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #ffffff;
+  margin: 0 0 24px 0;
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
+}
+
+.saleskip-hand-emoji {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: saleskipWave 2.2s infinite ease-in-out;
+}
+
+@keyframes saleskipWave {
+  0% { transform: rotate(0deg); }
+  10% { transform: rotate(14deg); }
+  20% { transform: rotate(-8deg); }
+  30% { transform: rotate(14deg); }
+  40% { transform: rotate(-4deg); }
+  50% { transform: rotate(10deg); }
+  60% { transform: rotate(0deg); }
+  100% { transform: rotate(0deg); }
+}
+
+.saleskip-hero-subtitle {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+  max-width: 440px;
+  letter-spacing: -0.01em;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+}
+
+/* Hero Footer */
+.saleskip-hero-footer {
+  position: relative;
+  z-index: 2;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* --------------------------------------------------------------------------
+   RIGHT COLUMN: CRISP MINIMAL WHITE FORM
+   -------------------------------------------------------------------------- */
+.saleskip-form-pane {
+  flex: 1;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 50px 70px 40px 70px;
+  position: relative;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* Top brand with Enlarged Toray logo */
+.saleskip-top-nav {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.toray-brand-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.toray-official-logo {
+  height: 76px;
+  width: auto;
+  max-width: 280px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.toray-brand-divider {
+  width: 1.5px;
+  height: 48px;
+  background-color: #e5e7eb;
+}
+
+.toray-brand-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.toray-sub-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: #004098; /* Toray Corporate Blue */
+  line-height: 1.2;
+}
+
+.toray-plant-name {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #6b7280;
+}
+
+/* Main Form Container */
+.saleskip-form-card {
+  width: 100%;
+  max-width: 380px;
+  margin: auto auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.saleskip-form-heading {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #111827;
+  margin: 0 0 10px 0;
+  line-height: 1.2;
+}
+
+.saleskip-form-subtext {
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: #6b7280;
+  margin: 0 0 32px 0;
+}
+
+.saleskip-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #111827;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.saleskip-inline-link:hover {
+  opacity: 0.75;
+}
+
+/* Alert notifications */
+.saleskip-alert {
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.saleskip-alert.error {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fee2e2;
+}
+
+.saleskip-alert.success {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #dcfce7;
+}
+
+/* Input Fields (Clean underline styling exactly matching mockup) */
+.saleskip-input-group {
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.saleskip-input-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 4px;
+  letter-spacing: -0.01em;
+}
+
+.saleskip-input-box {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.saleskip-input {
+  width: 100%;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14.5px;
+  color: #111827;
+  background-color: transparent;
+  border: none;
+  border-bottom: 1.5px solid #e5e7eb;
+  padding: 10px 2px 10px 2px;
+  outline: none;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  border-radius: 0;
+}
+
+.saleskip-input::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* Active Email Field style in mockup */
+.saleskip-input.active-field {
+  border-bottom: 2px solid #111827;
+  background-color: #fafafa;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+.saleskip-input:focus {
+  border-bottom: 2px solid #111827;
+  background-color: #fafafa;
+  padding-left: 8px;
+  padding-right: 8px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+/* Primary Button: Matte Black */
+.saleskip-btn-primary {
+  width: 100%;
+  height: 48px;
+  background-color: #17181c;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 14px;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.saleskip-btn-primary:hover {
+  background-color: #27272a;
+}
+
+.saleskip-btn-primary:active {
+  transform: scale(0.99);
+}
+
+/* Forget Password Link */
+.saleskip-forget-password-box {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.saleskip-forget-password-box .saleskip-inline-link {
+  font-size: 13px;
+  color: #111827;
+  font-weight: 700;
+}
+
+.saleskip-help-notice {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #4b5563;
+  animation: fadeIn 0.2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Discrete Demo Account Quick Switcher */
+.saleskip-demo-switcher {
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px dashed #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.saleskip-demo-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9ca3af;
+}
+
+.saleskip-demo-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.saleskip-demo-chip {
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.saleskip-demo-chip:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+  border-color: #d1d5db;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE BEHAVIOR (Mobile & Tablet)
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .saleskip-auth-wrapper {
+    flex-direction: column;
+  }
+
+  .saleskip-hero-pane {
+    flex: none;
+    min-height: auto;
+    padding: 50px 36px 40px 36px;
+  }
+
+  .saleskip-geometric-bg {
+    top: -30%;
+    right: -40%;
+    width: 180%;
+    height: 180%;
+  }
+
+  .saleskip-hero-title {
+    font-size: 40px;
+  }
+
+  .saleskip-hero-center {
+    padding: 20px 0;
+  }
+
+  .saleskip-hero-footer {
+    display: none;
+  }
+
+  .saleskip-form-pane {
+    flex: none;
+    min-height: auto;
+    padding: 40px 28px 40px 28px;
+  }
+
+  .saleskip-form-card {
+    max-width: 100%;
+    margin: 0;
+  }
+}
