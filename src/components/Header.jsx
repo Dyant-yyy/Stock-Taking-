@@ -6,7 +6,6 @@ import {
   Plus,
   RotateCcw,
   LogOut,
-  Globe,
   Cpu
 } from 'lucide-react';
 
@@ -29,11 +28,6 @@ export const Header = () => {
             <div className="company-title">PT. INDONESIA TORAY SYNTHETICS</div>
             <div className="sub-title">IT Device Inventory Management Portal</div>
           </div>
-        </div>
-
-        <div className="header-plant-pill">
-          <Globe size={14} />
-          <span>Tangerang Plant</span>
         </div>
       </div>
 

@@ -423,23 +423,16 @@
   z-index: 2;
 }
 
-.card-dual-pills {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.card-pill-dot {
-  width: 14px;
-  height: 22px;
-  background-color: rgba(255, 255, 255, 0.95);
-  border-radius: 9999px;
-}
-
-.card-pill-dot.circle {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
+.blue-card-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 6px;
+  padding: 4px 10px;
 }
 
 /* White Circle Plus Button (opens Add Device modal) */

@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useInventory } from '../../context/InventoryContext';
 import {
   Plus,
-  Copy,
-  Check,
   ArrowUpRight,
   HardDrive,
   CalendarCheck,
@@ -30,8 +28,6 @@ export const DashboardOverview = ({ onNavigate }) => {
     filteredDevices = []
   } = useInventory();
 
-  const [copiedSerial, setCopiedSerial] = useState(false);
-
   // Counts & status metrics
   const totalCount = devices.length;
   const onlineCount = devices.filter(d => d.status === 'Online').length;
@@ -42,13 +38,6 @@ export const DashboardOverview = ({ onNavigate }) => {
   const disposalCount = devices.filter(d => d.status === 'Disposal').length;
 
   const readyRate = totalCount > 0 ? Math.round(((onlineCount + inCount) / totalCount) * 100) : 0;
-
-  // Copy Serial Asset Code
-  const handleCopySerial = () => {
-    navigator.clipboard.writeText('ITS-TNG-2026-0911');
-    setCopiedSerial(true);
-    setTimeout(() => setCopiedSerial(false), 2000);
-  };
 
   // Recent 4 live device activities
   const recentActivities = devices.slice(0, 4).map((d, idx) => ({
@@ -93,17 +82,7 @@ export const DashboardOverview = ({ onNavigate }) => {
             </svg>
 
             <div className="blue-card-top-row">
-              <div className="card-dual-pills">
-                <span className="card-pill-dot"></span>
-                <span className="card-pill-dot circle"></span>
-              </div>
-              <button
-                className="blue-card-add-circle"
-                onClick={openAddModal}
-                title="Tambah Komputer Baru"
-              >
-                <Plus size={18} />
-              </button>
+              <span className="blue-card-badge">TOTAL INVENTARIS</span>
             </div>
 
             <div className="blue-card-metric-wrap">
@@ -111,30 +90,15 @@ export const DashboardOverview = ({ onNavigate }) => {
                 {totalCount} <span className="metric-unit">Unit</span>
               </h1>
               <div className="blue-card-sub-label">
-                <span>Total Perangkat IT • PT. Indonesia Toray Synthetics</span>
+                <span>Total Perangkat Komputer • PT. Indonesia Toray Synthetics</span>
               </div>
             </div>
-          </div>
-
-          {/* Serial / Asset Tag Master Code with Copy Button */}
-          <div className="serial-info-row">
-            <div className="serial-digits-group">
-              <span className="serial-number-code">ITS-TNG-2026-0911</span>
-              <button
-                className={`btn-copy-serial ${copiedSerial ? 'copied' : ''}`}
-                onClick={handleCopySerial}
-                title={copiedSerial ? 'Tersalin!' : 'Salin Kode Master Tag'}
-              >
-                {copiedSerial ? <Check size={14} /> : <Copy size={14} />}
-              </button>
-            </div>
-            <span className="serial-expiry-date">03/26</span>
           </div>
 
           {/* Transactions Section (Real Devices Audit Log) */}
           <div className="transactions-section">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '14px' }}>
-              <h2 className="transactions-heading" style={{ margin: 0 }}>Transactions</h2>
+              <h2 className="transactions-heading" style={{ margin: 0 }}>Aktivitas Audit Terkini</h2>
               <button
                 onClick={() => onNavigate && onNavigate('devices')}
                 className="btn-text-link"
@@ -178,7 +142,7 @@ export const DashboardOverview = ({ onNavigate }) => {
                 <div className="card-header-icon-circle">
                   <PieIcon />
                 </div>
-                <h3 className="card-header-title">Spendings</h3>
+                <h3 className="card-header-title">Status Kesiapan Unit</h3>
               </div>
               <button
                 className="card-arrow-btn"
@@ -259,7 +223,7 @@ export const DashboardOverview = ({ onNavigate }) => {
                 {/* Centered Donut Value */}
                 <div className="donut-center-content">
                   <span className="donut-percentage-val">{readyRate}%</span>
-                  <span className="donut-percentage-caption">of total balance</span>
+                  <span className="donut-percentage-caption">Siap Pakai</span>
                 </div>
               </div>
             </div>
@@ -268,27 +232,26 @@ export const DashboardOverview = ({ onNavigate }) => {
             <div className="spendings-legend-row">
               <div className="legend-item" title="Perangkat Operasional">
                 <span className="legend-dot striped"></span>
-                <span>Rent</span>
+                <span>Online ({onlineCount})</span>
               </div>
               <div className="legend-item" title="Perangkat Standby / In">
                 <span className="legend-dot blue-accent"></span>
-                <span>Medical Insurance</span>
+                <span>In / Standby ({inCount})</span>
               </div>
               <div className="legend-item" title="Perangkat Out / Broken / Disposal">
                 <span className="legend-dot yellow-accent"></span>
-                <span>Other</span>
+                <span>Out / Servis ({outCount + brokenCount + disposalCount})</span>
               </div>
             </div>
           </div>
 
-          {/* BOTTOM CARD: INCOME / AKTIVITAS AUDIT HISTOGRAM */}
+          {/* BOTTOM CARD: AKTIVITAS AUDIT HISTOGRAM */}
           <div className="bento-surface bento-card-income">
             <div className="income-header-row">
               <div className="income-metric-group">
-                <span className="income-label-text">Income</span>
+                <span className="income-label-text">Distribusi per Departemen</span>
                 <div className="income-val-badge-row">
-                  <span className="income-big-amount">{totalCount} Unit</span>
-                  <span className="income-pill-badge">+14%</span>
+                  <span className="income-big-amount">{totalCount} Unit Total</span>
                 </div>
               </div>
               <button

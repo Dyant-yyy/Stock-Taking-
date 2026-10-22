@@ -10,8 +10,7 @@ import {
   Settings,
   LogOut,
   Search,
-  Plus,
-  Globe
+  Plus
 } from 'lucide-react';
 
 import { DashboardOverview } from './pages/DashboardOverviewPage';
@@ -194,13 +193,8 @@ export const Dashboard = () => {
             )}
           </div>
 
-          {/* Right Action: Tangerang Plant + Solid White Pill Button + User Avatar */}
+          {/* Right Action: Solid White Pill Button + User Avatar */}
           <div className="fintech-top-right">
-            <div className="top-plant-capsule">
-              <Globe size={14} />
-              <span>Tangerang Plant</span>
-            </div>
-
             <button
               className="btn-solid-white-pill"
               onClick={openAddModal}
@@ -217,7 +211,6 @@ export const Dashboard = () => {
               onClick={() => handleDockNavigate('settings')}
             >
               <span>{currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : 'IT'}</span>
-              <span className="user-status-dot" title="Online"></span>
             </div>
           </div>
         </header>
