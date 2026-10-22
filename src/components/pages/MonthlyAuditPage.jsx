@@ -739,13 +739,24 @@ export const MonthlyAuditPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {devices.map((dev, idx) => {
-                  // Find all inspections for this device in the selected year
-                  const deviceYearInspections = (monthlyInspections || []).filter(
-                    i => (i.deviceId === dev.id || i.computerName === dev.computerName) && Number(i.year) === Number(selectedYear)
-                  );
+                {devices.length === 0 ? (
+                  <tr>
+                    <td colSpan={16} style={{ textAlign: 'center', padding: '36px 16px', color: '#94a3b8' }}>
+                      <CalendarCheck size={32} style={{ margin: '0 auto 8px', display: 'block', opacity: 0.35 }} />
+                      <strong style={{ display: 'block', fontSize: '14px', color: '#f1f5f9' }}>
+                        Belum Ada Perangkat untuk Matriks Audit
+                      </strong>
+                      <span style={{ fontSize: '12px' }}>Silakan tambahkan perangkat baru di Katalog Master</span>
+                    </td>
+                  </tr>
+                ) : (
+                  devices.map((dev, idx) => {
+                    // Find all inspections for this device in the selected year
+                    const deviceYearInspections = (monthlyInspections || []).filter(
+                      i => (i.deviceId === dev.id || i.computerName === dev.computerName) && Number(i.year) === Number(selectedYear)
+                    );
 
-                  return (
+                    return (
                     <tr key={dev.id}>
                       <td style={{ color: '#94a3b8', fontWeight: 600 }}>{idx + 1}</td>
                       <td>
@@ -822,7 +833,7 @@ export const MonthlyAuditPage = () => {
                       </td>
                     </tr>
                   );
-                })}
+                }))}
               </tbody>
             </table>
           </div>

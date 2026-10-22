@@ -24,38 +24,44 @@ const safeParseStorage = (key, fallback) => {
   }
 };
 
+const STORAGE_KEY_USER = 'its_current_user';
+const STORAGE_KEY_DEVICES = 'its_devices_clean_v4';
+const STORAGE_KEY_DEPTS = 'its_departments_clean_v4';
+const STORAGE_KEY_LOGS = 'its_logs_clean_v4';
+const STORAGE_KEY_INSPECTIONS = 'its_monthly_inspections_clean_v4';
+
+// Clean legacy dummy devices from old localStorage keys immediately
+try {
+  localStorage.removeItem('its_devices_v3');
+  localStorage.removeItem('its_devices_v2');
+  localStorage.removeItem('its_devices_v1');
+  localStorage.removeItem('its_monthly_inspections_v1');
+  localStorage.removeItem('its_logs_v3');
+} catch (e) {}
+
 export const InventoryProvider = ({ children }) => {
   // Current Logged-in User
   const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const saved = localStorage.getItem('its_current_user');
+      const saved = localStorage.getItem(STORAGE_KEY_USER);
       return saved ? JSON.parse(saved) : null;
     } catch (e) {
       return null;
     }
   });
 
-  // Devices matching client table specification
+  // Devices: starts completely clean and empty (no dummy devices)
   const [devices, setDevices] = useState(() => {
-    try {
-      const saved = localStorage.getItem('its_devices_v3');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].computerName) {
-          return parsed;
-        }
-      }
-    } catch (e) {}
-    return initialDevices;
+    return safeParseStorage(STORAGE_KEY_DEVICES, []);
   });
 
-  // Departments list
-  const [departments, setDepartments] = useState(() => safeParseStorage('its_departments_v3', initialDepartments));
-  const [logs, setLogs] = useState(() => safeParseStorage('its_logs_v3', initialLogs));
+  // Departments list (master data)
+  const [departments, setDepartments] = useState(() => safeParseStorage(STORAGE_KEY_DEPTS, initialDepartments));
+  const [logs, setLogs] = useState(() => safeParseStorage(STORAGE_KEY_LOGS, []));
 
-  // Monthly Device Inspections & Physical Audit Logs
+  // Monthly Device Inspections: starts completely clean and empty
   const [monthlyInspections, setMonthlyInspections] = useState(() => 
-    safeParseStorage('its_monthly_inspections_v1', initialMonthlyInspections)
+    safeParseStorage(STORAGE_KEY_INSPECTIONS, [])
   );
 
   // Filters & Search
@@ -79,25 +85,25 @@ export const InventoryProvider = ({ children }) => {
   // Sync to localStorage
   useEffect(() => {
     try {
-      localStorage.setItem('its_devices_v3', JSON.stringify(devices));
+      localStorage.setItem(STORAGE_KEY_DEVICES, JSON.stringify(devices));
     } catch (e) {}
   }, [devices]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('its_departments_v3', JSON.stringify(departments));
+      localStorage.setItem(STORAGE_KEY_DEPTS, JSON.stringify(departments));
     } catch (e) {}
   }, [departments]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('its_logs_v3', JSON.stringify(logs));
+      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logs));
     } catch (e) {}
   }, [logs]);
 
   useEffect(() => {
     try {
-      localStorage.setItem('its_monthly_inspections_v1', JSON.stringify(monthlyInspections));
+      localStorage.setItem(STORAGE_KEY_INSPECTIONS, JSON.stringify(monthlyInspections));
     } catch (e) {}
   }, [monthlyInspections]);
 
@@ -188,19 +194,17 @@ export const InventoryProvider = ({ children }) => {
   };
 
   const resetToSeedData = () => {
-    localStorage.removeItem('its_devices_v3');
-    localStorage.removeItem('its_departments_v3');
-    localStorage.removeItem('its_logs_v3');
-    localStorage.removeItem('its_monthly_inspections_v1');
-    setDevices(initialDevices);
-    setDepartments(initialDepartments);
-    setLogs(initialLogs);
-    setMonthlyInspections(initialMonthlyInspections);
+    localStorage.removeItem(STORAGE_KEY_DEVICES);
+    localStorage.removeItem(STORAGE_KEY_LOGS);
+    localStorage.removeItem(STORAGE_KEY_INSPECTIONS);
+    setDevices([]);
+    setLogs([]);
+    setMonthlyInspections([]);
     setFilterDept('All');
     setFilterStatus('All');
     setFilterType('All');
     setSearchQuery('');
-    addLog('Reset Data', 'Mereset data inventaris ke data awal bawaan ITS', 'System');
+    addLog('Reset Data', 'Mereset data inventaris menjadi kosong', 'System');
   };
 
   // Monthly Inspection CRUD Operations
@@ -312,10 +316,10 @@ export const InventoryProvider = ({ children }) => {
       loginUser,
       logoutUser,
       // Data
-      devices: Array.isArray(devices) ? devices : initialDevices,
+      devices: Array.isArray(devices) ? devices : [],
       departments: Array.isArray(departments) ? departments : initialDepartments,
-      logs: Array.isArray(logs) ? logs : initialLogs,
-      monthlyInspections: Array.isArray(monthlyInspections) ? monthlyInspections : initialMonthlyInspections,
+      logs: Array.isArray(logs) ? logs : [],
+      monthlyInspections: Array.isArray(monthlyInspections) ? monthlyInspections : [],
       setMonthlyInspections,
       monthOptions,
       physicalConditionOptions,

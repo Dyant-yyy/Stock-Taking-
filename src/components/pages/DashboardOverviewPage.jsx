@@ -49,6 +49,19 @@ export const DashboardOverview = ({ onNavigate }) => {
     type: d.type
   }));
 
+  // Dynamic department counts for histogram
+  const deptHistList = [
+    { code: 'IS', count: devices.filter(d => d.department === 'IS').length },
+    { code: 'RSN', count: devices.filter(d => d.department === 'RSN').length },
+    { code: 'QATECH', count: devices.filter(d => d.department === 'QATECH').length },
+    { code: 'SIS', count: devices.filter(d => d.department === 'SIS').length },
+    { code: 'HRGA', count: devices.filter(d => d.department === 'HRGA').length },
+    { code: 'NFY', count: devices.filter(d => d.department === 'NFY').length },
+    { code: 'PFY', count: devices.filter(d => d.department === 'PFY').length },
+    { code: 'FIN', count: devices.filter(d => d.department === 'FIN').length }
+  ];
+  const maxDeptUnit = Math.max(...deptHistList.map(d => d.count), 0);
+
   // Handle jump to devices with status filter
   const handleStatusFilterJump = (status) => {
     setFilterStatus(status);
@@ -108,25 +121,44 @@ export const DashboardOverview = ({ onNavigate }) => {
               </button>
             </div>
             <div className="transactions-list">
-              {recentActivities.map((tx) => (
-                <div key={tx.id} className="transaction-item-row">
-                  <div className="transaction-user-info">
-                    <div className={`transaction-avatar avatar-${(tx.dept || 'default').toLowerCase()}`}>
-                      {tx.dept}
-                    </div>
-                    <div className="transaction-text-meta">
-                      <span className="transaction-user-name">{tx.name}</span>
-                      <span className="transaction-date-time">{tx.time}</span>
-                    </div>
-                  </div>
-                  <div className="transaction-amount-col">
-                    <span className={`transaction-status-tag ${tx.status.toLowerCase().replace(/\s+/g, '-')}`}>
-                      {tx.status}
-                    </span>
-                    <span className="transaction-device-type">{tx.type}</span>
-                  </div>
+              {recentActivities.length === 0 ? (
+                <div style={{ padding: '36px 16px', textAlign: 'center', color: '#94a3b8' }}>
+                  <HardDrive size={32} style={{ margin: '0 auto 10px', display: 'block', opacity: 0.35 }} />
+                  <strong style={{ display: 'block', fontSize: '14px', color: '#f1f5f9', marginBottom: '4px' }}>
+                    Belum Ada Perangkat Terdaftar
+                  </strong>
+                  <p style={{ margin: '0 0 14px', fontSize: '12.5px', color: '#64748b' }}>
+                    Data inventaris komputer saat ini kosong (0 unit).
+                  </p>
+                  <button
+                    className="btn-solid-white-pill"
+                    style={{ margin: '0 auto', fontSize: '12.5px', padding: '8px 18px' }}
+                    onClick={openAddModal}
+                  >
+                    + Tambah Komputer Pertama
+                  </button>
                 </div>
-              ))}
+              ) : (
+                recentActivities.map((tx) => (
+                  <div key={tx.id} className="transaction-item-row">
+                    <div className="transaction-user-info">
+                      <div className={`transaction-avatar avatar-${(tx.dept || 'default').toLowerCase()}`}>
+                        {tx.dept}
+                      </div>
+                      <div className="transaction-text-meta">
+                        <span className="transaction-user-name">{tx.name}</span>
+                        <span className="transaction-date-time">{tx.time}</span>
+                      </div>
+                    </div>
+                    <div className="transaction-amount-col">
+                      <span className={`transaction-status-tag ${tx.status.toLowerCase().replace(/\s+/g, '-')}`}>
+                        {tx.status}
+                      </span>
+                      <span className="transaction-device-type">{tx.type}</span>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -263,32 +295,25 @@ export const DashboardOverview = ({ onNavigate }) => {
               </button>
             </div>
 
-            {/* 8 Vertical Rounded Bars (Peak bars in VIBRANT BLUE!) */}
+            {/* 8 Vertical Rounded Bars (Dynamic to real devices per department) */}
             <div className="histogram-bars-container">
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '48%' }} title="IS: 8 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '32%' }} title="RSN: 3 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '42%' }} title="QATECH: 4 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill dark-base" style={{ height: '58%' }} title="SIS: 2 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '100%' }} title="HRGA: 5 Unit (Peak)"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '82%' }} title="NFY: 3 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '38%' }} title="PFY: 2 Unit"></div>
-              </div>
-              <div className="histogram-bar-col">
-                <div className="bar-pill blue-peak" style={{ height: '22%' }} title="FIN: 2 Unit"></div>
-              </div>
+              {deptHistList.map((dept) => {
+                const heightPct = maxDeptUnit > 0 ? Math.max(Math.round((dept.count / maxDeptUnit) * 100), 16) : 10;
+                const isPeak = maxDeptUnit > 0 && dept.count === maxDeptUnit;
+                return (
+                  <div key={dept.code} className="histogram-bar-col">
+                    <div
+                      className={`bar-pill ${isPeak ? 'blue-peak' : (dept.count > 0 ? 'dark-base' : '')}`}
+                      style={{
+                        height: `${heightPct}%`,
+                        opacity: dept.count > 0 ? 1 : 0.25,
+                        backgroundColor: dept.count === 0 ? 'rgba(255, 255, 255, 0.1)' : undefined
+                      }}
+                      title={`${dept.code}: ${dept.count} Unit`}
+                    ></div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>

@@ -278,7 +278,19 @@ export const AnalyticsPage = ({ onNavigate }) => {
           </div>
 
           {/* THE 3D PIE COMPONENT */}
-          <ThreeDPieChart data={activePieData} />
+          {totalCount === 0 ? (
+            <div style={{ padding: '60px 20px', textAlign: 'center', color: '#94a3b8' }}>
+              <PieIcon size={44} style={{ margin: '0 auto 12px', display: 'block', opacity: 0.35 }} />
+              <strong style={{ display: 'block', fontSize: '15px', color: '#f1f5f9', marginBottom: '6px' }}>
+                Belum Ada Data Perangkat untuk Dianalisis
+              </strong>
+              <p style={{ margin: 0, fontSize: '13px', color: '#64748b' }}>
+                Tambahkan perangkat di Katalog Master untuk melihat visualisasi diagram 3D
+              </p>
+            </div>
+          ) : (
+            <ThreeDPieChart data={activePieData} />
+          )}
         </div>
       ) : (
         /* Classic 4 Metric Cards View */
