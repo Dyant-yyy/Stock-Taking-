@@ -2,84 +2,109 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   initialDepartments,
   initialDevices,
-  initialLogs,
-  initialMonthlyInspections,
+  initialStockTakingRecords,
   monthOptions,
-  physicalConditionOptions,
-  inspectionResultOptions,
-  statusOptions,
+  statusColumns,
   typeOptions
 } from '../data/initialData';
 
 const InventoryContext = createContext();
+
+const STORAGE_KEY_DEVICES = 'its_devices_v5';
+const STORAGE_KEY_STOCK_RECORDS = 'its_stock_records_v5';
+const STORAGE_KEY_SIGNATURES = 'its_signatures_v5';
 
 const safeParseStorage = (key, fallback) => {
   try {
     const saved = localStorage.getItem(key);
     if (!saved) return fallback;
     const parsed = JSON.parse(saved);
-    return Array.isArray(parsed) ? parsed : fallback;
+    return parsed !== null && parsed !== undefined ? parsed : fallback;
   } catch (err) {
     return fallback;
   }
 };
 
-const STORAGE_KEY_USER = 'its_current_user';
-const STORAGE_KEY_DEVICES = 'its_devices_clean_v4';
-const STORAGE_KEY_DEPTS = 'its_departments_clean_v4';
-const STORAGE_KEY_LOGS = 'its_logs_clean_v4';
-const STORAGE_KEY_INSPECTIONS = 'its_monthly_inspections_clean_v4';
-
-// Clean legacy dummy devices from old localStorage keys immediately
-try {
-  localStorage.removeItem('its_devices_v3');
-  localStorage.removeItem('its_devices_v2');
-  localStorage.removeItem('its_devices_v1');
-  localStorage.removeItem('its_monthly_inspections_v1');
-  localStorage.removeItem('its_logs_v3');
-} catch (e) {}
-
 export const InventoryProvider = ({ children }) => {
-  // Current Logged-in User
+  // 0. User session & active screen ('dashboard' | 'login')
   const [currentUser, setCurrentUser] = useState(() => {
+    return safeParseStorage('its_user_session', null);
+  });
+
+  const [currentScreen, setCurrentScreen] = useState(() => {
+    const session = safeParseStorage('its_user_session', null);
+    return session ? 'dashboard' : 'login';
+  });
+
+  const loginUser = (userData) => {
+    const user = typeof userData === 'string'
+      ? { name: userData, dept: 'IS', role: 'Staff' }
+      : (userData || { name: 'Staff User', dept: 'IS', role: 'Staff' });
+    setCurrentUser(user);
+    setCurrentScreen('dashboard');
     try {
-      const saved = localStorage.getItem(STORAGE_KEY_USER);
-      return saved ? JSON.parse(saved) : null;
-    } catch (e) {
-      return null;
-    }
-  });
+      localStorage.setItem('its_user_session', JSON.stringify(user));
+    } catch (e) {}
+  };
 
-  // Devices: starts completely clean and empty (no dummy devices)
+  const logoutUser = () => {
+    setCurrentUser(null);
+    setCurrentScreen('login');
+    try {
+      localStorage.removeItem('its_user_session');
+    } catch (e) {}
+  };
+
+  // 1. Devices List (Initial 27 authentic devices from Toray stock sheet)
   const [devices, setDevices] = useState(() => {
-    return safeParseStorage(STORAGE_KEY_DEVICES, []);
+    const saved = safeParseStorage(STORAGE_KEY_DEVICES, null);
+    if (saved && Array.isArray(saved) && saved.length > 0) {
+      return saved;
+    }
+    return initialDevices;
   });
 
-  // Departments list (master data)
-  const [departments, setDepartments] = useState(() => safeParseStorage(STORAGE_KEY_DEPTS, initialDepartments));
-  const [logs, setLogs] = useState(() => safeParseStorage(STORAGE_KEY_LOGS, []));
+  // 2. Stock Taking Records per Year & Month: { "2026_1": { "dev-1": { status: "Online", remark: "" } } }
+  const [stockRecords, setStockRecords] = useState(() => {
+    const saved = safeParseStorage(STORAGE_KEY_STOCK_RECORDS, null);
+    if (saved && typeof saved === 'object' && Object.keys(saved).length > 0) {
+      return saved;
+    }
+    return initialStockTakingRecords;
+  });
 
-  // Monthly Device Inspections: starts completely clean and empty
-  const [monthlyInspections, setMonthlyInspections] = useState(() => 
-    safeParseStorage(STORAGE_KEY_INSPECTIONS, [])
-  );
+  // 3. Active Time Period (Year & Month)
+  const [currentYear, setCurrentYear] = useState(2026);
+  const [currentMonth, setCurrentMonth] = useState(1); // 1 = Januari
+  const availableYears = [2024, 2025, 2026, 2027, 2028];
 
-  // Filters & Search
+  // 4. Active View: 'stock-taking' (Gambar 1) | 'ledger' (Gambar 2) | 'both'
+  const [activeView, setActiveView] = useState('stock-taking');
+
+  // 5. Filters & Search
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDept, setFilterDept] = useState('All');
-  const [filterStatus, setFilterStatus] = useState('All');
   const [filterType, setFilterType] = useState('All');
 
-  // Modal State for Add / Edit Device
+  // 6. Signatures (PIC & Manager as seen on the physical documents)
+  const [signatures, setSignatures] = useState(() => {
+    return safeParseStorage(STORAGE_KEY_SIGNATURES, {
+      picName: 'Anggit Kurniawan',
+      picTitle: 'PIC / IT Staff',
+      managerName: 'Matheus Djoko',
+      managerTitle: 'IT Manager',
+      docNo: 'IS-FRM-ITS-PC-Ledger-IS',
+      revision: '0',
+      createdDate: '26 Januari 2026'
+    });
+  });
+
+  // 7. Quick Device Modal State
   const [isDeviceModalOpen, setIsDeviceModalOpen] = useState(false);
   const [editingDevice, setEditingDevice] = useState(null);
 
-  // Barcode Scanner & Verification Modal State
-  const [isScannerOpen, setIsScannerOpen] = useState(false);
-  const [scannedDevice, setScannedDevice] = useState(null);
-
-  // Barcode / QR Print Sticker Modal State
-  const [isBarcodePrintOpen, setIsBarcodePrintOpen] = useState(false);
+  // 8. Barcode & Asset Tag Modal State
+  const [isBarcodeModalOpen, setIsBarcodeModalOpen] = useState(false);
   const [barcodeDevice, setBarcodeDevice] = useState(null);
 
   // Sync to localStorage
@@ -91,187 +116,133 @@ export const InventoryProvider = ({ children }) => {
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_DEPTS, JSON.stringify(departments));
+      localStorage.setItem(STORAGE_KEY_STOCK_RECORDS, JSON.stringify(stockRecords));
     } catch (e) {}
-  }, [departments]);
+  }, [stockRecords]);
 
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY_LOGS, JSON.stringify(logs));
+      localStorage.setItem(STORAGE_KEY_SIGNATURES, JSON.stringify(signatures));
     } catch (e) {}
-  }, [logs]);
+  }, [signatures]);
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY_INSPECTIONS, JSON.stringify(monthlyInspections));
-    } catch (e) {}
-  }, [monthlyInspections]);
+  // Key generator for current year and month
+  const periodKey = `${currentYear}_${currentMonth}`;
+  const currentMonthRecord = stockRecords[periodKey] || {};
 
-  // Activity logger
-  const addLog = (action, details, category = 'General') => {
-    const newLog = {
-      id: `LOG-${Date.now()}`,
-      timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-      user: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Admin',
-      action,
-      details,
-      category
-    };
-    setLogs(prev => [newLog, ...(Array.isArray(prev) ? prev : [])]);
+  // Update Status Checklist for a device in current month
+  const updateDeviceStockStatus = (deviceId, newStatus) => {
+    setStockRecords(prev => {
+      const prevPeriod = prev[periodKey] || {};
+      const currentItem = prevPeriod[deviceId] || { status: '', remark: '' };
+      
+      // If clicking already selected status, toggle it off or keep
+      const updatedStatus = currentItem.status === newStatus ? '' : newStatus;
+
+      return {
+        ...prev,
+        [periodKey]: {
+          ...prevPeriod,
+          [deviceId]: {
+            ...currentItem,
+            status: updatedStatus
+          }
+        }
+      };
+    });
   };
 
-  // Auth Operations
-  const registerUser = (userData) => {
-    setCurrentUser(userData);
-    try {
-      localStorage.setItem('its_current_user', JSON.stringify(userData));
-    } catch (e) {}
-    addLog('Registrasi', `User ${userData.name} ([${userData.deptCode}]) terdaftar dan masuk ke sesi.`, 'Auth');
+  // Update Remark for a device in current month
+  const updateDeviceStockRemark = (deviceId, remark) => {
+    setStockRecords(prev => {
+      const prevPeriod = prev[periodKey] || {};
+      const currentItem = prevPeriod[deviceId] || { status: 'Online', remark: '' };
+      return {
+        ...prev,
+        [periodKey]: {
+          ...prevPeriod,
+          [deviceId]: {
+            ...currentItem,
+            remark
+          }
+        }
+      };
+    });
   };
 
-  const loginUser = (identifier) => {
-    const userObj = {
-      id: `USR-${Date.now().toString().slice(-4)}`,
-      name: identifier.trim(),
-      deptCode: 'IS',
-      loginTime: new Date().toISOString()
-    };
-    setCurrentUser(userObj);
-    try {
-      localStorage.setItem('its_current_user', JSON.stringify(userObj));
-    } catch (e) {}
-    addLog('Login', `User ${identifier} masuk ke sesi inventory.`, 'Auth');
-    return true;
+  // Quick Action: Centang Semua Online untuk Bulan Ini
+  const checkAllOnline = () => {
+    setStockRecords(prev => {
+      const prevPeriod = prev[periodKey] || {};
+      const updatedPeriod = { ...prevPeriod };
+
+      devices.forEach(dev => {
+        const existing = updatedPeriod[dev.id] || {};
+        updatedPeriod[dev.id] = {
+          ...existing,
+          status: 'Online'
+        };
+      });
+
+      return {
+        ...prev,
+        [periodKey]: updatedPeriod
+      };
+    });
   };
 
-  const logoutUser = () => {
-    addLog('Logout', `User ${currentUser?.name || ''} keluar dari sesi.`, 'Auth');
-    setCurrentUser(null);
-    try {
-      localStorage.removeItem('its_current_user');
-    } catch (e) {}
+  // Reset Checklist Bulan Ini
+  const resetMonthStock = () => {
+    if (window.confirm(`Yakin ingin mereset checklist bulan ${monthOptions.find(m => m.value === currentMonth)?.label} ${currentYear}?`)) {
+      setStockRecords(prev => ({
+        ...prev,
+        [periodKey]: {}
+      }));
+    }
   };
 
-  // Device CRUD Operations
+  // Add New Device
   const addDevice = (deviceData) => {
-    const nextId = `DEV-${String((Array.isArray(devices) ? devices.length : 0) + 1).padStart(3, '0')}`;
+    const newId = `dev-${Date.now()}`;
+    const nextNo = devices.length > 0 ? Math.max(...devices.map(d => d.no || 0)) + 1 : 1;
     const newDevice = {
-      id: nextId,
-      department: deviceData.department || 'IS',
-      computerName: deviceData.computerName || `ITS-${deviceData.department || 'IS'}-PC${String(devices.length + 1).padStart(2, '0')}`,
-      ipAddress: deviceData.ipAddress || '192.168.1.100',
-      type: deviceData.type || 'Desktop PC',
-      user: deviceData.user || 'Unassigned',
-      status: deviceData.status || 'In',
-      remark: deviceData.remark || '-'
+      ...deviceData,
+      id: newId,
+      no: nextNo
     };
+    setDevices(prev => [...prev, newDevice]);
 
-    setDevices(prev => [newDevice, ...(Array.isArray(prev) ? prev : [])]);
-    addLog('Tambah Device', `Menambahkan komputer [${newDevice.computerName}] (IP: ${newDevice.ipAddress})`, 'Inventory');
+    // Also set default status for current period
+    if (deviceData.status) {
+      setStockRecords(prev => ({
+        ...prev,
+        [periodKey]: {
+          ...(prev[periodKey] || {}),
+          [newId]: {
+            status: deviceData.status,
+            remark: deviceData.remark || ''
+          }
+        }
+      }));
+    }
+    setIsDeviceModalOpen(false);
   };
 
-  const updateDevice = (updatedData) => {
-    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => d.id === updatedData.id ? { ...d, ...updatedData } : d));
-    addLog('Update Device', `Mengupdate data komputer [${updatedData.computerName}]`, 'Inventory');
+  // Update Existing Device
+  const updateDevice = (updatedDevice) => {
+    setDevices(prev => prev.map(d => d.id === updatedDevice.id ? updatedDevice : d));
+    setIsDeviceModalOpen(false);
+    setEditingDevice(null);
   };
 
-  const updateDeviceStatus = (id, newStatus) => {
-    setDevices(prev => (Array.isArray(prev) ? prev : []).map(d => {
-      if (d.id === id) {
-        addLog('Update Status', `Status komputer ${d.computerName} diverifikasi menjadi ${newStatus}`, 'Status');
-        return { ...d, status: newStatus };
-      }
-      return d;
-    }));
-  };
-
-  const deleteDevice = (id) => {
-    const target = (Array.isArray(devices) ? devices : []).find(d => d.id === id);
-    if (target) {
-      setDevices(prev => (Array.isArray(prev) ? prev : []).filter(d => d.id !== id));
-      addLog('Hapus Device', `Menghapus komputer [${target.computerName}] dari sistem`, 'Inventory');
+  // Delete Device
+  const deleteDevice = (deviceId) => {
+    if (window.confirm('Hapus perangkat ini dari daftar inventaris?')) {
+      setDevices(prev => prev.filter(d => d.id !== deviceId));
     }
   };
 
-  const resetToSeedData = () => {
-    localStorage.removeItem(STORAGE_KEY_DEVICES);
-    localStorage.removeItem(STORAGE_KEY_LOGS);
-    localStorage.removeItem(STORAGE_KEY_INSPECTIONS);
-    setDevices([]);
-    setLogs([]);
-    setMonthlyInspections([]);
-    setFilterDept('All');
-    setFilterStatus('All');
-    setFilterType('All');
-    setSearchQuery('');
-    addLog('Reset Data', 'Mereset data inventaris menjadi kosong', 'System');
-  };
-
-  // Monthly Inspection CRUD Operations
-  const addMonthlyInspection = (inspectionData) => {
-    const yr = inspectionData.year || 2026;
-    const mo = String(inspectionData.month || 10).padStart(2, '0');
-    const nextId = `INSP-${yr}-${mo}-${String((Array.isArray(monthlyInspections) ? monthlyInspections.length : 0) + 1).padStart(3, '0')}`;
-    const newRecord = {
-      id: nextId,
-      ...inspectionData,
-      inspectionDate: inspectionData.inspectionDate || new Date().toISOString().split('T')[0]
-    };
-
-    setMonthlyInspections(prev => [newRecord, ...(Array.isArray(prev) ? prev : [])]);
-    addLog('Input Pemeriksaan', `Mencatat pemeriksaan perangkat [${inspectionData.computerName}] periode ${inspectionData.periodName}`, 'Inspection');
-    return newRecord;
-  };
-
-  const updateMonthlyInspection = (updatedData) => {
-    setMonthlyInspections(prev => (Array.isArray(prev) ? prev : []).map(r => r.id === updatedData.id ? { ...r, ...updatedData } : r));
-    addLog('Update Pemeriksaan', `Mengupdate pemeriksaan [${updatedData.computerName}] periode ${updatedData.periodName}`, 'Inspection');
-  };
-
-  const deleteMonthlyInspection = (id) => {
-    const target = (Array.isArray(monthlyInspections) ? monthlyInspections : []).find(r => r.id === id);
-    if (target) {
-      setMonthlyInspections(prev => (Array.isArray(prev) ? prev : []).filter(r => r.id !== id));
-      addLog('Hapus Pemeriksaan', `Menghapus record audit [${target.computerName}] periode ${target.periodName}`, 'Inspection');
-    }
-  };
-
-  const quickVerifyMonthlyInspection = (device, month, year) => {
-    const periodLabel = `${monthOptions.find(m => m.value === Number(month))?.label || `Bulan ${month}`} ${year}`;
-    const existingIndex = (Array.isArray(monthlyInspections) ? monthlyInspections : []).findIndex(
-      r => (r.deviceId === device.id || r.computerName === device.computerName) && Number(r.month) === Number(month) && Number(r.year) === Number(year)
-    );
-
-    if (existingIndex >= 0) {
-      const existing = monthlyInspections[existingIndex];
-      const nextStatus = existing.inspectionResult === 'Verified (Sesuai)' ? 'Pending (Belum Diperiksa)' : 'Verified (Sesuai)';
-      updateMonthlyInspection({
-        ...existing,
-        inspectionResult: nextStatus,
-        inspectionDate: new Date().toISOString().split('T')[0],
-        auditorName: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Auditor IT'
-      });
-    } else {
-      addMonthlyInspection({
-        deviceId: device.id,
-        year: Number(year),
-        month: Number(month),
-        periodName: periodLabel,
-        computerName: device.computerName,
-        ipAddress: device.ipAddress,
-        department: device.department,
-        user: device.user,
-        type: device.type,
-        inspectionDate: new Date().toISOString().split('T')[0],
-        auditorName: currentUser ? `${currentUser.name} (${currentUser.deptCode || 'IS'})` : 'Auditor IT',
-        physicalCondition: 'Baik / Normal',
-        status: device.status || 'In',
-        inspectionResult: 'Verified (Sesuai)',
-        notes: `Pemeriksaan rutin berkala ${periodLabel} terverifikasi.`
-      });
-    }
-  };
-
+  // Modal controls
   const openAddModal = () => {
     setEditingDevice(null);
     setIsDeviceModalOpen(true);
@@ -287,87 +258,88 @@ export const InventoryProvider = ({ children }) => {
     setEditingDevice(null);
   };
 
-  // Barcode Scanner Controls
-  const openScannerModal = (preselected = null) => {
-    setScannedDevice(preselected);
-    setIsScannerOpen(true);
-  };
-
-  const closeScannerModal = () => {
-    setIsScannerOpen(false);
-    setScannedDevice(null);
-  };
-
-  // Barcode Sticker Print Controls
-  const openBarcodePrint = (device) => {
+  const openBarcodeModal = (device) => {
     setBarcodeDevice(device);
-    setIsBarcodePrintOpen(true);
+    setIsBarcodeModalOpen(true);
   };
 
-  const closeBarcodePrint = () => {
-    setIsBarcodePrintOpen(false);
+  const closeBarcodeModal = () => {
+    setIsBarcodeModalOpen(false);
     setBarcodeDevice(null);
   };
 
+  // Filtered devices based on search query, department, type
+  const filteredDevices = devices.filter(dev => {
+    const matchesSearch = !searchQuery || 
+      (dev.computerName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (dev.user || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (dev.department || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (dev.type || '').toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesDept = filterDept === 'All' || dev.department === filterDept;
+    const matchesType = filterType === 'All' || dev.type === filterType;
+
+    return matchesSearch && matchesDept && matchesType;
+  });
+
   return (
-    <InventoryContext.Provider value={{
-      currentUser,
-      registerUser,
-      loginUser,
-      logoutUser,
-      // Data
-      devices: Array.isArray(devices) ? devices : [],
-      departments: Array.isArray(departments) ? departments : initialDepartments,
-      logs: Array.isArray(logs) ? logs : [],
-      monthlyInspections: Array.isArray(monthlyInspections) ? monthlyInspections : [],
-      setMonthlyInspections,
-      monthOptions,
-      physicalConditionOptions,
-      inspectionResultOptions,
-      statusOptions,
-      typeOptions,
-      // Filters
-      searchQuery,
-      setSearchQuery,
-      filterDept,
-      setFilterDept,
-      filterStatus,
-      setFilterStatus,
-      filterType,
-      setFilterType,
-      // Modals
-      isDeviceModalOpen,
-      editingDevice,
-      openAddModal,
-      openEditModal,
-      closeModal,
-      // Scanner & Barcode Print
-      isScannerOpen,
-      openScannerModal,
-      closeScannerModal,
-      scannedDevice,
-      setScannedDevice,
-      isBarcodePrintOpen,
-      barcodeDevice,
-      openBarcodePrint,
-      closeBarcodePrint,
-      // Methods
-      addDevice,
-      updateDevice,
-      updateDeviceStatus,
-      deleteDevice,
-      resetToSeedData,
-      addMonthlyInspection,
-      updateMonthlyInspection,
-      deleteMonthlyInspection,
-      quickVerifyMonthlyInspection,
-      addLog
-    }}>
-      <div className="theme-dark">
-        {children}
-      </div>
+    <InventoryContext.Provider
+      value={{
+        currentUser,
+        currentScreen,
+        setCurrentScreen,
+        loginUser,
+        logoutUser,
+        devices,
+        filteredDevices,
+        stockRecords,
+        currentMonthRecord,
+        currentYear,
+        setCurrentYear,
+        currentMonth,
+        setCurrentMonth,
+        availableYears,
+        activeView,
+        setActiveView,
+        searchQuery,
+        setSearchQuery,
+        filterDept,
+        setFilterDept,
+        filterType,
+        setFilterType,
+        departments: initialDepartments,
+        statusColumns,
+        typeOptions,
+        monthOptions,
+        signatures,
+        setSignatures,
+        updateDeviceStockStatus,
+        updateDeviceStockRemark,
+        checkAllOnline,
+        resetMonthStock,
+        addDevice,
+        updateDevice,
+        deleteDevice,
+        isDeviceModalOpen,
+        editingDevice,
+        openAddModal,
+        openEditModal,
+        closeModal,
+        isBarcodeModalOpen,
+        barcodeDevice,
+        openBarcodeModal,
+        closeBarcodeModal
+      }}
+    >
+      {children}
     </InventoryContext.Provider>
   );
 };
 
-export const useInventory = () => useContext(InventoryContext);
+export const useInventory = () => {
+  const context = useContext(InventoryContext);
+  if (!context) {
+    throw new Error('useInventory must be used within an InventoryProvider');
+  }
+  return context;
+};

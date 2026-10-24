@@ -1,78 +1,58 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useInventory } from '../context/InventoryContext';
-import './Dashboard.css';
+import { StockTakingTable } from './StockTakingTable';
+import { PcLedgerTable } from './PcLedgerTable';
 import {
-  Home,
-  HardDrive,
-  BarChart3,
-  CalendarCheck,
-  QrCode,
-  Settings,
-  LogOut,
   Search,
-  Plus
+  Plus,
+  Printer,
+  Calendar,
+  Filter,
+  Layers,
+  FileSpreadsheet,
+  LogIn,
+  LogOut,
+  User,
+  Sparkles,
+  ShieldCheck,
+  CheckCircle2,
+  Building
 } from 'lucide-react';
-
-import { DashboardOverview } from './pages/DashboardOverviewPage';
-import { DevicesCatalogPage } from './pages/DevicesCatalogPage';
-import { MonthlyAuditPage } from './pages/MonthlyAuditPage';
-import { AnalyticsPage } from './pages/AnalyticsPage';
-import { ScannerPage } from './pages/ScannerPage';
-import { SettingsPage } from './pages/SettingsPage';
+import './Dashboard.css';
 
 export const Dashboard = () => {
   const {
-    currentUser,
-    logoutUser,
+    activeView,
+    setActiveView,
+    currentYear,
+    setCurrentYear,
+    availableYears,
     searchQuery,
     setSearchQuery,
-    openAddModal
+    filterDept,
+    setFilterDept,
+    departments,
+    openAddModal,
+    devices,
+    currentUser,
+    logoutUser,
+    setCurrentScreen
   } = useInventory();
 
-  // Navigation dock state: 'dashboard' | 'devices' | 'analytics' | 'scanner' | 'settings'
-  const [activeDockTab, setActiveDockTab] = useState('dashboard');
-
-  const handleDockNavigate = (tab) => {
-    setActiveDockTab(tab);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+  const handlePrint = () => {
+    window.print();
   };
 
   return (
-    <div className="fintech-dashboard-shell">
-      {/* Decorative Toray Geometric Wireframe Background (Authentic to login hero) */}
-      <svg
-        className="dashboard-geometric-bg"
-        viewBox="0 0 1000 1000"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-hidden="true"
-      >
-        <g transform="translate(850, 260) rotate(26)">
-          <rect x="-190" y="-190" width="380" height="380" rx="38" stroke="rgba(255,255,255,0.06)" strokeWidth="1.5" />
-          <rect x="-250" y="-250" width="500" height="500" rx="48" stroke="rgba(255,255,255,0.05)" strokeWidth="1.5" />
-          <rect x="-310" y="-310" width="620" height="620" rx="58" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-          <rect x="-370" y="-370" width="740" height="740" rx="68" stroke="rgba(255,255,255,0.03)" strokeWidth="1.5" />
-          <rect x="-430" y="-430" width="860" height="860" rx="78" stroke="rgba(255,255,255,0.02)" strokeWidth="1.5" />
-        </g>
-      </svg>
-
-      {/* --------------------------------------------------------------------
-          1. LEFT VERTICAL SLIM ICON DOCK (FULL HEIGHT - AS IN IMAGE 1)
-          -------------------------------------------------------------------- */}
-      <aside className="fintech-sidebar-dock">
-        <div className="dock-top">
-          {/* Glowing Toray Asterisk Emblem (Exact match to login hero) */}
-          <div
-            className="dock-logo-mark"
-            onClick={() => handleDockNavigate('dashboard')}
-            title="PT. Indonesia Toray Synthetics"
-          >
-            <svg
-              className="dock-logo-svg"
-              viewBox="0 0 64 64"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
+    <div className="stock-system-shell synergy-theme">
+      {/* -------------------------------------------------------------
+          1. TOP APP BAR (DEEP NAVY - AS IN REFERENCE IMAGE)
+          ------------------------------------------------------------- */}
+      <header className="app-primary-navbar print-hide">
+        <div className="navbar-left">
+          {/* Logo Circle Emblem */}
+          <div className="brand-emblem-container" title="PT Indonesia Toray Synthetics">
+            <svg viewBox="0 0 64 64" fill="none" className="brand-emblem-svg">
               <line x1="32" y1="7" x2="32" y2="57" stroke="white" strokeWidth="8" strokeLinecap="round" />
               <line x1="7" y1="32" x2="57" y2="32" stroke="white" strokeWidth="8" strokeLinecap="round" />
               <line x1="14.3" y1="14.3" x2="49.7" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
@@ -80,111 +60,144 @@ export const Dashboard = () => {
             </svg>
           </div>
 
-          {/* Navigation Stack */}
-          <nav className="dock-nav-stack">
-            {/* 1. Home / Dashboard Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('dashboard')}
-              title="Dashboard Overview"
-            >
-              <Home size={19} />
-            </button>
-
-            {/* 2. Devices / Master Catalog Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'devices' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('devices')}
-              title="Tabel Master Inventaris IT"
-            >
-              <HardDrive size={19} />
-            </button>
-
-            {/* 3. Monthly Audit / Pemeriksaan Bulanan Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'monthly' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('monthly')}
-              title="Pemeriksaan & Pendataan Bulanan"
-            >
-              <CalendarCheck size={19} />
-            </button>
-
-            {/* 4. Bar Chart / Statistics Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'analytics' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('analytics')}
-              title="Statistik Stock Opname"
-            >
-              <BarChart3 size={19} />
-            </button>
-
-            {/* 4. Camera / Barcode Scanner Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'scanner' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('scanner')}
-              title="Pusat Scan & Cetak Barcode"
-            >
-              <QrCode size={19} />
-            </button>
-
-            {/* 5. Settings / Pengaturan Page Button */}
-            <button
-              className={`dock-icon-btn ${activeDockTab === 'settings' ? 'active' : ''}`}
-              onClick={() => handleDockNavigate('settings')}
-              title="Pengaturan Sistem & Master Data"
-            >
-              <Settings size={19} />
-            </button>
-          </nav>
+          <div className="brand-text-block">
+            <h1 className="brand-title">PT. INDONESIA TORAY SYNTHETICS</h1>
+            <span className="brand-subtitle">IT Asset Stock Taking & Hardware Ledger System</span>
+          </div>
         </div>
 
-        {/* Bottom Logout */}
-        <div className="dock-bottom">
-          <button
-            className="dock-logout-btn"
-            onClick={logoutUser}
-            title="Keluar / Ganti Akun"
+        {/* Year Selector Ribbon */}
+        <div className="year-selector-pill">
+          <Calendar size={15} className="pill-icon" />
+          <span className="pill-label">Tahun:</span>
+          <select
+            value={currentYear}
+            onChange={(e) => setCurrentYear(Number(e.target.value))}
+            className="year-select-dropdown"
           >
-            <LogOut size={19} />
+            {availableYears.map(yr => (
+              <option key={yr} value={yr}>
+                {yr}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Right Actions: Print, Add Computer & Login/User Profile */}
+        <div className="navbar-right">
+          <button
+            className="btn-print-doc"
+            onClick={handlePrint}
+            title="Cetak Formulir Standar Toray (Print / PDF)"
+          >
+            <Printer size={16} />
+            <span>Cetak Dokumen</span>
+          </button>
+
+          <button
+            className="btn-add-primary"
+            onClick={openAddModal}
+            title="Tambah Perangkat Komputer Baru"
+          >
+            <Plus size={16} />
+            <span>+ Tambah Komputer</span>
+          </button>
+
+          {/* User Session & Switch to Login View Button */}
+          <div className="user-nav-box">
+            <button
+              className="btn-nav-user-pill"
+              onClick={() => setCurrentScreen('login')}
+              title="Buka Halaman Login / Portal"
+            >
+              <User size={15} />
+              <span>{currentUser?.name || 'Login'}</span>
+            </button>
+
+            <button
+              className="btn-nav-logout-icon"
+              onClick={logoutUser}
+              title="Keluar / Ganti Akun"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* -------------------------------------------------------------
+          2. VIBRANT SKY-BLUE HERO BANNER WITH ORGANIC WAVE DIVIDER
+          ------------------------------------------------------------- */}
+      <section className="dashboard-hero-banner print-hide">
+        <div className="hero-banner-inner">
+          <div className="hero-banner-tag">
+            <Sparkles size={14} />
+            <span>TORAY INFORMATION SYSTEM • INTERNAL PERUSAHAAN</span>
+          </div>
+          <h2 className="hero-banner-title">
+            BUILDING YOUR DIGITAL FUTURE.
+          </h2>
+          <p className="hero-banner-desc">
+            Sistem resmi inventarisasi komputer & server, formulir stock taking Januari s/d Desember, dan rekapitulasi status online/offline PC Ledger.
+          </p>
+        </div>
+
+        {/* Smooth Organic SVG Wave Divider */}
+        <div className="dashboard-wave-divider">
+          <svg viewBox="0 0 1440 90" fill="none" preserveAspectRatio="none" className="dash-wave-svg">
+            <path
+              d="M0,24L80,32C160,40,320,56,480,58.7C640,61,800,51,960,37.3C1120,24,1280,8,1360,0L1440,0L1440,90L1360,90C1280,90,1120,90,960,90C800,90,640,90,480,90C320,90,160,90,80,90L0,90Z"
+              fill="#f8fafc"
+            />
+          </svg>
+        </div>
+      </section>
+
+      {/* -------------------------------------------------------------
+          3. DEDICATED 2-TABLE VIEW SELECTOR & FILTERS (STICKY TOOLBAR)
+          ------------------------------------------------------------- */}
+      <section className="control-toolbar print-hide">
+        {/* Table Selector Tabs */}
+        <div className="view-mode-tabs">
+          <button
+            className={`view-mode-btn ${activeView === 'stock-taking' ? 'active' : ''}`}
+            onClick={() => setActiveView('stock-taking')}
+          >
+            <Layers size={16} />
+            <span>1. Stock Taking (Jan - Des)</span>
+          </button>
+
+          <button
+            className={`view-mode-btn ${activeView === 'ledger' ? 'active' : ''}`}
+            onClick={() => setActiveView('ledger')}
+          >
+            <FileSpreadsheet size={16} />
+            <span>2. PC Ledger Toray (Online / Offline)</span>
+          </button>
+
+          <button
+            className={`view-mode-btn ${activeView === 'both' ? 'active' : ''}`}
+            onClick={() => setActiveView('both')}
+          >
+            <span>⊞ Tampilkan 2 Tabel</span>
           </button>
         </div>
-      </aside>
 
-      {/* --------------------------------------------------------------------
-          2. MAIN CONTENT CONTAINER
-          -------------------------------------------------------------------- */}
-      <main className="fintech-main-container">
-        {/* Top Navigation Bar */}
-        <header className="fintech-top-bar">
-          {/* Mobile Only Brand Emblem */}
-          <div className="mobile-header-brand" onClick={() => handleDockNavigate('dashboard')}>
-            <div className="mobile-brand-emblem">
-              <svg viewBox="0 0 64 64" fill="none" className="mobile-brand-svg">
-                <line x1="32" y1="7" x2="32" y2="57" stroke="white" strokeWidth="8" strokeLinecap="round" />
-                <line x1="7" y1="32" x2="57" y2="32" stroke="white" strokeWidth="8" strokeLinecap="round" />
-                <line x1="14.3" y1="14.3" x2="49.7" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
-                <line x1="49.7" y1="14.3" x2="14.3" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
-              </svg>
-            </div>
-            <div className="mobile-brand-title">
-              <strong>PT. TORAY</strong>
-              <span>IT Inventory</span>
-            </div>
-          </div>
-
-          {/* Pill Search Input */}
-          <div className="fintech-search-pill">
-            <Search size={17} className="search-pill-icon" />
+        {/* Search & Dept Filter */}
+        <div className="filter-tools-cluster">
+          {/* Search Box */}
+          <div className="search-field-pill">
+            <Search size={15} className="search-icon" />
             <input
               type="text"
-              placeholder="Search something"
+              placeholder="Cari nama PC, user, dept..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-pill-input"
+              className="search-input"
             />
             {searchQuery && (
               <button
-                className="search-clear-btn"
+                className="search-clear"
                 onClick={() => setSearchQuery('')}
                 title="Hapus pencarian"
               >
@@ -193,55 +206,53 @@ export const Dashboard = () => {
             )}
           </div>
 
-          {/* Right Action: Solid White Pill Button + User Avatar */}
-          <div className="fintech-top-right">
-            <button
-              className="btn-solid-white-pill"
-              onClick={openAddModal}
-              title="Tambah Perangkat Komputer Baru"
+          {/* Department Filter */}
+          <div className="dept-filter-dropdown">
+            <Filter size={14} className="filter-icon" />
+            <select
+              value={filterDept}
+              onChange={(e) => setFilterDept(e.target.value)}
+              className="dept-select"
             >
-              <Plus size={16} />
-              <span>+ Tambah Komputer</span>
-            </button>
-
-            {/* User Avatar Circle */}
-            <div
-              className="top-user-avatar"
-              title={`${currentUser?.name || 'Administrator'} [${currentUser?.deptCode || 'IS'}]`}
-              onClick={() => handleDockNavigate('settings')}
-            >
-              <span>{currentUser?.name ? currentUser.name.substring(0, 2).toUpperCase() : 'IT'}</span>
-            </div>
+              <option value="All">Semua Dept ({devices.length})</option>
+              {departments.map(d => (
+                <option key={d.id} value={d.code}>
+                  {d.code} - {d.name}
+                </option>
+              ))}
+            </select>
           </div>
-        </header>
+        </div>
+      </section>
 
-        {/* ------------------------------------------------------------------
-            3. DEDICATED SEPARATE PAGES SWITCHER
-            ------------------------------------------------------------------ */}
-        {activeDockTab === 'dashboard' && (
-          <DashboardOverview onNavigate={handleDockNavigate} />
+      {/* -------------------------------------------------------------
+          4. MAIN DATA TABLES CONTAINER (THE 2 AUTHENTIC TABLES)
+          ------------------------------------------------------------- */}
+      <main className="tables-content-area">
+        {/* Table 1: Stock Taking Bulanan (Januari - Desember) */}
+        {(activeView === 'stock-taking' || activeView === 'both') && (
+          <div className="table-section-block">
+            <StockTakingTable />
+          </div>
         )}
 
-        {activeDockTab === 'devices' && (
-          <DevicesCatalogPage />
-        )}
-
-        {activeDockTab === 'monthly' && (
-          <MonthlyAuditPage onNavigate={handleDockNavigate} />
-        )}
-
-        {activeDockTab === 'analytics' && (
-          <AnalyticsPage onNavigate={handleDockNavigate} />
-        )}
-
-        {activeDockTab === 'scanner' && (
-          <ScannerPage onNavigate={handleDockNavigate} />
-        )}
-
-        {activeDockTab === 'settings' && (
-          <SettingsPage />
+        {/* Table 2: PC Ledger Toray (Online / Offline) */}
+        {(activeView === 'ledger' || activeView === 'both') && (
+          <div className="table-section-block margin-top-lg">
+            <PcLedgerTable />
+          </div>
         )}
       </main>
+
+      {/* -------------------------------------------------------------
+          5. DEEP NAVY FOOTER
+          ------------------------------------------------------------- */}
+      <footer className="synergy-footer-dark print-hide">
+        <div className="footer-bottom-bar">
+          <span>PT INDONESIA TORAY SYNTHETICS • INFORMATION SYSTEM DEPARTMENT • DOKUMEN INTERNAL PERUSAHAAN</span>
+          <span>© 2026 PT. Indonesia Toray Synthetics • Versi 2.1 (Synergy Light Theme)</span>
+        </div>
+      </footer>
     </div>
   );
 };

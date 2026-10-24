@@ -2135,6 +2135,16 @@ input, select, textarea {
   outline: none;
 }
 
+.form-select {
+  cursor: pointer;
+}
+
+.form-select option {
+  background-color: #0a1642 !important;
+  color: #ffffff !important;
+  padding: 8px 12px !important;
+}
+
 .form-input:focus, .form-select:focus, .form-textarea:focus {
   border-color: var(--toray-cyan);
   box-shadow: 0 0 0 3px rgba(0, 163, 224, 0.15);

@@ -1,47 +1,22 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { InventoryProvider, useInventory } from './context/InventoryContext';
-import { Header } from './components/Header';
-import { RegistrationView } from './components/RegistrationView';
 import { Dashboard } from './components/Dashboard';
+import { LoginView } from './components/LoginView';
 import { DeviceModal } from './components/DeviceModal';
-import { BarcodeScannerModal } from './components/BarcodeScannerModal';
-import { BarcodePrintModal } from './components/BarcodePrintModal';
+import { DeviceBarcodeModal } from './components/DeviceBarcodeModal';
 
-const MainAppContent = () => {
-  const { currentUser, devices, openScannerModal } = useInventory();
+const AppContent = () => {
+  const { currentScreen } = useInventory();
 
-  // URL Deep Link Listener for Barcode / QR Scan (?scan=COMPUTER_NAME or ?device=...)
-  useEffect(() => {
-    if (currentUser && devices && devices.length > 0) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const scanCode = urlParams.get('scan') || urlParams.get('device');
-      if (scanCode) {
-        const matched = devices.find(d => 
-          (d.computerName || '').toLowerCase() === scanCode.toLowerCase() ||
-          (d.id || '').toLowerCase() === scanCode.toLowerCase() ||
-          (d.ipAddress || '').toLowerCase() === scanCode.toLowerCase()
-        );
-        if (matched) {
-          openScannerModal(matched);
-        } else {
-          openScannerModal();
-        }
-      }
-    }
-  }, [currentUser, devices, openScannerModal]);
-
-  // 1. Initial Gate: Registration & Login Form
-  if (!currentUser) {
-    return <RegistrationView />;
+  if (currentScreen === 'login') {
+    return <LoginView />;
   }
 
-  // 2. Main Executive View: First Dashboard Table
   return (
     <div className="app-shell">
       <Dashboard />
       <DeviceModal />
-      <BarcodeScannerModal />
-      <BarcodePrintModal />
+      <DeviceBarcodeModal />
     </div>
   );
 };
@@ -49,7 +24,7 @@ const MainAppContent = () => {
 export default function App() {
   return (
     <InventoryProvider>
-      <MainAppContent />
+      <AppContent />
     </InventoryProvider>
   );
 }

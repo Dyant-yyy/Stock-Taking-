@@ -1,0 +1,409 @@
+/* ==========================================================================
+   SYNERGY DIGITAL / TORAY AUTH PORTAL STYLESHEET
+   Matching User's Reference (Deep Navy + Vibrant Sky/Cyan Gradient Theme)
+   ========================================================================== */
+
+.synergy-portal-wrapper {
+  min-height: 100vh;
+  background-color: #0c192c;
+  color: #0f172a;
+  font-family: var(--font-primary, 'Plus Jakarta Sans', sans-serif);
+  display: flex;
+  flex-direction: column;
+}
+
+/* --------------------------------------------------------------------------
+   1. TOP NAVBAR (DEEP NAVY)
+   -------------------------------------------------------------------------- */
+.synergy-top-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 48px;
+  background-color: #0c192c;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 10;
+  gap: 20px;
+}
+
+.navbar-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.synergy-logo-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.45);
+}
+
+.synergy-logo-svg {
+  width: 24px;
+  height: 24px;
+}
+
+.synergy-brand-title {
+  display: flex;
+  flex-direction: column;
+}
+
+.synergy-brand-title strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #ffffff;
+}
+
+.synergy-brand-title span {
+  font-size: 11px;
+  color: #94a3b8;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.portal-version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  padding: 7px 16px;
+  border-radius: 20px;
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* --------------------------------------------------------------------------
+   2. HERO SECTION WITH BLUE GRADIENT & FLOATING AUTH CARD
+   -------------------------------------------------------------------------- */
+.synergy-hero-section {
+  flex: 1;
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 40%, #0ea5e9 75%, #38bdf8 100%);
+  position: relative;
+  padding: 56px 48px 110px 48px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.hero-container-grid {
+  max-width: 1180px;
+  width: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.hero-left-column {
+  color: #ffffff;
+}
+
+.hero-badge-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px);
+  padding: 6px 15px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+}
+
+.hero-giant-title {
+  font-size: 48px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin: 0 0 20px 0;
+  text-shadow: 0 2px 14px rgba(2, 132, 199, 0.4);
+}
+
+.hero-description {
+  font-size: 16px;
+  line-height: 1.65;
+  color: rgba(255, 255, 255, 0.94);
+  margin: 0 0 28px 0;
+  max-width: 520px;
+}
+
+.hero-corporate-points {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.hero-corporate-points .point-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.hero-corporate-points .point-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* Floating Sign In Card (Right Column) */
+.synergy-auth-card {
+  background: #ffffff;
+  border-radius: 22px;
+  padding: 34px 32px;
+  box-shadow: 0 25px 60px -12px rgba(2, 44, 95, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+}
+
+.auth-card-header {
+  margin-bottom: 22px;
+}
+
+.auth-card-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: #0c192c;
+  margin: 0 0 5px 0;
+}
+
+.auth-card-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 0;
+  font-weight: 500;
+}
+
+.auth-error-banner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.auth-card-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-field-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #334155;
+  letter-spacing: 0.01em;
+}
+
+.auth-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-field-icon {
+  position: absolute;
+  left: 14px;
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.auth-text-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background-color: #f8fafc;
+  font-size: 14px;
+  font-family: inherit;
+  color: #0f172a;
+  outline: none;
+  transition: all 0.18s ease;
+}
+
+.auth-text-input::placeholder {
+  color: #94a3b8;
+}
+
+.auth-text-input:focus {
+  border-color: #0ea5e9;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.auth-select-input {
+  width: 100%;
+  padding: 12px 14px 12px 42px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background-color: #f8fafc;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #0f172a;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2364748b%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+}
+
+.auth-select-input option {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  padding: 6px;
+}
+
+.auth-select-input:focus {
+  border-color: #0ea5e9;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
+}
+
+.btn-auth-gradient-submit {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: linear-gradient(90deg, #0284c7 0%, #0ea5e9 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 14.5px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-auth-gradient-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: linear-gradient(90deg, #0369a1 0%, #0284c7 100%);
+  box-shadow: 0 12px 26px rgba(2, 132, 199, 0.55);
+}
+
+.btn-auth-gradient-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Organic Wave Divider */
+.hero-wave-divider {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.hero-wave-divider .wave-svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 60px;
+}
+
+/* --------------------------------------------------------------------------
+   3. MINIMAL CORPORATE FOOTER (DEEP NAVY)
+   -------------------------------------------------------------------------- */
+.synergy-footer-clean {
+  background-color: #0c192c;
+  padding: 24px 48px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.footer-clean-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.footer-clean-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #cbd5e1;
+  letter-spacing: 0.03em;
+}
+
+.footer-clean-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #38bdf8;
+}
+
+.footer-clean-meta {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE BREAKPOINTS
+   -------------------------------------------------------------------------- */
+@media (max-width: 960px) {
+  .synergy-top-navbar {
+    padding: 16px 24px;
+  }
+
+  .synergy-hero-section {
+    padding: 40px 24px 80px 24px;
+  }
+
+  .hero-container-grid {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .hero-giant-title {
+    font-size: 36px;
+  }
+
+  .footer-clean-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
