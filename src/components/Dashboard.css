@@ -228,66 +228,93 @@
 }
 
 /* --------------------------------------------------------------------------
-   2. DASHBOARD HERO BANNER WITH ORGANIC WAVE
+   2. STREAMLINED HORIZONTAL HERO BANNER (MENYAMPING & COMPACT)
    -------------------------------------------------------------------------- */
-.dashboard-hero-banner {
-  background: linear-gradient(135deg, #0369a1 0%, #0284c7 40%, #0ea5e9 75%, #38bdf8 100%);
+.dashboard-hero-banner.compact-horizontal {
+  background: linear-gradient(90deg, #0284c7 0%, #0369a1 40%, #0c192c 100%);
   position: relative;
-  padding: 38px 40px 65px 40px;
+  padding: 14px 28px;
   color: #ffffff;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.hero-banner-inner {
-  max-width: 1200px;
+.hero-banner-inner.horizontal-layout {
+  max-width: 100%;
   margin: 0 auto;
-  position: relative;
-  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.hero-text-side {
+  flex: 1;
 }
 
 .hero-banner-tag {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255, 255, 255, 0.18);
-  padding: 5px 12px;
+  background: rgba(255, 255, 255, 0.14);
+  padding: 3px 10px;
   border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
+  font-size: 10.5px;
+  font-weight: 800;
   letter-spacing: 0.05em;
-  margin-bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  margin-bottom: 5px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #bae6fd;
 }
 
 .hero-banner-title {
-  font-size: 32px;
+  font-size: 20px;
   font-weight: 900;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: #ffffff;
-  margin: 0 0 8px 0;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  margin: 0 0 3px 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .hero-banner-desc {
-  font-size: 14.5px;
-  color: rgba(255, 255, 255, 0.92);
-  max-width: 650px;
-  line-height: 1.5;
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.88);
+  max-width: 820px;
+  line-height: 1.4;
   margin: 0;
 }
 
-.dashboard-wave-divider {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  line-height: 0;
-  z-index: 1;
+.hero-quick-status-side {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
-.dash-wave-svg {
-  width: 100%;
-  height: 48px;
-  display: block;
+.hero-stat-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 6px 14px;
+  border-radius: 10px;
+  min-width: 80px;
+}
+
+.hero-stat-badge .stat-num {
+  font-size: 18px;
+  font-weight: 900;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.hero-stat-badge .stat-label {
+  font-size: 10px;
+  color: #93c5fd;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 /* --------------------------------------------------------------------------
@@ -487,19 +514,20 @@
 }
 
 /* --------------------------------------------------------------------------
-   4. MAIN TABLES CONTENT AREA (CRISP WHITE SURFACES)
+   4. MAIN TABLES CONTENT AREA (CRISP WHITE SURFACES - MENYAMPING & TONJOLKAN)
    -------------------------------------------------------------------------- */
 .tables-content-area {
-  padding: 24px 32px;
+  padding: 16px 24px;
   flex: 1;
+  width: 100%;
 }
 
 .table-module-wrapper {
   background: #ffffff;
-  border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 26px;
-  box-shadow: 0 4px 25px rgba(2, 44, 95, 0.06);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 14px;
+  padding: 22px 24px;
+  box-shadow: 0 10px 30px rgba(0, 37, 91, 0.08);
 }
 
 .margin-top-lg {
@@ -705,45 +733,51 @@
 }
 
 /* --------------------------------------------------------------------------
-   7. CRISP TORAY TABLE STYLING
+   7. CRISP TORAY TABLE STYLING - PROMINENT & HIGH VISIBILITY
    -------------------------------------------------------------------------- */
 .authentic-table-container {
   overflow-x: auto;
-  border: 1.5px solid #cbd5e1;
+  border: 2px solid #00255b;
   border-radius: 10px;
   background: #ffffff;
+  box-shadow: 0 6px 20px rgba(0, 37, 91, 0.08);
 }
 
 .authentic-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 12.5px;
+  font-size: 13px;
   text-align: left;
 }
 
 .authentic-table th {
-  background-color: #0c192c;
+  background: linear-gradient(180deg, #00255b 0%, #0c192c 100%);
   color: #ffffff;
   font-weight: 800;
-  padding: 11px 12px;
-  border-bottom: 2.5px solid #0284c7;
-  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 12px 14px;
+  border-bottom: 3px solid #0ea5e9;
+  border-right: 1px solid rgba(255, 255, 255, 0.15);
   white-space: nowrap;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .authentic-table td {
-  padding: 9px 12px;
+  padding: 10px 14px;
   border-bottom: 1px solid #e2e8f0;
   border-right: 1px solid #f1f5f9;
-  color: #1e293b;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.authentic-table tbody tr:nth-child(even) {
+  background-color: #f8fafc;
 }
 
 .authentic-table tbody tr:hover {
-  background: #f8fafc;
+  background: #eff6ff !important;
 }
 
 .col-no { width: 44px; text-align: center; }

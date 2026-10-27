@@ -137,38 +137,41 @@ export const Dashboard = () => {
       </header>
 
       {/* -------------------------------------------------------------
-          2. VIBRANT SKY-BLUE HERO BANNER WITH DYNAMIC PAGE CONTEXT
+          2. COMPACT HORIZONTAL HERO BANNER (MENYAMPING & STREAMLINED)
           ------------------------------------------------------------- */}
-      <section className="dashboard-hero-banner print-hide">
-        <div className="hero-banner-inner">
-          <div className="hero-banner-tag">
-            <Sparkles size={14} />
-            <span>
+      <section className="dashboard-hero-banner compact-horizontal print-hide">
+        <div className="hero-banner-inner horizontal-layout">
+          <div className="hero-text-side">
+            <div className="hero-banner-tag">
+              <Sparkles size={13} />
+              <span>
+                {activeView === 'stock-taking'
+                  ? 'AUDIT & PENDATAAN BULANAN (12 BULAN)'
+                  : 'DOKUMEN MASTER FINAL PC LEDGER'}
+              </span>
+            </div>
+            <h2 className="hero-banner-title">
               {activeView === 'stock-taking'
-                ? 'HALAMAN 1 • AUDIT & PENDATAAN BULANAN (12 BULAN)'
-                : 'HALAMAN 2 • DOKUMEN MASTER FINAL PC LEDGER'}
-            </span>
+                ? 'FORMULIR PENDATAAN STOCK TAKING BULANAN'
+                : 'FINAL PC LEDGER & MASTER ASSET TORAY'}
+            </h2>
+            <p className="hero-banner-desc">
+              {activeView === 'stock-taking'
+                ? 'Formulir pendataan fisik rutin dan checklist status operasional komputer (Januari s/d Desember 2026).'
+                : 'Dokumen master final rekapitulasi status operasional (Online / Offline), spesifikasi hardware lengkap, dan tag stiker barcode aset PT. ITS.'}
+            </p>
           </div>
-          <h2 className="hero-banner-title">
-            {activeView === 'stock-taking'
-              ? 'FORMULIR PENDATAAN STOCK TAKING BULANAN'
-              : 'FINAL PC LEDGER & MASTER ASSET TORAY'}
-          </h2>
-          <p className="hero-banner-desc">
-            {activeView === 'stock-taking'
-              ? 'Halaman 1: Formulir pendataan fisik rutin dan checklist status operasional komputer (Januari s/d Desember 2026). Gunakan halaman ini untuk update audit bulanan.'
-              : 'Halaman 2: Dokumen master final rekapitulasi status operasional (Online / Offline), spesifikasi hardware lengkap, dan tag stiker barcode aset PT. ITS.'}
-          </p>
-        </div>
 
-        {/* Smooth Organic SVG Wave Divider */}
-        <div className="dashboard-wave-divider">
-          <svg viewBox="0 0 1440 90" fill="none" preserveAspectRatio="none" className="dash-wave-svg">
-            <path
-              d="M0,24L80,32C160,40,320,56,480,58.7C640,61,800,51,960,37.3C1120,24,1280,8,1360,0L1440,0L1440,90L1360,90C1280,90,1120,90,960,90C800,90,640,90,480,90C320,90,160,90,80,90L0,90Z"
-              fill="#f8fafc"
-            />
-          </svg>
+          <div className="hero-quick-status-side">
+            <div className="hero-stat-badge">
+              <span className="stat-num">{devices.length}</span>
+              <span className="stat-label">Total Komputer</span>
+            </div>
+            <div className="hero-stat-badge">
+              <span className="stat-num">{currentYear}</span>
+              <span className="stat-label">Tahun Audit</span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -181,11 +184,11 @@ export const Dashboard = () => {
           <button
             className={`view-mode-btn page-tab-btn ${activeView === 'stock-taking' ? 'active' : ''}`}
             onClick={() => setActiveView('stock-taking')}
-            title="Buka Halaman 1: Pendataan Stock Taking Bulanan"
+            title="Buka Pendataan Stock Taking Bulanan"
           >
             <CalendarCheck size={16} className="page-tab-icon" />
             <div className="page-tab-text">
-              <span className="page-tab-title">Halaman 1: Pendataan Stock Taking</span>
+              <span className="page-tab-title">Pendataan Stock Taking</span>
               <span className="page-tab-subtitle">Formulir Audit Bulanan (Jan - Des)</span>
             </div>
             <span className="page-tab-badge">Audit</span>
@@ -194,11 +197,11 @@ export const Dashboard = () => {
           <button
             className={`view-mode-btn page-tab-btn ${activeView === 'ledger' ? 'active' : ''}`}
             onClick={() => setActiveView('ledger')}
-            title="Buka Halaman 2: Master Final PC Ledger Toray"
+            title="Buka Final PC Ledger Toray"
           >
             <FileSpreadsheet size={16} className="page-tab-icon" />
             <div className="page-tab-text">
-              <span className="page-tab-title">Halaman 2: Final PC Ledger Toray</span>
+              <span className="page-tab-title">Final PC Ledger Toray</span>
               <span className="page-tab-subtitle">Master Rekapitulasi & Asset Tag</span>
             </div>
             <span className="page-tab-badge">Final</span>
