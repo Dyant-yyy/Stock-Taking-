@@ -68,6 +68,34 @@
   font-weight: 600;
 }
 
+.synergy-nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn-nav-direct-dash {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+}
+
+.btn-nav-direct-dash:hover {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5);
+}
+
 .portal-version-badge {
   display: inline-flex;
   align-items: center;
@@ -319,6 +347,200 @@
 .btn-auth-gradient-submit:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* --------------------------------------------------------------------------
+   QUICK DEV & ADMIN TOOLS (AKSES CEPAT KELUAR MASUK)
+   -------------------------------------------------------------------------- */
+.auth-quick-tools-panel {
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px dashed #cbd5e1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quick-tools-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.quick-tools-divider span {
+  background: #f0fdf4;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.quick-tools-caption {
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+  margin: 0;
+  font-weight: 500;
+}
+
+.quick-roles-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.btn-quick-role {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-quick-role:hover {
+  background: #ffffff;
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+}
+
+.btn-quick-role.admin {
+  border-left: 3px solid #0284c7;
+}
+
+.btn-quick-role.admin:hover {
+  border-color: #0284c7;
+}
+
+.btn-quick-role.manager {
+  border-left: 3px solid #6366f1;
+}
+
+.btn-quick-role.manager:hover {
+  border-color: #6366f1;
+}
+
+.btn-quick-role.pic {
+  border-left: 3px solid #0d9488;
+}
+
+.btn-quick-role.pic:hover {
+  border-color: #0d9488;
+}
+
+.btn-quick-role.user {
+  border-left: 3px solid #f59e0b;
+}
+
+.btn-quick-role.user:hover {
+  border-color: #f59e0b;
+}
+
+.btn-quick-role .role-icon {
+  color: #0284c7;
+  flex-shrink: 0;
+}
+
+.btn-quick-role.manager .role-icon {
+  color: #6366f1;
+}
+
+.btn-quick-role.pic .role-icon {
+  color: #0d9488;
+}
+
+.btn-quick-role.user .role-icon {
+  color: #f59e0b;
+}
+
+.role-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.role-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.role-dept {
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 2px;
+}
+
+.quick-action-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-quick-bypass {
+  flex: 1.3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.btn-quick-bypass:hover {
+  background: #0369a1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
+}
+
+.btn-quick-autofill {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 10px 10px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-quick-autofill:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+  color: #0f172a;
+}
+
+.btn-quick-autofill.success {
+  background: #f0fdf4;
+  border-color: #86efac;
+  color: #166534;
 }
 
 /* Organic Wave Divider */

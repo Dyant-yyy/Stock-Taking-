@@ -161,8 +161,30 @@
 .user-nav-box {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin-left: 4px;
+}
+
+.btn-nav-portal-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(56, 189, 248, 0.14);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.btn-nav-portal-switch:hover {
+  background: #38bdf8;
+  color: #0c192c;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.35);
 }
 
 .btn-nav-user-pill {

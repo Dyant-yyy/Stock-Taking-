@@ -106,20 +106,29 @@ export const Dashboard = () => {
           {/* User Session & Switch to Login View Button */}
           <div className="user-nav-box">
             <button
+              className="btn-nav-portal-switch"
+              onClick={() => setCurrentScreen('login')}
+              title="Kembali ke Tampilan Login Portal"
+            >
+              <LogIn size={14} />
+              <span>Portal Login</span>
+            </button>
+
+            <button
               className="btn-nav-user-pill"
               onClick={() => setCurrentScreen('login')}
-              title="Buka Halaman Login / Portal"
+              title="User aktif. Klik untuk ganti akun"
             >
-              <User size={15} />
-              <span>{currentUser?.name || 'Login'}</span>
+              <User size={14} />
+              <span>{currentUser?.name || 'Admin IT'}</span>
             </button>
 
             <button
               className="btn-nav-logout-icon"
               onClick={logoutUser}
-              title="Keluar / Ganti Akun"
+              title="Keluar / Logout dan kembali ke Portal Login"
             >
-              <LogOut size={15} />
+              <LogOut size={14} />
             </button>
           </div>
         </div>

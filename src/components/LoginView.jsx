@@ -7,14 +7,20 @@ import {
   Building,
   Mail,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Zap,
+  Shield,
+  UserCheck,
+  KeyRound,
+  LayoutDashboard,
+  Check
 } from 'lucide-react';
 import './LoginView.css';
 
 export const LoginView = () => {
-  const { loginUser, departments } = useInventory();
+  const { loginUser, departments, setCurrentScreen, currentUser } = useInventory();
 
-  // Completely empty form state - zero dummy data
+  // Completely empty form state by default
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -24,6 +30,44 @@ export const LoginView = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [autofillSuccess, setAutofillSuccess] = useState(false);
+
+  // 1-Click Quick Login
+  const handleQuickLogin = (name, dept, role) => {
+    loginUser({
+      name,
+      email: `${name.toLowerCase().replace(/[^a-z0-9]/g, '')}@toray.co.id`,
+      dept,
+      role
+    });
+  };
+
+  // Direct bypass to dashboard without entering any credentials
+  const handleDirectDashboard = () => {
+    if (!currentUser) {
+      loginUser({
+        name: 'Admin IT (Quick Access)',
+        email: 'admin.is@toray.co.id',
+        dept: 'IS',
+        role: 'IT Administrator'
+      });
+    } else {
+      setCurrentScreen('dashboard');
+    }
+  };
+
+  // Autofill form for testing manual submit
+  const handleAutofill = () => {
+    setFormData({
+      name: 'Admin IT (IS Dept)',
+      email: 'admin.is@toray.co.id',
+      department: 'IS',
+      password: 'toray-internal-2026'
+    });
+    setErrorMessage('');
+    setAutofillSuccess(true);
+    setTimeout(() => setAutofillSuccess(false), 2000);
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -51,7 +95,7 @@ export const LoginView = () => {
         role: formData.department === 'IS' ? 'IT Staff' : 'User Staff'
       });
       setIsSubmitting(false);
-    }, 400);
+    }, 300);
   };
 
   return (
@@ -76,8 +120,18 @@ export const LoginView = () => {
           </div>
         </div>
 
-        {/* Right Badge */}
+        {/* Right Actions: Quick Access to Dashboard & Version Badge */}
         <div className="synergy-nav-actions">
+          <button
+            type="button"
+            className="btn-nav-direct-dash"
+            onClick={handleDirectDashboard}
+            title="Langsung Masuk ke Dashboard (Bypass Login)"
+          >
+            <LayoutDashboard size={15} />
+            <span>Masuk Dashboard ➔</span>
+          </button>
+
           <div className="portal-version-badge">
             <ShieldCheck size={14} />
             <span>Sistem Otentikasi Internal</span>
@@ -216,6 +270,98 @@ export const LoginView = () => {
                   <ArrowRight size={16} />
                 </button>
               </form>
+
+              {/* -------------------------------------------------------------
+                  QUICK DEV & ADMIN TOOLS (AKSES CEPAT KELUAR MASUK)
+                  ------------------------------------------------------------- */}
+              <div className="auth-quick-tools-panel">
+                <div className="quick-tools-divider">
+                  <span>⚡ QUICK TOOLS / DEV ACCESS</span>
+                </div>
+
+                <p className="quick-tools-caption">
+                  Akses instan keluar-masuk sistem tanpa perlu isi form manual:
+                </p>
+
+                {/* 1-Click Quick Preset Roles */}
+                <div className="quick-roles-grid">
+                  <button
+                    type="button"
+                    className="btn-quick-role admin"
+                    onClick={() => handleQuickLogin('Admin IT (IS)', 'IS', 'IT Administrator')}
+                    title="1-Klik Masuk sebagai Administrator IT"
+                  >
+                    <Shield size={14} className="role-icon" />
+                    <div className="role-info">
+                      <span className="role-name">Admin IT</span>
+                      <span className="role-dept">Dept IS • Full</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-quick-role manager"
+                    onClick={() => handleQuickLogin('Matheus Djoko', 'IS', 'IT Manager')}
+                    title="1-Klik Masuk sebagai IT Manager"
+                  >
+                    <UserCheck size={14} className="role-icon" />
+                    <div className="role-info">
+                      <span className="role-name">Matheus D.</span>
+                      <span className="role-dept">IT Manager</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-quick-role pic"
+                    onClick={() => handleQuickLogin('Anggit Kurniawan', 'IS', 'PIC Stock Taking')}
+                    title="1-Klik Masuk sebagai PIC Stock Taking"
+                  >
+                    <Zap size={14} className="role-icon" />
+                    <div className="role-info">
+                      <span className="role-name">Anggit K.</span>
+                      <span className="role-dept">PIC Stock Taking</span>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="btn-quick-role user"
+                    onClick={() => handleQuickLogin('Staff User', 'NFY', 'User Staff')}
+                    title="1-Klik Masuk sebagai User Section"
+                  >
+                    <User size={14} className="role-icon" />
+                    <div className="role-info">
+                      <span className="role-name">User Dept</span>
+                      <span className="role-dept">NFY Section</span>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Direct Bypass & Autofill Actions */}
+                <div className="quick-action-row">
+                  <button
+                    type="button"
+                    className="btn-quick-bypass"
+                    onClick={handleDirectDashboard}
+                    title="Langsung lompat ke Dashboard"
+                  >
+                    <LayoutDashboard size={14} />
+                    <span>⚡ Langsung Masuk Dashboard</span>
+                    <ArrowRight size={13} />
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`btn-quick-autofill ${autofillSuccess ? 'success' : ''}`}
+                    onClick={handleAutofill}
+                    title="Isi form input di atas dengan data akun Admin"
+                  >
+                    {autofillSuccess ? <Check size={14} /> : <KeyRound size={14} />}
+                    <span>{autofillSuccess ? 'Form Terisi!' : 'Auto-Fill Form'}</span>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
