@@ -16,7 +16,9 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle2,
-  Building
+  Building,
+  CalendarCheck,
+  ClipboardList
 } from 'lucide-react';
 import './Dashboard.css';
 
@@ -135,19 +137,27 @@ export const Dashboard = () => {
       </header>
 
       {/* -------------------------------------------------------------
-          2. VIBRANT SKY-BLUE HERO BANNER WITH ORGANIC WAVE DIVIDER
+          2. VIBRANT SKY-BLUE HERO BANNER WITH DYNAMIC PAGE CONTEXT
           ------------------------------------------------------------- */}
       <section className="dashboard-hero-banner print-hide">
         <div className="hero-banner-inner">
           <div className="hero-banner-tag">
             <Sparkles size={14} />
-            <span>TORAY INFORMATION SYSTEM • INTERNAL PERUSAHAAN</span>
+            <span>
+              {activeView === 'stock-taking'
+                ? 'HALAMAN 1 • AUDIT & PENDATAAN BULANAN (12 BULAN)'
+                : 'HALAMAN 2 • DOKUMEN MASTER FINAL PC LEDGER'}
+            </span>
           </div>
           <h2 className="hero-banner-title">
-            BUILDING YOUR DIGITAL FUTURE.
+            {activeView === 'stock-taking'
+              ? 'FORMULIR PENDATAAN STOCK TAKING BULANAN'
+              : 'FINAL PC LEDGER & MASTER ASSET TORAY'}
           </h2>
           <p className="hero-banner-desc">
-            Sistem resmi inventarisasi komputer & server, formulir stock taking Januari s/d Desember, dan rekapitulasi status online/offline PC Ledger.
+            {activeView === 'stock-taking'
+              ? 'Halaman 1: Formulir pendataan fisik rutin dan checklist status operasional komputer (Januari s/d Desember 2026). Gunakan halaman ini untuk update audit bulanan.'
+              : 'Halaman 2: Dokumen master final rekapitulasi status operasional (Online / Offline), spesifikasi hardware lengkap, dan tag stiker barcode aset PT. ITS.'}
           </p>
         </div>
 
@@ -163,32 +173,35 @@ export const Dashboard = () => {
       </section>
 
       {/* -------------------------------------------------------------
-          3. DEDICATED 2-TABLE VIEW SELECTOR & FILTERS (STICKY TOOLBAR)
+          3. DEDICATED 2-PAGE SELECTOR & FILTERS (STICKY TOOLBAR)
           ------------------------------------------------------------- */}
       <section className="control-toolbar print-hide">
-        {/* Table Selector Tabs */}
-        <div className="view-mode-tabs">
+        {/* Dedicated 2 Pages Switcher */}
+        <div className="view-mode-tabs two-pages-selector">
           <button
-            className={`view-mode-btn ${activeView === 'stock-taking' ? 'active' : ''}`}
+            className={`view-mode-btn page-tab-btn ${activeView === 'stock-taking' ? 'active' : ''}`}
             onClick={() => setActiveView('stock-taking')}
+            title="Buka Halaman 1: Pendataan Stock Taking Bulanan"
           >
-            <Layers size={16} />
-            <span>1. Stock Taking (Jan - Des)</span>
+            <CalendarCheck size={16} className="page-tab-icon" />
+            <div className="page-tab-text">
+              <span className="page-tab-title">Halaman 1: Pendataan Stock Taking</span>
+              <span className="page-tab-subtitle">Formulir Audit Bulanan (Jan - Des)</span>
+            </div>
+            <span className="page-tab-badge">Audit</span>
           </button>
 
           <button
-            className={`view-mode-btn ${activeView === 'ledger' ? 'active' : ''}`}
+            className={`view-mode-btn page-tab-btn ${activeView === 'ledger' ? 'active' : ''}`}
             onClick={() => setActiveView('ledger')}
+            title="Buka Halaman 2: Master Final PC Ledger Toray"
           >
-            <FileSpreadsheet size={16} />
-            <span>2. PC Ledger Toray (Online / Offline)</span>
-          </button>
-
-          <button
-            className={`view-mode-btn ${activeView === 'both' ? 'active' : ''}`}
-            onClick={() => setActiveView('both')}
-          >
-            <span>⊞ Tampilkan 2 Tabel</span>
+            <FileSpreadsheet size={16} className="page-tab-icon" />
+            <div className="page-tab-text">
+              <span className="page-tab-title">Halaman 2: Final PC Ledger Toray</span>
+              <span className="page-tab-subtitle">Master Rekapitulasi & Asset Tag</span>
+            </div>
+            <span className="page-tab-badge">Final</span>
           </button>
         </div>
 
@@ -235,19 +248,19 @@ export const Dashboard = () => {
       </section>
 
       {/* -------------------------------------------------------------
-          4. MAIN DATA TABLES CONTAINER (THE 2 AUTHENTIC TABLES)
+          4. MAIN DATA PAGES CONTAINER (DEDICATED 2 SEPARATE PAGES)
           ------------------------------------------------------------- */}
       <main className="tables-content-area">
-        {/* Table 1: Stock Taking Bulanan (Januari - Desember) */}
-        {(activeView === 'stock-taking' || activeView === 'both') && (
-          <div className="table-section-block">
+        {/* Page 1: Stock Taking Bulanan (Januari - Desember) */}
+        {activeView === 'stock-taking' && (
+          <div className="table-section-block page-view-wrapper">
             <StockTakingTable />
           </div>
         )}
 
-        {/* Table 2: PC Ledger Toray (Online / Offline) */}
-        {(activeView === 'ledger' || activeView === 'both') && (
-          <div className="table-section-block margin-top-lg">
+        {/* Page 2: PC Ledger Toray (Online / Offline) */}
+        {activeView === 'ledger' && (
+          <div className="table-section-block page-view-wrapper">
             <PcLedgerTable />
           </div>
         )}
