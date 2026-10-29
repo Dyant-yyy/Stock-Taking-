@@ -1,6 +1,6 @@
 /* ==========================================================================
-   TORAY IT DEVICE STOCK TAKING - AUTHENTIC LOGIN PORTAL
-   Aesthetic derived with 1:1 precision from the high-agency reference design
+   TORAY IT DEVICE STOCK TAKING - AUTHENTIC SPLIT-SCREEN LOGIN PORTAL
+   PT. Indonesia Toray Synthetics (ITS)
    ========================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
@@ -11,20 +11,20 @@
   width: 100%;
   display: flex;
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: #ffffff;
-  color: #111827;
+  background-color: #f8fafc;
+  color: #0f172a;
   overflow-x: hidden;
   position: relative;
 }
 
-/* --------------------------------------------------------------------------
-   LEFT COLUMN: VIBRANT COBALT BLUE HERO WITH TORAY PLANT PHOTO GRADIENT
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   LEFT COLUMN: VIBRANT TORAY COBALT BLUE HERO WITH PLANT PHOTO & WIREFRAME
+   ========================================================================== */
 .saleskip-hero-pane {
-  flex: 1.15;
-  background-color: #0b1b54;
+  flex: 1.1;
+  background-color: #081a4d;
   background-image: 
-    linear-gradient(140deg, rgba(22, 60, 195, 0.82) 0%, rgba(15, 38, 138, 0.88) 50%, rgba(8, 18, 72, 0.94) 100%),
+    linear-gradient(145deg, rgba(16, 52, 166, 0.88) 0%, rgba(10, 29, 99, 0.92) 50%, rgba(5, 14, 56, 0.96) 100%),
     url('../assets/toray-plant-bg.jpg');
   background-size: cover;
   background-position: center center;
@@ -34,13 +34,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 60px 70px 50px 75px;
+  padding: 48px 56px 40px 60px;
   color: #ffffff;
   min-height: 100vh;
   min-height: 100dvh;
 }
 
-/* Geometric concentric wireframe outlines with soft overlay blend */
+/* Concentric geometric wireframe overlay */
 .saleskip-geometric-bg {
   position: absolute;
   top: -15%;
@@ -49,53 +49,74 @@
   height: 140%;
   pointer-events: none;
   z-index: 1;
-  opacity: 0.65;
+  opacity: 0.55;
   mix-blend-mode: overlay;
 }
 
-/* 8-pointed star / asterisk emblem */
-.saleskip-asterisk-icon {
+/* Top Hero Bar */
+.saleskip-hero-top {
   position: relative;
   z-index: 2;
-  width: 64px;
-  height: 64px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  margin-bottom: 40px;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.saleskip-asterisk-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .saleskip-asterisk-svg {
-  width: 58px;
-  height: 58px;
-  filter: drop-shadow(0 2px 12px rgba(0, 0, 0, 0.3));
+  width: 44px;
+  height: 44px;
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.3));
+}
+
+.saleskip-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #e0e7ff;
+  backdrop-filter: blur(8px);
 }
 
 /* Hero Center Content */
 .saleskip-hero-center {
   position: relative;
   z-index: 2;
-  max-width: 490px;
+  max-width: 520px;
   margin-top: auto;
   margin-bottom: auto;
-  padding: 40px 0;
+  padding: 32px 0;
 }
 
 .saleskip-hero-title {
   font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 56px;
+  font-size: 52px;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.12;
   letter-spacing: -0.03em;
   color: #ffffff;
-  margin: 0 0 24px 0;
-  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.4);
+  margin: 0 0 20px 0;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.45);
 }
 
 .saleskip-hand-emoji {
   display: inline-block;
   transform-origin: 70% 70%;
-  animation: saleskipWave 2.2s infinite ease-in-out;
+  animation: saleskipWave 2.4s infinite ease-in-out;
 }
 
 @keyframes saleskipWave {
@@ -110,146 +131,196 @@
 }
 
 .saleskip-hero-subtitle {
-  font-size: 16px;
+  font-size: 15.5px;
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.65;
   color: rgba(255, 255, 255, 0.92);
-  margin: 0;
-  max-width: 440px;
+  margin: 0 0 24px 0;
   letter-spacing: -0.01em;
-  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.45);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.4);
+}
+
+.saleskip-hero-highlights {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-left: 2px;
+}
+
+.hero-highlight-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13.5px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 500;
+}
+
+.highlight-bullet {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #38bdf8;
+  box-shadow: 0 0 8px #38bdf8;
+  flex-shrink: 0;
 }
 
 /* Hero Footer */
 .saleskip-hero-footer {
   position: relative;
   z-index: 2;
-  font-size: 13.5px;
-  font-weight: 400;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
   letter-spacing: 0.01em;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
-/* --------------------------------------------------------------------------
-   RIGHT COLUMN: CRISP MINIMAL WHITE FORM
-   -------------------------------------------------------------------------- */
+.hero-footer-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hero-shield-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   RIGHT COLUMN: CRISP WHITE FORM WITH TORAY BRAND & DEV TOOLS
+   ========================================================================== */
 .saleskip-form-pane {
-  flex: 1;
+  flex: 1.25;
   background-color: #ffffff;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 50px 70px 40px 70px;
+  padding: 36px 54px 28px 54px;
   position: relative;
   min-height: 100vh;
   min-height: 100dvh;
+  overflow-y: auto;
 }
 
-/* Top brand with Enlarged Toray logo */
+/* Top Navigation Bar */
 .saleskip-top-nav {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #f1f5f9;
+  margin-bottom: 20px;
 }
 
 .toray-brand-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .toray-official-logo {
-  height: 76px;
+  height: 52px;
   width: auto;
-  max-width: 280px;
+  max-width: 200px;
   object-fit: contain;
   mix-blend-mode: multiply;
   display: block;
-  transition: transform 0.2s ease;
 }
 
 .toray-brand-divider {
   width: 1.5px;
-  height: 48px;
-  background-color: #e5e7eb;
+  height: 38px;
+  background-color: #e2e8f0;
 }
 
 .toray-brand-text {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
 }
 
 .toray-sub-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13.5px;
+  font-size: 12.5px;
   font-weight: 800;
-  letter-spacing: -0.01em;
-  color: #004098; /* Toray Corporate Blue */
+  letter-spacing: 0.02em;
+  color: #00255b; /* Toray Deep Blue */
   line-height: 1.2;
 }
 
 .toray-plant-name {
-  font-family: 'Plus Jakarta Sans', sans-serif;
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.01em;
-  color: #6b7280;
+  color: #64748b;
 }
 
-/* Main Form Container */
+.btn-top-direct-dash {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #0f172a;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-top-direct-dash:hover {
+  background-color: #00255b;
+  color: #ffffff;
+  border-color: #00255b;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 37, 91, 0.2);
+}
+
+/* Main Form Card */
 .saleskip-form-card {
   width: 100%;
-  max-width: 380px;
-  margin: auto auto;
+  max-width: 440px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
 }
 
+.form-card-intro {
+  margin-bottom: 20px;
+}
+
 .saleskip-form-heading {
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 32px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 800;
   letter-spacing: -0.025em;
-  color: #111827;
-  margin: 0 0 10px 0;
+  color: #0f172a;
+  margin: 0 0 6px 0;
   line-height: 1.2;
 }
 
 .saleskip-form-subtext {
-  font-size: 13.5px;
+  font-size: 13px;
   line-height: 1.55;
-  color: #6b7280;
-  margin: 0 0 32px 0;
-}
-
-.saleskip-inline-link {
-  background: none;
-  border: none;
-  padding: 0;
-  font-family: inherit;
-  font-size: inherit;
-  color: #111827;
-  font-weight: 600;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.saleskip-inline-link:hover {
-  opacity: 0.75;
+  color: #64748b;
+  margin: 0;
 }
 
 /* Alert notifications */
 .saleskip-alert {
   padding: 10px 14px;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 13px;
-  margin-bottom: 20px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  animation: fadeInAlert 0.2s ease;
+}
+
+@keyframes fadeInAlert {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .saleskip-alert.error {
@@ -264,18 +335,23 @@
   border: 1px solid #dcfce7;
 }
 
-/* Input Fields (Clean underline styling exactly matching mockup) */
+/* Main Form Fields */
+.saleskip-main-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .saleskip-input-group {
-  margin-bottom: 24px;
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .saleskip-input-label {
-  display: block;
   font-size: 12px;
   font-weight: 600;
-  color: #374151;
-  margin-bottom: 4px;
+  color: #334155;
   letter-spacing: -0.01em;
 }
 
@@ -286,151 +362,287 @@
   align-items: center;
 }
 
-.saleskip-input {
+.saleskip-field-icon {
+  position: absolute;
+  left: 12px;
+  color: #94a3b8;
+  pointer-events: none;
+  transition: color 0.2s ease;
+}
+
+.saleskip-input,
+.saleskip-select {
   width: 100%;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14.5px;
-  color: #111827;
-  background-color: transparent;
-  border: none;
-  border-bottom: 1.5px solid #e5e7eb;
-  padding: 10px 2px 10px 2px;
+  font-family: inherit;
+  font-size: 13.5px;
+  color: #0f172a;
+  background-color: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 10px 14px 10px 38px;
   outline: none;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
-  border-radius: 0;
+  transition: all 0.2s ease;
+}
+
+.saleskip-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 36px;
 }
 
 .saleskip-input::placeholder {
-  color: #9ca3af;
+  color: #94a3b8;
   font-weight: 400;
 }
 
-/* Active Email Field style in mockup */
-.saleskip-input.active-field {
-  border-bottom: 2px solid #111827;
-  background-color: #fafafa;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+.saleskip-input:focus,
+.saleskip-select:focus {
+  border-color: #00255b;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(0, 37, 91, 0.1);
 }
 
-.saleskip-input:focus {
-  border-bottom: 2px solid #111827;
-  background-color: #fafafa;
-  padding-left: 8px;
-  padding-right: 8px;
-  border-top-left-radius: 4px;
-  border-top-right-radius: 4px;
+.saleskip-input:focus + .saleskip-field-icon,
+.saleskip-input-box:focus-within .saleskip-field-icon {
+  color: #00255b;
 }
 
-/* Primary Button: Matte Black */
+/* Primary Button: Toray Deep Navy */
 .saleskip-btn-primary {
   width: 100%;
-  height: 48px;
-  background-color: #17181c;
+  height: 46px;
+  background-color: #00255b;
   color: #ffffff;
   border: none;
   border-radius: 8px;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 14.5px;
-  font-weight: 600;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
   letter-spacing: -0.01em;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  margin-top: 14px;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-top: 6px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 37, 91, 0.25);
 }
 
-.saleskip-btn-primary:hover {
-  background-color: #27272a;
+.saleskip-btn-primary:hover:not(:disabled) {
+  background-color: #0b3275;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 37, 91, 0.3);
 }
 
-.saleskip-btn-primary:active {
+.saleskip-btn-primary:active:not(:disabled) {
   transform: scale(0.99);
+}
+
+.saleskip-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 
 /* Forget Password Link */
 .saleskip-forget-password-box {
-  margin-top: 24px;
+  margin-top: 14px;
   text-align: center;
-  font-size: 13px;
-  color: #6b7280;
+  font-size: 12.5px;
+  color: #64748b;
 }
 
-.saleskip-forget-password-box .saleskip-inline-link {
-  font-size: 13px;
-  color: #111827;
+.saleskip-inline-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  font-size: inherit;
+  color: #00255b;
   font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
 }
 
 .saleskip-help-notice {
-  margin-top: 14px;
+  margin-top: 12px;
   padding: 10px 14px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
+  background-color: #f1f5f9;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
   font-size: 12px;
   line-height: 1.5;
-  color: #4b5563;
-  animation: fadeIn 0.2s ease-in;
+  color: #334155;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  animation: fadeInAlert 0.2s ease-in;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-4px); }
-  to { opacity: 1; transform: translateY(0); }
+.saleskip-help-notice .help-icon {
+  color: #0284c7;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 
-/* Discrete Demo Account Quick Switcher */
-.saleskip-demo-switcher {
-  margin-top: 36px;
-  padding-top: 20px;
-  border-top: 1px dashed #e5e7eb;
+/* ==========================================================================
+   QUICK DEV & PRESET ROLES PANEL (AKSES CEPAT KELUAR MASUK)
+   ========================================================================== */
+.saleskip-dev-panel {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px dashed #cbd5e1;
   display: flex;
   flex-direction: column;
+  gap: 10px;
+}
+
+.dev-panel-header {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.saleskip-demo-label {
+.dev-panel-line {
+  flex: 1;
+  height: 1px;
+  background-color: #e2e8f0;
+}
+
+.dev-panel-tag {
   font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
+  font-weight: 800;
   letter-spacing: 0.05em;
-  color: #9ca3af;
+  color: #0369a1;
+  background-color: #e0f2fe;
+  padding: 3px 8px;
+  border-radius: 4px;
 }
 
-.saleskip-demo-chips {
+.dev-panel-subtext {
+  font-size: 11.5px;
+  color: #64748b;
+  margin: 0;
+}
+
+.dev-roles-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.dev-role-chip {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.saleskip-demo-chip {
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 5px 9px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #374151;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  background-color: #f8fafc;
   cursor: pointer;
-  transition: all 0.15s ease;
+  text-align: left;
+  transition: all 0.18s ease;
 }
 
-.saleskip-demo-chip:hover {
-  background-color: #e5e7eb;
-  color: #111827;
-  border-color: #d1d5db;
+.dev-role-chip:hover {
+  background-color: #ffffff;
+  border-color: #00255b;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
 }
 
-/* --------------------------------------------------------------------------
-   RESPONSIVE BEHAVIOR (Mobile & Tablet)
-   -------------------------------------------------------------------------- */
-@media (max-width: 960px) {
+.dev-role-chip .role-icon {
+  flex-shrink: 0;
+}
+
+.dev-role-chip.admin .role-icon { color: #dc2626; }
+.dev-role-chip.manager .role-icon { color: #0284c7; }
+.dev-role-chip.pic .role-icon { color: #16a34a; }
+.dev-role-chip.user .role-icon { color: #9333ea; }
+
+.dev-role-chip .role-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.dev-role-chip .role-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.dev-role-chip .role-meta {
+  font-size: 10px;
+  color: #64748b;
+}
+
+.dev-actions-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.btn-dev-direct,
+.btn-dev-autofill {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-dev-direct {
+  background-color: #0284c7;
+  color: #ffffff;
+  border: 1px solid #0284c7;
+}
+
+.btn-dev-direct:hover {
+  background-color: #0369a1;
+  border-color: #0369a1;
+}
+
+.btn-dev-autofill {
+  background-color: #ffffff;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-dev-autofill:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-dev-autofill.active {
+  background-color: #f0fdf4;
+  color: #166534;
+  border-color: #86efac;
+}
+
+/* Footer note */
+.saleskip-form-footer {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (Tablets & Mobile Breakpoints)
+   ========================================================================== */
+@media (max-width: 980px) {
   .saleskip-auth-wrapper {
     flex-direction: column;
   }
@@ -438,22 +650,22 @@
   .saleskip-hero-pane {
     flex: none;
     min-height: auto;
-    padding: 50px 36px 40px 36px;
+    padding: 40px 28px 36px 28px;
   }
 
   .saleskip-geometric-bg {
-    top: -30%;
-    right: -40%;
-    width: 180%;
-    height: 180%;
+    top: -25%;
+    right: -30%;
+    width: 160%;
+    height: 160%;
   }
 
   .saleskip-hero-title {
-    font-size: 40px;
+    font-size: 38px;
   }
 
   .saleskip-hero-center {
-    padding: 20px 0;
+    padding: 16px 0;
   }
 
   .saleskip-hero-footer {
@@ -463,11 +675,10 @@
   .saleskip-form-pane {
     flex: none;
     min-height: auto;
-    padding: 40px 28px 40px 28px;
+    padding: 32px 24px 32px 24px;
   }
 
   .saleskip-form-card {
     max-width: 100%;
-    margin: 0;
   }
 }
