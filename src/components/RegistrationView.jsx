@@ -123,9 +123,9 @@ export const RegistrationView = () => {
           </g>
         </svg>
 
-        {/* Top Header Badge & Asterisk Icon */}
+        {/* Top Header Asterisk Icon */}
         <div className="saleskip-hero-top">
-          <div className="saleskip-asterisk-icon" title="Toray Synergy Star">
+          <div className="saleskip-asterisk-icon" title="ITS Synergy Star">
             <svg
               className="saleskip-asterisk-svg"
               viewBox="0 0 64 64"
@@ -138,17 +138,13 @@ export const RegistrationView = () => {
               <line x1="49.7" y1="14.3" x2="14.3" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
             </svg>
           </div>
-          <div className="saleskip-hero-badge">
-            <Sparkles size={13} />
-            <span>INFORMATION SYSTEM • 2026</span>
-          </div>
         </div>
 
         {/* Center Main Headline & Description */}
         <div className="saleskip-hero-center">
           <h1 className="saleskip-hero-title">
             Hello<br />
-            Toray! <span className="saleskip-hand-emoji">👋</span>
+            ITS! <span className="saleskip-hand-emoji">👋</span>
           </h1>
           <p className="saleskip-hero-subtitle">
             IT Device Stock Taking & PC Ledger System. Kelola inventarisasi komputer, audit bulanan 12 bulan, barcode scanner, dan verifikasi fisik perangkat IT PT. ITS dengan cepat, akurat, dan transparan.
