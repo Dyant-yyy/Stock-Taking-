@@ -52,7 +52,7 @@ export const SparePartsManagement = () => {
         <div>
           <h2>Stok Consumable & Spare Parts IT</h2>
           <p className="sub-header-text">
-            Pengawasan stok suku cadang, ribbon printer barcode, SSD, RAM, dan kabel jaringan pabrik ITS.
+            Pengawasan stok suku cadang, ribbon printer barcode, SSD, RAM, dan kabel jaringan pabrik Indonesia Toray Synthetics.
           </p>
         </div>
         <div className="view-header-actions">

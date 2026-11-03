@@ -56,12 +56,18 @@ export const DeviceBarcodeModal = () => {
 
   const barcodeResult = generateBarcodeBars(barcodeDevice.computerName);
 
-  // QR Code payload
-  const qrData = `PT. ITS | ${barcodeDevice.computerName} | ${barcodeDevice.department} | ${barcodeDevice.user} | IP:${specForm.ipAddress} | SN:${specForm.serialNumber}`;
-  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(qrData)}&color=00255b`;
+  // QR Code universal deep-link payload
+  // Allows ANY smartphone (iOS Camera / Android Google Lens) to scan the physical sticker and directly open this web app to this device!
+  const baseUrl = typeof window !== 'undefined' ? `${window.location.origin}${window.location.pathname}` : '';
+  const qrDeepLink = `${baseUrl}?scan=${encodeURIComponent(barcodeDevice.computerName)}`;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(qrDeepLink)}&color=00255b`;
 
   const handlePrint = () => {
+    document.body.classList.add('printing-sticker');
     window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-sticker');
+    }, 1000);
   };
 
   const handleCopy = () => {

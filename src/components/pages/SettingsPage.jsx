@@ -45,9 +45,9 @@ export const SettingsPage = () => {
   };
 
   const handleResetData = () => {
-    if (window.confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh data inventaris ke data awal bawaan pabrik ITS? Perubahan kustom akan dikembalikan ke data awal.')) {
+    if (window.confirm('PERINGATAN: Apakah Anda yakin ingin mereset seluruh data inventaris ke data awal bawaan pabrik Indonesia Toray Synthetics? Perubahan kustom akan dikembalikan ke data awal.')) {
       resetToSeedData();
-      alert('Data inventaris berhasil direset ke konfigurasi bawaan pabrik ITS.');
+      alert('Data inventaris berhasil direset ke konfigurasi bawaan pabrik Indonesia Toray Synthetics.');
     }
   };
 
@@ -69,7 +69,7 @@ export const SettingsPage = () => {
       <div className="settings-grid-layout">
         {/* Left Column: Departemen Management & Plant Profile */}
         <div className="settings-left-stack">
-          {/* Section 1: Daftar Departemen ITS */}
+          {/* Section 1: Daftar Departemen Indonesia Toray Synthetics */}
           <div className="bento-surface">
             <div className="bento-card-header">
               <div className="card-header-left">
@@ -213,7 +213,7 @@ export const SettingsPage = () => {
                 onClick={handleResetData}
               >
                 <RotateCcw size={15} />
-                <span>Reset ke Data Awal Pabrik ITS</span>
+                <span>Reset ke Data Awal Pabrik Indonesia Toray Synthetics</span>
               </button>
             </div>
           </div>

@@ -57,7 +57,7 @@ export const ScannerPage = ({ onNavigate }) => {
             <span>Pusat Barcode & QR Code Perangkat IT</span>
           </h1>
           <p className="section-subtitle-text">
-            Scan Kamera Langsung, Pencarian Serial Tag, dan Cetak Stiker Label Inventaris Resmi PT. ITS Tangerang
+            Scan Kamera Langsung, Pencarian Serial Tag, dan Cetak Stiker Label Inventaris Resmi PT. Indonesia Toray Synthetics Tangerang
           </p>
         </div>
 
@@ -82,7 +82,7 @@ export const ScannerPage = ({ onNavigate }) => {
               </div>
               <h2 className="scanner-hero-title">Scan Barcode / QR dengan Kamera</h2>
               <p className="scanner-hero-desc">
-                Gunakan kamera smartphone atau webcam laptop untuk memindai stiker barcode fisik yang tertempel pada CPU, laptop, atau monitor di area pabrik ITS.
+                Gunakan kamera smartphone atau webcam laptop untuk memindai stiker barcode fisik yang tertempel pada CPU, laptop, atau monitor di area pabrik Indonesia Toray Synthetics.
               </p>
 
               <div className="scanner-hero-actions-row" style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginTop: '16px' }}>
@@ -249,7 +249,7 @@ export const ScannerPage = ({ onNavigate }) => {
             <div className="bento-card-header">
               <div className="card-header-left">
                 <Printer size={18} style={{ color: '#fbbf24' }} />
-                <h3 className="card-header-title">Preview Stiker Label Asset Toray ITS</h3>
+                <h3 className="card-header-title">Preview Stiker Label Asset Indonesia Toray Synthetics</h3>
               </div>
             </div>
 

@@ -7,9 +7,12 @@ import {
   Printer,
   ShieldCheck,
   FileSpreadsheet,
+  FileText,
+  Download,
   Info,
   Barcode
 } from 'lucide-react';
+import { downloadPcLedgerWordDoc } from '../utils/wordExport';
 
 export const PcLedgerTable = () => {
   const {
@@ -24,12 +27,14 @@ export const PcLedgerTable = () => {
     openEditModal,
     deleteDevice,
     openBarcodeModal,
+    openScannerModal,
     signatures,
     setSignatures
   } = useInventory();
 
   const [editingRemarkId, setEditingRemarkId] = useState(null);
   const [tempRemark, setTempRemark] = useState('');
+  const [isExportingWord, setIsExportingWord] = useState(false);
 
   const activeMonthObj = monthOptions.find(m => m.value === currentMonth) || monthOptions[0];
 
@@ -72,8 +77,60 @@ export const PcLedgerTable = () => {
     }
   };
 
+  const handleExportWord = () => {
+    setIsExportingWord(true);
+    try {
+      downloadPcLedgerWordDoc({
+        devices: filteredDevices.length > 0 ? filteredDevices : devices,
+        currentMonthRecord,
+        currentYear,
+        currentMonth,
+        monthOptions,
+        signatures
+      });
+    } finally {
+      setTimeout(() => setIsExportingWord(false), 1200);
+    }
+  };
+
+  const handlePrintDocument = () => {
+    window.print();
+  };
+
   return (
     <div className="table-module-wrapper">
+      {/* 0. Official Document Action Bar (Word Export & Print PDF) */}
+      <div className="ledger-action-bar print-hide">
+        <div className="action-bar-left">
+          <span className="doc-type-badge">
+            <ShieldCheck size={15} />
+            <span>Dokumen Master Final PC Ledger</span>
+          </span>
+          <span className="doc-desc-sub">
+            Output resmi siap cetak & diekspor ke Microsoft Word (.doc) lengkap dengan tabel dan slot tanda tangan PIC & Manager.
+          </span>
+        </div>
+        <div className="action-bar-right">
+          <button
+            className="btn-word-export"
+            onClick={handleExportWord}
+            disabled={isExportingWord}
+            title="Download & Buka Dokumen Microsoft Word Lengkap dengan Tabel & Slot Tanda Tangan"
+          >
+            <FileText size={16} />
+            <span>{isExportingWord ? 'Menyiapkan Word...' : 'Cetak ke Word (.doc)'}</span>
+          </button>
+          <button
+            className="btn-print-table"
+            onClick={handlePrintDocument}
+            title="Cetak Dokumen Resmi atau Simpan sebagai PDF"
+          >
+            <Printer size={16} />
+            <span>Cetak PDF</span>
+          </button>
+        </div>
+      </div>
+
       {/* 1. Official Corporate Header Box (Authentic to Photo 2) */}
       <div className="ledger-corporate-header">
         <div className="corp-header-left">
@@ -153,6 +210,11 @@ export const PcLedgerTable = () => {
         </div>
       </div>
 
+      {/* Mobile Swipe Hint */}
+      <div className="mobile-table-scroll-hint print-hide">
+        <span>⇄ Geser tabel ke samping untuk melihat seluruh status & aksi</span>
+      </div>
+
       {/* 3. The Authentic PC Ledger Table (Sesuai Gambar 2) */}
       <div className="authentic-table-container">
         <table className="authentic-table ledger-table">
@@ -196,8 +258,15 @@ export const PcLedgerTable = () => {
                     </td>
 
                     {/* 3. Computer Name */}
-                    <td className="cell-name">
-                      <strong className="code-font">{dev.computerName}</strong>
+                    <td
+                      className="cell-name"
+                      onClick={() => openScannerModal && openScannerModal(dev)}
+                      title="Klik untuk lihat spesifikasi lengkap & verifikasi kondisi perangkat"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <strong className="code-font text-link-hover" style={{ textDecoration: 'underline', textDecorationColor: 'rgba(56, 189, 248, 0.4)', textUnderlineOffset: '3px' }}>
+                        {dev.computerName}
+                      </strong>
                     </td>
 
                     {/* 4. Type */}

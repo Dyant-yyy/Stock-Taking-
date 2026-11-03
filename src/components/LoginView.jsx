@@ -148,7 +148,7 @@ export const LoginView = () => {
           <div className="hero-left-column">
             <div className="hero-badge-tag">
               <Sparkles size={14} />
-              <span>PT. ITS INFORMATION SYSTEM • 2026</span>
+              <span>PT. INDONESIA TORAY SYNTHETICS INFORMATION SYSTEM • 2026</span>
             </div>
 
             <h1 className="hero-giant-title">

@@ -136,7 +136,7 @@ export const DeviceList = () => {
         <div>
           <h2>Katalog & Manajemen Perangkat IT</h2>
           <p className="sub-header-text">
-            {filteredDevices.length} Perangkat ditemukan dari total {devices.length} asset terdaftar di ITS Tangerang.
+            {filteredDevices.length} Perangkat ditemukan dari total {devices.length} asset terdaftar di Indonesia Toray Synthetics Tangerang.
           </p>
         </div>
         <div className="view-header-actions">

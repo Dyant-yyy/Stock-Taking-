@@ -107,6 +107,38 @@ export const InventoryProvider = ({ children }) => {
   const [isBarcodeModalOpen, setIsBarcodeModalOpen] = useState(false);
   const [barcodeDevice, setBarcodeDevice] = useState(null);
 
+  // 9. Universal Barcode & Camera Scanner State
+  const [isScannerOpen, setIsScannerOpen] = useState(false);
+  const [scannedDevice, setScannedDevice] = useState(null);
+
+  // Auto-detect URL parameter on initial load (e.g. https://domain/?scan=NITSIS2307352)
+  // Allows any mobile phone camera or QR scanner to open the web app directly to that device!
+  useEffect(() => {
+    try {
+      if (typeof window !== 'undefined' && window.location) {
+        const params = new URLSearchParams(window.location.search);
+        const scanParam = params.get('scan') || params.get('device') || params.get('asset');
+        if (scanParam) {
+          const targetKey = decodeURIComponent(scanParam).trim().toLowerCase();
+          const matched = devices.find(d => 
+            (d.computerName || '').toLowerCase() === targetKey ||
+            (d.id || '').toLowerCase() === targetKey ||
+            (d.specs?.assetTag || '').toLowerCase() === targetKey ||
+            (d.specs?.serialNumber || '').toLowerCase() === targetKey ||
+            (d.ipAddress || '').toLowerCase() === targetKey
+          );
+          if (matched) {
+            setScannedDevice(matched);
+            setIsScannerOpen(true);
+            setCurrentScreen('dashboard');
+          }
+        }
+      }
+    } catch (e) {
+      console.warn('URL deep-link parameter parsing error:', e);
+    }
+  }, [devices]);
+
   // Sync to localStorage
   useEffect(() => {
     try {
@@ -268,6 +300,77 @@ export const InventoryProvider = ({ children }) => {
     setBarcodeDevice(null);
   };
 
+  const openScannerModal = (device = null) => {
+    if (device) setScannedDevice(device);
+    setIsScannerOpen(true);
+  };
+
+  const closeScannerModal = () => {
+    setIsScannerOpen(false);
+    setScannedDevice(null);
+  };
+
+  // Helper to get real-time condition of device in current period
+  const getDeviceCurrentStatus = (deviceId) => {
+    const periodData = stockRecords[periodKey] || {};
+    const item = periodData[deviceId];
+    if (item && item.status) return item.status;
+    const dev = devices.find(d => d.id === deviceId);
+    return dev?.status || 'Online';
+  };
+
+  const getDeviceCurrentRemark = (deviceId) => {
+    const periodData = stockRecords[periodKey] || {};
+    const item = periodData[deviceId];
+    if (item && item.remark !== undefined) return item.remark;
+    const dev = devices.find(d => d.id === deviceId);
+    return dev?.remark || '';
+  };
+
+  // Direct update of condition & remark from scanner or audit view
+  const updateDeviceCondition = (deviceId, newStatus, newRemark = null) => {
+    // 1. Update in stock records for active period
+    setStockRecords(prev => {
+      const prevPeriod = prev[periodKey] || {};
+      const currentItem = prevPeriod[deviceId] || { status: 'Online', remark: '' };
+      return {
+        ...prev,
+        [periodKey]: {
+          ...prevPeriod,
+          [deviceId]: {
+            ...currentItem,
+            status: newStatus,
+            remark: newRemark !== null ? newRemark : currentItem.remark
+          }
+        }
+      };
+    });
+
+    // 2. Also keep device base status/remark in sync
+    setDevices(prev => prev.map(d => {
+      if (d.id === deviceId) {
+        return {
+          ...d,
+          status: newStatus,
+          remark: newRemark !== null ? newRemark : d.remark
+        };
+      }
+      return d;
+    }));
+
+    // 3. If currently inspected in scanner, update scannedDevice too
+    setScannedDevice(prev => {
+      if (prev && prev.id === deviceId) {
+        return {
+          ...prev,
+          status: newStatus,
+          remark: newRemark !== null ? newRemark : prev.remark
+        };
+      }
+      return prev;
+    });
+  };
+
   // Filtered devices based on search query, department, type
   const filteredDevices = devices.filter(dev => {
     const matchesSearch = !searchQuery || 
@@ -328,7 +431,18 @@ export const InventoryProvider = ({ children }) => {
         isBarcodeModalOpen,
         barcodeDevice,
         openBarcodeModal,
-        closeBarcodeModal
+        closeBarcodeModal,
+        // Universal Scanner Integration
+        isScannerOpen,
+        scannedDevice,
+        setScannedDevice,
+        openScannerModal,
+        closeScannerModal,
+        getDeviceCurrentStatus,
+        getDeviceCurrentRemark,
+        updateDeviceCondition,
+        statusOptions: statusColumns.map(s => ({ value: s.key, label: s.label, color: s.color, badgeClass: s.badgeClass })),
+        openBarcodePrint: openBarcodeModal
       }}
     >
       {children}

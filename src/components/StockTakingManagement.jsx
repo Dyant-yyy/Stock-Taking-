@@ -70,7 +70,7 @@ export const StockTakingManagement = () => {
         <div>
           <h2>Stock Taking & Stock Opname Physical Verification</h2>
           <p className="sub-header-text">
-            Formulir & Rekam Jejak Pemeriksaan Fisik Inventaris Perangkat IT per Departemen ITS.
+            Formulir & Rekam Jejak Pemeriksaan Fisik Inventaris Perangkat IT per Departemen Indonesia Toray Synthetics.
           </p>
         </div>
         <div className="view-header-actions">

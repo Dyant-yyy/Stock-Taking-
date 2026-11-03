@@ -400,7 +400,7 @@ export const DashboardOverview = ({ onNavigate }) => {
           </div>
           <div className="shortcut-meta">
             <h4>Pusat Scan & Cetak Barcode</h4>
-            <p>Scan kamera HP & cetak label sticker inventaris Toray ITS</p>
+            <p>Scan kamera HP & cetak label sticker inventaris Indonesia Toray Synthetics</p>
           </div>
           <ArrowUpRight size={18} className="shortcut-arrow" />
         </div>
@@ -428,7 +428,7 @@ export const DashboardOverview = ({ onNavigate }) => {
           </div>
           <div className="shortcut-meta">
             <h4>Pemeriksaan Bulanan</h4>
-            <p>Tabel audit rutin & matriks 12 bulan device ITS</p>
+            <p>Tabel audit rutin & matriks 12 bulan device Indonesia Toray Synthetics</p>
           </div>
           <ArrowUpRight size={18} className="shortcut-arrow" />
         </div>

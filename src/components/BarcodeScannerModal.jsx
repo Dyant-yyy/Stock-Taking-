@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useInventory } from '../context/InventoryContext';
+import jsQR from 'jsqr';
 import {
   X,
   QrCode,
@@ -15,13 +16,22 @@ import {
   Volume2,
   VolumeX,
   Smartphone,
-  Upload,
-  Info,
-  ExternalLink,
   Laptop,
   Server,
   Monitor,
-  Printer
+  Printer,
+  Cpu,
+  HardDrive,
+  Network,
+  Shield,
+  MapPin,
+  Tag,
+  User,
+  Hash,
+  Edit3,
+  ExternalLink,
+  PlusCircle,
+  FileSpreadsheet
 } from 'lucide-react';
 
 export const BarcodeScannerModal = () => {
@@ -29,11 +39,18 @@ export const BarcodeScannerModal = () => {
     isScannerOpen,
     closeScannerModal,
     devices = [],
-    updateDeviceStatus,
     scannedDevice,
     setScannedDevice,
+    getDeviceCurrentStatus,
+    getDeviceCurrentRemark,
+    updateDeviceCondition,
     statusOptions = [],
-    openBarcodePrint
+    openBarcodePrint,
+    openEditModal,
+    openAddModal,
+    currentMonth,
+    currentYear,
+    monthOptions = []
   } = useInventory();
 
   const [barcodeInput, setBarcodeInput] = useState('');
@@ -48,20 +65,27 @@ export const BarcodeScannerModal = () => {
   const [isSoundMuted, setIsSoundMuted] = useState(false);
   const [lastScannedCode, setLastScannedCode] = useState('');
   const [isScanningSuccessAnim, setIsScanningSuccessAnim] = useState(false);
+  const [auditRemarkInput, setAuditRemarkInput] = useState('');
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const streamRef = useRef(null);
   const fileInputRef = useRef(null);
   const lastScanTimeRef = useRef(0);
+  const keyBufferRef = useRef('');
+  const lastKeyTimeRef = useRef(0);
 
-  // Initialize selected device if passed via prop / context
+  // Sync selected device when context's scannedDevice changes
   useEffect(() => {
     if (scannedDevice) {
       setSelectedDevice(scannedDevice);
+      const currentRemark = getDeviceCurrentRemark ? getDeviceCurrentRemark(scannedDevice.id) : (scannedDevice.remark || '');
+      setAuditRemarkInput(currentRemark);
     }
-  }, [scannedDevice]);
+  }, [scannedDevice, isScannerOpen]);
 
-  // Audio synthesizer beep for barcode scan feedback (Works offline, no audio asset needed)
+  // Audio synthesizer beep for scan feedback (Works completely offline on any browser)
   const playScannerBeep = () => {
     if (isSoundMuted) return;
     try {
@@ -72,16 +96,16 @@ export const BarcodeScannerModal = () => {
       const gain = ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(1760, ctx.currentTime); // High-pitch POS beep
-      gain.gain.setValueAtTime(0.3, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.14);
+      osc.frequency.setValueAtTime(1850, ctx.currentTime);
+      gain.gain.setValueAtTime(0.28, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.13);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
-      osc.stop(ctx.currentTime + 0.14);
+      osc.stop(ctx.currentTime + 0.13);
     } catch (e) {
-      // Audio might be blocked until user gesture
+      // Audio playback might be restricted without user interaction
     }
   };
 
@@ -89,12 +113,47 @@ export const BarcodeScannerModal = () => {
   const triggerHaptic = () => {
     try {
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([70, 40, 70]);
+        navigator.vibrate([70, 30, 70]);
       }
     } catch (e) {}
   };
 
-  // List available video devices on load or when permissions change
+  // Hardware Barcode Scanner Gun Keyboard-Wedge Listener (USB / Bluetooth POS Guns)
+  useEffect(() => {
+    if (!isScannerOpen) return;
+
+    const handleGlobalKeyDown = (e) => {
+      // Ignore if typing inside the text input field
+      if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) {
+        return;
+      }
+
+      const now = Date.now();
+      // Most physical barcode scanners type characters in rapid succession (< 50ms per key)
+      if (now - lastKeyTimeRef.current > 120) {
+        keyBufferRef.current = '';
+      }
+      lastKeyTimeRef.current = now;
+
+      if (e.key === 'Enter') {
+        if (keyBufferRef.current.length >= 2) {
+          e.preventDefault();
+          const scannedCode = keyBufferRef.current;
+          keyBufferRef.current = '';
+          handleBarcodeSuccess(scannedCode);
+        }
+      } else if (e.key.length === 1) {
+        keyBufferRef.current += e.key;
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleGlobalKeyDown);
+    };
+  }, [isScannerOpen, devices]);
+
+  // Enumerate cameras (support multiple lenses on modern smartphones: ultra-wide, tele, main rear)
   const enumerateCameras = async () => {
     try {
       if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) return;
@@ -102,7 +161,6 @@ export const BarcodeScannerModal = () => {
       const videoDevices = devicesList.filter(d => d.kind === 'videoinput');
       setAvailableCameras(videoDevices);
       if (videoDevices.length > 0 && !selectedCameraId) {
-        // Prefer back camera if label hints at it
         const backCam = videoDevices.find(d => 
           d.label.toLowerCase().includes('back') || 
           d.label.toLowerCase().includes('rear') ||
@@ -133,7 +191,7 @@ export const BarcodeScannerModal = () => {
     setIsTorchOn(false);
   };
 
-  // Start live camera stream with cross-device fallbacks
+  // Start live camera stream with universal mobile fallbacks
   const startCamera = async (preferredFacing = facingMode, deviceId = selectedCameraId) => {
     try {
       setCameraError(null);
@@ -145,7 +203,6 @@ export const BarcodeScannerModal = () => {
 
       let stream = null;
 
-      // Primary attempt: targeted device or facingMode with HD resolution
       try {
         const constraints = {
           video: deviceId
@@ -160,7 +217,6 @@ export const BarcodeScannerModal = () => {
         stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (firstErr) {
         console.warn('Targeted camera constraint failed, attempting generic video fallback...', firstErr);
-        // Secondary attempt: loose facingMode
         try {
           stream = await navigator.mediaDevices.getUserMedia({
             video: { facingMode: preferredFacing },
@@ -168,7 +224,6 @@ export const BarcodeScannerModal = () => {
           });
         } catch (secErr) {
           console.warn('Loose facingMode failed, falling back to basic video: true...', secErr);
-          // Final fallback: any video stream available
           stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         }
       }
@@ -190,11 +245,11 @@ export const BarcodeScannerModal = () => {
       console.error('Camera startup error:', err);
       let userMsg = 'Kamera tidak dapat dibuka.';
       if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
-        userMsg = 'Izin kamera ditolak oleh browser. Mohon izinkan akses kamera di pengaturan browser Anda.';
+        userMsg = 'Izin kamera ditolak oleh browser. Mohon klik "Izinkan Akses Kamera" di pengaturan browser Anda.';
       } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
         userMsg = 'Tidak ada perangkat kamera / webcam yang terdeteksi di perangkat ini.';
       } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
-        userMsg = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi lain dan coba lagi.';
+        userMsg = 'Kamera sedang digunakan oleh aplikasi lain. Tutup aplikasi kamera lain dan coba lagi.';
       } else if (err.message) {
         userMsg = err.message;
       }
@@ -235,12 +290,12 @@ export const BarcodeScannerModal = () => {
     }
   };
 
-  // Handle successful barcode / QR detection
+  // Successful Barcode / QR detection
   const handleBarcodeSuccess = (rawCode) => {
     const clean = (rawCode || '').trim();
     if (!clean) return;
 
-    // Debounce scans within 1.5 seconds to prevent rapid duplicate beeps
+    // Debounce scans within 1.5s
     const now = Date.now();
     if (clean === lastScannedCode && now - lastScanTimeRef.current < 1500) {
       return;
@@ -248,52 +303,63 @@ export const BarcodeScannerModal = () => {
     lastScanTimeRef.current = now;
     setLastScannedCode(clean);
 
-    // Audio & Haptic feedback
     playScannerBeep();
     triggerHaptic();
 
-    // Trigger visual success pulse
     setIsScanningSuccessAnim(true);
-    setTimeout(() => setIsScanningSuccessAnim(false), 900);
+    setTimeout(() => setIsScanningSuccessAnim(false), 800);
 
-    // Process matching
     handleProcessScan(clean);
   };
 
-  // Process barcode input and match against database
+  // Parse raw barcode / QR code / URL into device match
   const handleProcessScan = (inputVal) => {
     const clean = (inputVal || '').trim();
     if (!clean) return;
 
-    // Extract device identifier from raw code or URL (e.g. http://localhost:5173/?scan=ITS-IS-PC01)
+    // Extract device identifier from raw code, deep-link URL, or pipe-delimited payload
     let searchKey = clean;
     if (clean.includes('scan=')) {
       searchKey = clean.split('scan=')[1].split('&')[0];
     } else if (clean.includes('device=')) {
       searchKey = clean.split('device=')[1].split('&')[0];
+    } else if (clean.includes('|')) {
+      // Format: "PT. ITS | ITS_ESXi01 | IS | Administrator | ..."
+      const parts = clean.split('|').map(p => p.trim());
+      if (parts.length >= 2) {
+        searchKey = parts[1];
+      }
     }
 
+    searchKey = decodeURIComponent(searchKey).trim().toLowerCase();
+
+    // Match against devices
     const matched = devices.find(d => 
-      (d.computerName || '').toLowerCase() === searchKey.toLowerCase() ||
-      (d.id || '').toLowerCase() === searchKey.toLowerCase() ||
-      (d.ipAddress || '').toLowerCase() === searchKey.toLowerCase()
+      (d.computerName || '').toLowerCase() === searchKey ||
+      (d.id || '').toLowerCase() === searchKey ||
+      (d.specs?.assetTag || '').toLowerCase() === searchKey ||
+      (d.specs?.serialNumber || '').toLowerCase() === searchKey ||
+      (d.ipAddress || '').toLowerCase() === searchKey
     );
 
     if (matched) {
       setSelectedDevice(matched);
+      setScannedDevice(matched);
+      const currentRemark = getDeviceCurrentRemark ? getDeviceCurrentRemark(matched.id) : (matched.remark || '');
+      setAuditRemarkInput(currentRemark);
       setVerificationFeedback({
         type: 'success',
-        message: `Barcode Terdeteksi! Perangkat [${matched.computerName}] terverifikasi dari Dept ${matched.department}.`
+        message: `Barcode Terverifikasi! Komputer [${matched.computerName}] terhubung dari Dept ${matched.department}.`
       });
     } else {
       setVerificationFeedback({
         type: 'error',
-        message: `Barcode / Kode "${clean}" tidak terdaftar di database inventaris PT. ITS.`
+        message: `Barcode / Tag "${inputVal}" tidak ditemukan dalam sistem inventaris PT. Indonesia Toray Synthetics.`
       });
     }
   };
 
-  // Continuous BarcodeDetector frame analysis loop
+  // Continuous frame analysis loop: uses jsQR (works everywhere) + BarcodeDetector fallback
   useEffect(() => {
     let animId;
     let detector = null;
@@ -304,23 +370,59 @@ export const BarcodeScannerModal = () => {
           formats: ['qr_code', 'code_128', 'code_39', 'ean_13', 'data_matrix', 'upc_a']
         });
       } catch (e) {
-        console.warn('BarcodeDetector initialization error:', e);
+        console.warn('BarcodeDetector init error:', e);
       }
     }
 
     const scanVideoFrame = async () => {
       if (isCameraActive && videoRef.current && videoRef.current.readyState >= 2) {
-        if (detector) {
+        const video = videoRef.current;
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+
+        if (videoWidth > 0 && videoHeight > 0) {
+          // 1. First attempt: jsQR via offscreen canvas (ultra-reliable QR decoding across ALL browsers)
           try {
-            const barcodes = await detector.detect(videoRef.current);
-            if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
-              handleBarcodeSuccess(barcodes[0].rawValue);
+            if (!canvasRef.current) {
+              canvasRef.current = document.createElement('canvas');
             }
-          } catch (e) {
-            // Frame skip is normal during rapid movement
+            const canvas = canvasRef.current;
+            // Downscale frame slightly for faster FPS processing on mobile CPUs
+            const scanWidth = Math.min(videoWidth, 640);
+            const scanHeight = Math.floor((videoHeight / videoWidth) * scanWidth);
+            canvas.width = scanWidth;
+            canvas.height = scanHeight;
+
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            if (ctx) {
+              ctx.drawImage(video, 0, 0, scanWidth, scanHeight);
+              const imageData = ctx.getImageData(0, 0, scanWidth, scanHeight);
+              const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                inversionAttempts: 'dontInvert'
+              });
+
+              if (code && code.data) {
+                handleBarcodeSuccess(code.data);
+              }
+            }
+          } catch (qrErr) {
+            // Frame skip normal
+          }
+
+          // 2. Second attempt: BarcodeDetector for 1D Barcodes (Code 128 / Code 39) if available
+          if (detector) {
+            try {
+              const barcodes = await detector.detect(video);
+              if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
+                handleBarcodeSuccess(barcodes[0].rawValue);
+              }
+            } catch (dErr) {
+              // Frame skip normal
+            }
           }
         }
       }
+
       if (isCameraActive) {
         animId = requestAnimationFrame(scanVideoFrame);
       }
@@ -349,44 +451,94 @@ export const BarcodeScannerModal = () => {
     reader.onload = (event) => {
       const img = new Image();
       img.onload = async () => {
-        // Attempt detection via BarcodeDetector
-        if ('BarcodeDetector' in window) {
+        let detectedCode = null;
+
+        // 1. Try jsQR on image
+        try {
+          const testCanvas = document.createElement('canvas');
+          testCanvas.width = img.naturalWidth || img.width;
+          testCanvas.height = img.naturalHeight || img.height;
+          const ctx = testCanvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          const imgData = ctx.getImageData(0, 0, testCanvas.width, testCanvas.height);
+          const qrResult = jsQR(imgData.data, imgData.width, imgData.height);
+          if (qrResult && qrResult.data) {
+            detectedCode = qrResult.data;
+          }
+        } catch (e) {
+          console.warn('Canvas jsQR error:', e);
+        }
+
+        // 2. Try BarcodeDetector on image
+        if (!detectedCode && 'BarcodeDetector' in window) {
           try {
             const detector = new window.BarcodeDetector({
               formats: ['qr_code', 'code_128', 'code_39', 'ean_13', 'data_matrix']
             });
             const barcodes = await detector.detect(img);
             if (barcodes && barcodes.length > 0 && barcodes[0].rawValue) {
-              handleBarcodeSuccess(barcodes[0].rawValue);
-              return;
+              detectedCode = barcodes[0].rawValue;
             }
           } catch (err) {
-            console.warn('Image detection error:', err);
+            console.warn('BarcodeDetector image error:', err);
           }
         }
 
-        // If automatic detection in photo couldn't find barcode, provide quick helper
-        setVerificationFeedback({
-          type: 'info',
-          message: 'Foto berhasil diambil. Jika barcode tidak terbaca otomatis karena resolusi kamera, silakan pilih nama unit pada simulasi atau ketik nama komputer di bawah.'
-        });
+        if (detectedCode) {
+          handleBarcodeSuccess(detectedCode);
+        } else {
+          setVerificationFeedback({
+            type: 'info',
+            message: 'Foto barcode berhasil diambil. Jika barcode buram, Anda dapat memilih unit pada daftar simulasi atau mengetik nama komputer di bawah.'
+          });
+        }
       };
       img.src = event.target.result;
     };
     reader.readAsDataURL(file);
   };
 
-  const handleUpdateStatusVerified = (newStatus) => {
-    if (selectedDevice) {
-      updateDeviceStatus(selectedDevice.id, newStatus);
-      setSelectedDevice(prev => ({ ...prev, status: newStatus }));
-      setVerificationFeedback({
-        type: 'success',
-        message: `Status perangkat ${selectedDevice.computerName} berhasil diubah menjadi "${newStatus}"!`
-      });
-      playScannerBeep();
-      triggerHaptic();
+  // Update Status & Condition directly from Scanner modal
+  const handleUpdateStatus = (newStatus) => {
+    if (!selectedDevice) return;
+    setIsUpdatingStatus(true);
+
+    if (updateDeviceCondition) {
+      updateDeviceCondition(selectedDevice.id, newStatus, auditRemarkInput);
     }
+
+    setSelectedDevice(prev => ({
+      ...prev,
+      status: newStatus,
+      remark: auditRemarkInput
+    }));
+
+    setVerificationFeedback({
+      type: 'success',
+      message: `Status perangkat [${selectedDevice.computerName}] berhasil diubah menjadi "${newStatus}" untuk audit bulan ini!`
+    });
+
+    playScannerBeep();
+    triggerHaptic();
+
+    setTimeout(() => {
+      setIsUpdatingStatus(false);
+    }, 400);
+  };
+
+  // Save updated Remark
+  const handleSaveRemark = (e) => {
+    e.preventDefault();
+    if (!selectedDevice) return;
+    const currentStatus = getDeviceCurrentStatus ? getDeviceCurrentStatus(selectedDevice.id) : (selectedDevice.status || 'Online');
+    if (updateDeviceCondition) {
+      updateDeviceCondition(selectedDevice.id, currentStatus, auditRemarkInput);
+    }
+    setVerificationFeedback({
+      type: 'success',
+      message: `Catatan temuan audit [${selectedDevice.computerName}] berhasil disimpan!`
+    });
+    playScannerBeep();
   };
 
   const handleClose = () => {
@@ -402,22 +554,39 @@ export const BarcodeScannerModal = () => {
 
   if (!isScannerOpen) return null;
 
+  // Real-time live status of selected device
+  const currentLiveStatus = selectedDevice
+    ? (getDeviceCurrentStatus ? getDeviceCurrentStatus(selectedDevice.id) : (selectedDevice.status || 'Online'))
+    : 'Online';
+
+  const specs = selectedDevice?.specs || {};
+  const currentMonthLabel = monthOptions.find(m => m.value === currentMonth)?.label || 'Januari';
+
   return (
     <div className="modal-backdrop" onClick={handleClose}>
       <div
         className="modal-container modal-lg scanner-modal-container"
         onClick={(e) => e.stopPropagation()}
-        style={{ maxWidth: '680px', maxHeight: '92vh', overflowY: 'auto' }}
+        style={{
+          maxWidth: '740px',
+          width: '95%',
+          maxHeight: '94vh',
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}
       >
-        {/* HEADER */}
+        {/* MODAL HEADER */}
         <div className="modal-header">
           <div className="modal-title-group">
-            <div className="brand-icon">
+            <div className="brand-icon barcode-accent">
               <QrCode size={20} className="icon-toray" />
             </div>
             <div>
-              <h3>Scan Barcode & Kamera Device IT</h3>
-              <p className="modal-sub-text">Bisa dibuka dari Smartphone (Android/iOS), Laptop Webcam & Barcode Gun Fisik</p>
+              <h3>Scan Barcode & Spesifikasi Perangkat IT</h3>
+              <p className="modal-sub-text">
+                Kamera Smartphone (Android / iOS) • Laptop Webcam • Barcode Scanner Gun Fisik
+              </p>
             </div>
           </div>
           <button className="btn-modal-close" onClick={handleClose} title="Tutup">
@@ -425,9 +594,11 @@ export const BarcodeScannerModal = () => {
           </button>
         </div>
 
-        <div className="modal-body">
+        {/* MODAL SCROLLABLE BODY */}
+        <div className="modal-body" style={{ overflowY: 'auto', flex: 1, padding: '16px 20px' }}>
+          
           {/* CAMERA VIEWPORT FRAME */}
-          <div className={`scanner-camera-frame ${isScanningSuccessAnim ? 'scan-success-pulse' : ''}`}>
+          <div className={`scanner-camera-frame ${isScanningSuccessAnim ? 'scan-success-pulse' : ''}`} style={{ minHeight: '180px' }}>
             {isCameraActive ? (
               <video
                 ref={videoRef}
@@ -438,10 +609,10 @@ export const BarcodeScannerModal = () => {
               />
             ) : null}
 
-            {/* Red Laser Scanner Animation Bar */}
+            {/* Red Laser Scanning Animation Line */}
             <div className={`scanner-laser-line ${isCameraActive ? 'active' : ''}`}></div>
 
-            {/* Centered Reticle / Target Box */}
+            {/* Centered Reticle Target */}
             <div className="scanner-target-reticle">
               <span className="reticle-corner top-left"></span>
               <span className="reticle-corner top-right"></span>
@@ -449,41 +620,43 @@ export const BarcodeScannerModal = () => {
               <span className="reticle-corner bottom-right"></span>
             </div>
 
-            {/* Offline / Inactive Placeholder Overlay */}
+            {/* Idle Overlay when camera is off */}
             {!isCameraActive && (
               <div className="scanner-overlay-grid">
                 <div className="scanner-idle-icon-wrap">
-                  <Camera size={48} className="qr-scanner-icon" />
+                  <Camera size={44} className="qr-scanner-icon" />
                 </div>
                 <p className="scanner-instruction">
-                  Kamera Belum Aktif. Klik tombol <strong>"Buka Kamera Langsung"</strong> atau <strong>"Ambil Foto Kamera HP"</strong> di bawah.
+                  Arahkan kamera ke stiker Barcode / QR Code Asset Tag komputer, atau pilih tombol di bawah.
                 </p>
                 <div className="scanner-device-compatibility-badge">
                   <Smartphone size={13} />
-                  <span>Mendukung Android • iPhone (iOS) • Windows Laptop • Barcode Gun</span>
+                  <span>Kompatibel: Android (Samsung, Xiaomi, Oppo, Vivo) • iPhone / iPad (iOS) • Windows PC</span>
                 </div>
               </div>
             )}
           </div>
 
-          {/* HARDWARE CAMERA CONTROLS STRIP */}
-          <div className="camera-controls-action-bar">
-            {/* Primary Toggle: Start/Stop Live Stream */}
+          {/* HARDWARE CAMERA CONTROLS ACTION BAR */}
+          <div className="camera-controls-action-bar" style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px' }}>
+            {/* Live Camera Stream Toggle */}
             <button
               type="button"
               className={`btn-camera-toggle-main ${isCameraActive ? 'active-stop' : 'active-start'}`}
               onClick={isCameraActive ? stopCamera : () => startCamera(facingMode, selectedCameraId)}
+              style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 16px' }}
             >
               {isCameraActive ? <CameraOff size={16} /> : <Camera size={16} />}
               <span>{isCameraActive ? 'Matikan Kamera' : '📷 Buka Kamera Langsung'}</span>
             </button>
 
-            {/* Direct Mobile Native Camera Button (Guaranteed to work on ALL mobile browsers & HTTP) */}
+            {/* Native Mobile Camera Photo Button (100% universal on every smartphone) */}
             <button
               type="button"
               className="btn-camera-native-mobile"
               onClick={() => fileInputRef.current && fileInputRef.current.click()}
               title="Gunakan kamera bawaan smartphone untuk foto stiker barcode"
+              style={{ flex: '1 1 200px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', padding: '10px 16px' }}
             >
               <Smartphone size={16} />
               <span>Ambil Foto Barcode (Kamera HP)</span>
@@ -499,10 +672,9 @@ export const BarcodeScannerModal = () => {
               onChange={handleNativeCameraPhoto}
             />
 
-            {/* Secondary Controls (Shown when camera is active) */}
+            {/* Sub-controls when camera is active */}
             {isCameraActive && (
-              <div className="camera-sub-controls">
-                {/* Flip Camera (Front/Rear) */}
+              <div className="camera-sub-controls" style={{ display: 'flex', gap: '6px' }}>
                 <button
                   type="button"
                   className="btn-camera-mini-tool"
@@ -513,12 +685,11 @@ export const BarcodeScannerModal = () => {
                   <span>{facingMode === 'environment' ? 'Belakang' : 'Depan'}</span>
                 </button>
 
-                {/* Torch / Flashlight Toggle */}
                 <button
                   type="button"
                   className={`btn-camera-mini-tool ${isTorchOn ? 'torch-active' : ''}`}
                   onClick={handleToggleTorch}
-                  title="Nyalakan Lampu Senter / Flash Kamera"
+                  title="Nyalakan Lampu Flash Kamera"
                 >
                   <Zap size={15} />
                   <span>Flash</span>
@@ -526,7 +697,7 @@ export const BarcodeScannerModal = () => {
               </div>
             )}
 
-            {/* Sound Mute Toggle */}
+            {/* Sound Toggle */}
             <button
               type="button"
               className="btn-camera-mini-tool"
@@ -537,10 +708,10 @@ export const BarcodeScannerModal = () => {
             </button>
           </div>
 
-          {/* Camera Device Switcher Dropdown (If multiple cameras detected) */}
+          {/* Camera Device Switcher (Multi-lens smartphones & external webcams) */}
           {availableCameras.length > 1 && (
-            <div className="camera-device-selector-row">
-              <span className="text-xs text-muted">Pilih Sensor Kamera:</span>
+            <div className="camera-device-selector-row" style={{ marginTop: '8px' }}>
+              <span className="text-xs text-muted">Lensa Kamera:</span>
               <select
                 value={selectedCameraId}
                 onChange={(e) => handleSelectCameraDevice(e.target.value)}
@@ -555,9 +726,9 @@ export const BarcodeScannerModal = () => {
             </div>
           )}
 
-          {/* Error Message Alert */}
+          {/* Camera Error Banner */}
           {cameraError && (
-            <div className="camera-error-banner">
+            <div className="camera-error-banner" style={{ marginTop: '10px' }}>
               <AlertTriangle size={16} className="text-amber-400" />
               <div className="camera-error-text">
                 <strong>Pemberitahuan Kamera:</strong> {cameraError}
@@ -565,36 +736,39 @@ export const BarcodeScannerModal = () => {
             </div>
           )}
 
-          {/* SEARCH & PHYSICAL BARCODE GUN INPUT SECTION */}
-          <div className="barcode-input-section">
-            <div className="search-box-wrapper full-width">
-              <Search size={16} className="search-icon" />
-              <input
-                type="text"
-                autoFocus
-                placeholder="Scan dengan Barcode Gun USB atau ketik nama komputer (cth: ITS-IS-PC01)..."
-                value={barcodeInput}
-                onChange={(e) => setBarcodeInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    handleProcessScan(barcodeInput);
-                  }
-                }}
-                className="search-input-field code-font"
-              />
+          {/* MANUAL SEARCH & HARDWARE BARCODE GUN INPUT */}
+          <div className="barcode-input-section" style={{ marginTop: '12px' }}>
+            <div className="search-box-wrapper full-width" style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ position: 'relative', flex: 1 }}>
+                <Search size={15} className="search-icon" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+                <input
+                  type="text"
+                  placeholder="Scan dengan Barcode Gun USB/Bluetooth atau ketik nama komputer..."
+                  value={barcodeInput}
+                  onChange={(e) => setBarcodeInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleProcessScan(barcodeInput);
+                    }
+                  }}
+                  className="search-input-field code-font"
+                  style={{ width: '100%', paddingLeft: '36px', height: '38px', borderRadius: '6px' }}
+                />
+              </div>
               <button
                 className="btn-primary-sm"
                 onClick={() => handleProcessScan(barcodeInput)}
+                style={{ padding: '0 16px', height: '38px' }}
               >
-                Cari & Verifikasi
+                Cari & Hubungkan
               </button>
             </div>
 
-            {/* QUICK TEST SIMULATION CHIPS */}
-            <div className="scanner-quick-chips-wrap">
-              <span className="text-muted text-xs font-semibold">Simulasi Cepat (Klik untuk Uji Scan):</span>
-              <div className="quick-chips-scroll">
-                {devices.slice(0, 6).map((d) => (
+            {/* Quick Test Chips for Plant Simulation */}
+            <div className="scanner-quick-chips-wrap" style={{ marginTop: '8px' }}>
+              <span className="text-muted text-xs font-semibold">Uji Coba Scan Cepat (Klik salah satu unit):</span>
+              <div className="quick-chips-scroll" style={{ display: 'flex', gap: '6px', overflowX: 'auto', paddingBottom: '4px', marginTop: '4px' }}>
+                {devices.slice(0, 8).map((d) => (
                   <button
                     key={d.id}
                     type="button"
@@ -613,100 +787,284 @@ export const BarcodeScannerModal = () => {
 
           {/* FEEDBACK STATUS ALERT */}
           {verificationFeedback && (
-            <div className={`auth-alert margin-top-sm ${verificationFeedback.type === 'success' ? 'success' : verificationFeedback.type === 'info' ? 'info' : 'error'}`}>
+            <div
+              className={`auth-alert margin-top-sm ${
+                verificationFeedback.type === 'success'
+                  ? 'success'
+                  : verificationFeedback.type === 'info'
+                  ? 'info'
+                  : 'error'
+              }`}
+              style={{ marginTop: '10px' }}
+            >
               {verificationFeedback.type === 'success' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
               <span>{verificationFeedback.message}</span>
             </div>
           )}
 
-          {/* VERIFIED DEVICE INSPECTION CARD */}
-          {selectedDevice && (
-            <div className="verified-result-card margin-top">
+          {/* =========================================================================
+              VERIFIED DEVICE INSPECTION CARD & COMPLETE HARDWARE SPECIFICATIONS
+              ========================================================================= */}
+          {selectedDevice ? (
+            <div className="verified-result-card" style={{ marginTop: '16px' }}>
+              {/* CARD TOP BAR */}
               <div className="verified-result-header">
                 <div>
-                  <div className="text-xs text-muted font-bold uppercase tracking-wider">Perangkat Terverifikasi:</div>
-                  <h3 className="code-font text-xl text-white" style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}>
-                    {selectedDevice.type === 'Notebook' ? <Laptop size={20} style={{ color: '#38bdf8' }} /> : selectedDevice.type === 'Server' ? <Server size={20} style={{ color: '#f59e0b' }} /> : <Monitor size={20} style={{ color: '#60a5fa' }} />}
+                  <div className="text-xs text-muted font-bold uppercase tracking-wider" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <CheckCircle2 size={13} style={{ color: '#10b981' }} />
+                    <span>Perangkat IT Terverifikasi di Database Web:</span>
+                  </div>
+                  <h3
+                    className="code-font text-xl text-white"
+                    style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0' }}
+                  >
+                    {selectedDevice.type === 'Notebook' ? (
+                      <Laptop size={20} style={{ color: '#38bdf8' }} />
+                    ) : selectedDevice.type === 'Server' ? (
+                      <Server size={20} style={{ color: '#f59e0b' }} />
+                    ) : (
+                      <Monitor size={20} style={{ color: '#60a5fa' }} />
+                    )}
                     <span>{selectedDevice.computerName}</span>
+                    <span className="text-xs text-muted" style={{ fontWeight: 400 }}>
+                      ({selectedDevice.type})
+                    </span>
                   </h3>
                 </div>
 
-                {/* CURRENT LIVE STATUS BADGE */}
-                <div className={`status-badge-capsule status-${(selectedDevice.status || 'online').toLowerCase().replace(/\s+/g, '-')}`}>
-                  <span className="live-pulse"></span>
-                  <span>{selectedDevice.status}</span>
+                {/* CURRENT LIVE REAL-TIME CONDITION BADGE */}
+                <div style={{ textAlign: 'right' }}>
+                  <div className="text-xs text-muted" style={{ marginBottom: '4px' }}>
+                    Kondisi ({currentMonthLabel} {currentYear}):
+                  </div>
+                  <div className={`status-badge-capsule status-${currentLiveStatus.toLowerCase().replace(/\s+/g, '-')}`}>
+                    <span className="live-pulse"></span>
+                    <span style={{ fontWeight: 700 }}>{currentLiveStatus}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* SPECIFICATION MATRIX */}
-              <div className="specs-grid-two margin-top-sm">
-                <div className="verified-info-row">
-                  <span className="text-muted text-xs">Departemen:</span>
-                  <span className={`dept-badge-pill dept-${(selectedDevice.department || 'is').toLowerCase()}`}>
-                    {selectedDevice.department}
-                  </span>
+              {/* COMPLETE HARDWARE SPECIFICATIONS MATRIX */}
+              <div style={{ marginTop: '14px', background: 'rgba(0, 0, 0, 0.25)', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.06)' }}>
+                <div className="text-xs font-bold text-cyan" style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                  <Cpu size={14} />
+                  <span>Spesifikasi Hardware & Jaringan Lengkap:</span>
                 </div>
-                <div className="verified-info-row">
-                  <span className="text-muted text-xs">IP Address:</span>
-                  <span className="code-font font-bold text-cyan">{selectedDevice.ipAddress || '-'}</span>
-                </div>
-                <div className="verified-info-row">
-                  <span className="text-muted text-xs">Tipe Perangkat:</span>
-                  <span className="font-semibold text-white">{selectedDevice.type}</span>
-                </div>
-                <div className="verified-info-row">
-                  <span className="text-muted text-xs">User / PIC:</span>
-                  <span className="font-bold text-white">{selectedDevice.user}</span>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+                    gap: '10px 16px',
+                    fontSize: '0.82rem'
+                  }}
+                >
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Departemen:</span>
+                    <span className={`dept-badge-pill dept-${(selectedDevice.department || 'is').toLowerCase()}`}>
+                      {selectedDevice.department}
+                    </span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">User / PIC:</span>
+                    <span className="font-bold text-white">{selectedDevice.user || '-'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Merk & Tipe:</span>
+                    <span className="font-semibold text-white">
+                      {specs.brand || 'Lenovo'} {specs.model || '-'}
+                    </span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Processor (CPU):</span>
+                    <span className="text-slate-200">{specs.cpu || 'Intel Core i5'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Memory (RAM):</span>
+                    <span className="font-bold text-cyan">{specs.ram || '16 GB DDR4'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Penyimpanan (Storage):</span>
+                    <span className="text-slate-200">{specs.storage || '512 GB SSD'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Operating System:</span>
+                    <span className="text-slate-200">{specs.os || 'Windows 11 Pro 64-bit'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">IP Address:</span>
+                    <span className="code-font font-bold text-cyan">{selectedDevice.ipAddress || specs.ipAddress || '-'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">MAC Address:</span>
+                    <span className="code-font text-slate-300">{specs.macAddress || '-'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Serial Number (SN):</span>
+                    <span className="code-font text-amber-300">{specs.serialNumber || selectedDevice.serialNumber || '-'}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Asset Tag Resmi:</span>
+                    <span className="code-font text-white">{specs.assetTag || selectedDevice.assetTag || `ITS-${selectedDevice.computerName}`}</span>
+                  </div>
+
+                  <div className="verified-info-row">
+                    <span className="text-muted text-xs">Lokasi Fisik:</span>
+                    <span className="text-slate-200">{specs.location || `${selectedDevice.department} Area`}</span>
+                  </div>
                 </div>
               </div>
 
-              <div className="verified-info-row margin-top-sm">
-                <span className="text-muted text-xs">Keterangan / Remark:</span>
-                <span className="text-sm text-slate-300">{selectedDevice.remark || '-'}</span>
-              </div>
-
-              {/* QUICK STATUS UPDATE BUTTONS IN SCANNER */}
-              <div className="quick-verify-status-section margin-top">
-                <div className="text-xs font-bold text-cyan mb-2" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Zap size={14} />
-                  <span>Ubah / Verifikasi Status Operasional Unit Ini di Lapangan:</span>
+              {/* DYNAMIC CONDITION & STATUS UPDATER (ONE-CLICK FIELD AUDIT) */}
+              <div className="quick-verify-status-section" style={{ marginTop: '14px', background: 'rgba(0, 163, 224, 0.06)', padding: '12px 14px', borderRadius: '8px', border: '1px solid rgba(0, 163, 224, 0.25)' }}>
+                <div className="text-xs font-bold text-cyan" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <Zap size={14} />
+                    <span>Ubah Kondisi Unit Ini di Lapangan (Audit {currentMonthLabel} {currentYear}):</span>
+                  </div>
+                  <span className="text-muted text-xs">Klik untuk perbarui</span>
                 </div>
-                <div className="quick-status-buttons-grid">
+
+                {/* STATUS BUTTONS GRID */}
+                <div className="quick-status-buttons-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(100px, 1fr))', gap: '8px' }}>
                   {statusOptions.map((st) => {
-                    const isCurrent = selectedDevice.status === st.value;
+                    const isCurrent = currentLiveStatus === st.value;
                     return (
                       <button
                         key={st.value}
                         type="button"
                         className={`btn-quick-status ${isCurrent ? 'current' : ''}`}
-                        onClick={() => handleUpdateStatusVerified(st.value)}
+                        onClick={() => handleUpdateStatus(st.value)}
+                        disabled={isUpdatingStatus}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '8px 10px',
+                          borderRadius: '6px',
+                          border: isCurrent ? `2px solid ${st.color || '#00a3e0'}` : '1px solid rgba(255, 255, 255, 0.1)',
+                          background: isCurrent ? 'rgba(0, 163, 224, 0.25)' : 'rgba(15, 23, 42, 0.6)',
+                          color: isCurrent ? '#ffffff' : '#cbd5e1',
+                          fontWeight: isCurrent ? 700 : 500,
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
                       >
-                        {isCurrent && <Check size={14} />}
+                        {isCurrent && <Check size={14} style={{ color: st.color || '#38bdf8' }} />}
                         <span>{st.label}</span>
                       </button>
                     );
                   })}
                 </div>
+
+                {/* REMARKS INPUT FORM */}
+                <form onSubmit={handleSaveRemark} style={{ marginTop: '10px', display: 'flex', gap: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Tambah catatan kondisi fisik / temuan audit (cth: Layar bergaris, kipas bunyi, siap pakai)..."
+                    value={auditRemarkInput}
+                    onChange={(e) => setAuditRemarkInput(e.target.value)}
+                    className="search-input-field"
+                    style={{ flex: 1, height: '36px', fontSize: '0.82rem', borderRadius: '6px' }}
+                  />
+                  <button type="submit" className="btn-primary-sm" style={{ height: '36px', whiteSpace: 'nowrap' }}>
+                    Simpan Catatan
+                  </button>
+                </form>
               </div>
 
-              {/* ACTION BUTTON: PRINT LABEL */}
-              <div style={{ marginTop: '14px', display: 'flex', gap: '10px' }}>
+              {/* ACTION BUTTONS (PRINT STIKER & EDIT SPECS) */}
+              <div style={{ marginTop: '14px', display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
                 <button
                   type="button"
                   className="btn-inventory-action btn-blue-solid"
-                  style={{ flex: 1, justifyContent: 'center' }}
-                  onClick={() => openBarcodePrint(selectedDevice)}
+                  style={{ flex: '1 1 200px', justifyContent: 'center', padding: '9px 14px' }}
+                  onClick={() => {
+                    handleClose();
+                    if (openBarcodePrint) openBarcodePrint(selectedDevice);
+                  }}
                 >
                   <Printer size={15} />
-                  <span>Cetak Stiker Barcode Komputer Ini</span>
+                  <span>Cetak Stiker Barcode & Tag Resmi</span>
+                </button>
+
+                <button
+                  type="button"
+                  className="btn-inventory-action btn-secondary"
+                  style={{ flex: '1 1 200px', justifyContent: 'center', padding: '9px 14px' }}
+                  onClick={() => {
+                    handleClose();
+                    if (openEditModal) openEditModal(selectedDevice);
+                  }}
+                >
+                  <Edit3 size={15} />
+                  <span>Edit Data Spesifikasi Komputer</span>
                 </button>
               </div>
             </div>
+          ) : (
+            /* EMPTY / UNKNOWN BARCODE PROMPT */
+            verificationFeedback?.type === 'error' && (
+              <div
+                style={{
+                  marginTop: '16px',
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px dashed rgba(239, 68, 68, 0.4)',
+                  padding: '16px',
+                  borderRadius: '8px',
+                  textAlign: 'center'
+                }}
+              >
+                <AlertTriangle size={32} style={{ color: '#ef4444', margin: '0 auto 8px auto' }} />
+                <h4 style={{ color: '#f87171', margin: '0 0 6px 0' }}>Perangkat Belum Terdaftar</h4>
+                <p className="text-xs text-slate-300" style={{ maxWidth: '440px', margin: '0 auto 12px auto' }}>
+                  Barcode atau kode yang di-scan belum ada di sistem inventaris. Anda dapat mendaftarkannya sekarang sebagai perangkat baru.
+                </p>
+                <button
+                  type="button"
+                  className="btn-primary-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                  onClick={() => {
+                    handleClose();
+                    if (openAddModal) openAddModal();
+                  }}
+                >
+                  <PlusCircle size={15} />
+                  <span>+ Daftarkan Sebagai Perangkat Baru</span>
+                </button>
+              </div>
+            )
           )}
         </div>
 
-        <div className="modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
-          <button className="btn-secondary" onClick={handleClose}>
+        {/* MODAL FOOTER */}
+        <div
+          className="modal-footer"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 20px',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            background: 'rgba(2, 6, 23, 0.8)'
+          }}
+        >
+          <div className="text-xs text-muted" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+            <span>Database PT. Indonesia Toray Synthetics Online • {devices.length} Perangkat Terhubung</span>
+          </div>
+          <button className="btn-secondary" onClick={handleClose} style={{ padding: '8px 18px' }}>
             Tutup Scanner
           </button>
         </div>

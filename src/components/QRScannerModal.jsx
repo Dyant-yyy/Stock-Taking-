@@ -23,7 +23,7 @@ export const QRScannerModal = () => {
     if (dev) {
       setScannedDevice(dev);
     } else {
-      alert(`Asset Tag "${assetTag}" tidak ditemukan di database ITS.`);
+      alert(`Asset Tag "${assetTag}" tidak ditemukan di database Indonesia Toray Synthetics.`);
     }
   };
 

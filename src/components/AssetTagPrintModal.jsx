@@ -15,7 +15,11 @@ export const AssetTagPrintModal = () => {
   const printDevices = selectedDevice ? [selectedDevice] : devices.slice(0, 8);
 
   const handleTriggerPrint = () => {
+    document.body.classList.add('printing-sticker');
     window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-sticker');
+    }, 1000);
   };
 
   return (

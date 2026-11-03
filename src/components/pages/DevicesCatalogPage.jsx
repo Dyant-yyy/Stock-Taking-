@@ -127,7 +127,7 @@ export const DevicesCatalogPage = () => {
             <span>Tabel Master Inventaris Komputer & Device IT</span>
           </h1>
           <p className="section-subtitle-text">
-            PT. Indonesia Toray Synthetics (ITS) Tangerang Plant • Monitoring Status Perangkat per Departemen
+            PT. Indonesia Toray Synthetics Tangerang Plant • Monitoring Status Perangkat per Departemen
           </p>
         </div>
 
@@ -454,7 +454,7 @@ export const DevicesCatalogPage = () => {
 
         {/* Table Footer */}
         <div className="fintech-table-footer">
-          <span>Menampilkan {filteredDevices.length} dari total {devices.length} komputer terdaftar di sistem ITS.</span>
+          <span>Menampilkan {filteredDevices.length} dari total {devices.length} komputer terdaftar di sistem Indonesia Toray Synthetics.</span>
           <span>PT. Indonesia Toray Synthetics • Device Master Management</span>
         </div>
       </div>

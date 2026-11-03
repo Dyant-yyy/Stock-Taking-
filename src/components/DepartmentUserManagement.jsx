@@ -65,7 +65,7 @@ export const DepartmentUserManagement = () => {
     <div className="dept-user-view">
       <div className="view-header">
         <div>
-          <h2>Master Departemen & Direktori Pegawai ITS</h2>
+          <h2>Master Departemen & Direktori Pegawai Indonesia Toray Synthetics</h2>
           <p className="sub-header-text">
             Struktur Master Departemen Resmi PT. Indonesia Toray Synthetics (IS, RSN, QATECH, SIS, NFY, PFY) & Alokasi Asset.
           </p>
@@ -98,7 +98,7 @@ export const DepartmentUserManagement = () => {
                 </div>
               </div>
               <h3 className="dept-card-title">{dept.name}</h3>
-              <p className="text-xs text-muted mb-2">{dept.description || 'Unit Kerja Operasional ITS'}</p>
+              <p className="text-xs text-muted mb-2">{dept.description || 'Unit Kerja Operasional Indonesia Toray Synthetics'}</p>
               <div className="dept-head-info">
                 <UserCheck size={14} />
                 <span>Head: <strong>{dept.head}</strong></span>

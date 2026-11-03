@@ -97,7 +97,7 @@ export const DeviceFormModal = () => {
             <div className="form-section-title">1. Identitas Utama Asset</div>
             <div className="form-grid-two">
               <div className="form-group">
-                <label>Asset Tag ID (Nomor Label ITS):</label>
+                <label>Asset Tag ID (Nomor Label Indonesia Toray Synthetics):</label>
                 <input
                   type="text"
                   placeholder="Kosongkan untuk auto-generate (ITS-PC-2026-xxx)"

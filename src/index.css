@@ -94,6 +94,15 @@ html, body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
+}
+
+#root, .app-shell {
+  overflow-x: hidden;
+  max-width: 100vw;
+  width: 100%;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -2259,15 +2268,16 @@ input, select, textarea {
   padding-top: 4px;
 }
 
-/* PRINT STYLESHEET */
+/* PRINT STYLESHEET FOR ASSET STICKERS (ONLY ACTIVE WHEN PRINTING FROM STICKER MODAL) */
 @media print {
-  body * {
+  body.printing-sticker * {
     visibility: hidden;
   }
-  .print-stickers-grid, .print-stickers-grid * {
+  body.printing-sticker .print-stickers-grid,
+  body.printing-sticker .print-stickers-grid * {
     visibility: visible;
   }
-  .print-stickers-grid {
+  body.printing-sticker .print-stickers-grid {
     position: absolute;
     left: 0;
     top: 0;
@@ -3737,16 +3747,17 @@ input, select, textarea {
 }
 
 /* ==========================================================================
-   PRINT RULES FOR BARCODE STICKER
+   PRINT RULES FOR BARCODE STICKER (SCOPED TO STICKER PRINTING)
    ========================================================================== */
 @media print {
-  body * {
-    visibility: hidden;
-  }
-  #printable-sticker, #printable-sticker * {
+  body.printing-sticker #printable-sticker,
+  body.printing-sticker #printable-sticker *,
+  body.printing-sticker #asset-sticker-card,
+  body.printing-sticker #asset-sticker-card * {
     visibility: visible;
   }
-  #printable-sticker {
+  body.printing-sticker #printable-sticker,
+  body.printing-sticker #asset-sticker-card {
     position: absolute;
     left: 20px;
     top: 20px;

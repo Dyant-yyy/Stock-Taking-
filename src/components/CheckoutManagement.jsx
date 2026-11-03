@@ -94,7 +94,7 @@ export const CheckoutManagement = () => {
         <div>
           <h2>Peminjaman & Form Serah Terima Device</h2>
           <p className="sub-header-text">
-            Pencatatan peminjaman perangkat luar kantor, perjalanan dinas, dan inventarisir temporary ITS.
+            Pencatatan peminjaman perangkat luar kantor, perjalanan dinas, dan inventarisir temporary Indonesia Toray Synthetics.
           </p>
         </div>
         <div className="view-header-actions">
@@ -230,7 +230,7 @@ export const CheckoutManagement = () => {
                 </div>
 
                 <div className="form-group margin-top">
-                  <label>Nama Peminjam / Pegawai ITS *:</label>
+                  <label>Nama Peminjam / Pegawai Indonesia Toray Synthetics *:</label>
                   <input
                     type="text"
                     required

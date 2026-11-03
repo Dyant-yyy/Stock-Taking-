@@ -17,7 +17,11 @@ export const BarcodePrintModal = () => {
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(scanUrl)}&color=00255b`;
 
   const handlePrint = () => {
+    document.body.classList.add('printing-sticker');
     window.print();
+    setTimeout(() => {
+      document.body.classList.remove('printing-sticker');
+    }, 1000);
   };
 
   return (

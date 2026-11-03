@@ -53,7 +53,7 @@ export const MaintenanceManagement = () => {
       setReportForm(prev => ({
         ...prev,
         deviceId: devices[0].id,
-        reportedBy: devices[0].assignedTo || 'Karyawan ITS'
+        reportedBy: devices[0].assignedTo || 'Karyawan Indonesia Toray Synthetics'
       }));
     }
     setIsReportMaintenanceOpen(true);
@@ -93,7 +93,7 @@ export const MaintenanceManagement = () => {
         <div>
           <h2>Ticketing Perbaikan & Maintenance Perangkat</h2>
           <p className="sub-header-text">
-            Pengawasan servis teknisi, klaim garansi, dan preventive maintenance mesin pabrik ITS.
+            Pengawasan servis teknisi, klaim garansi, dan preventive maintenance mesin pabrik Indonesia Toray Synthetics.
           </p>
         </div>
         <div className="view-header-actions">

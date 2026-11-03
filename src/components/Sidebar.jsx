@@ -33,8 +33,8 @@ export const Sidebar = () => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard Opname', icon: LayoutDashboard, badge: null },
     { id: 'stocktaking', label: 'Form & Record Stock Opname', icon: ClipboardCheck, badge: `${safeStockTakings.length} Audit`, badgeColor: 'badge-info' },
-    { id: 'devices', label: 'Katalog Perangkat ITS', icon: HardDrive, badge: safeDevices.length },
-    { id: 'departments', label: 'Master Departemen ITS', icon: Users, badge: `${safeDepts.length} Unit`, badgeColor: 'badge-info' },
+    { id: 'devices', label: 'Katalog Perangkat Indonesia Toray Synthetics', icon: HardDrive, badge: safeDevices.length },
+    { id: 'departments', label: 'Master Departemen Indonesia Toray Synthetics', icon: Users, badge: `${safeDepts.length} Unit`, badgeColor: 'badge-info' },
     { id: 'audit', label: 'Audit Trail & Log', icon: History, badge: null },
     { id: 'print', label: 'Cetak Tag QR Asset', icon: Printer, badge: null },
   ];
@@ -44,7 +44,7 @@ export const Sidebar = () => {
       <div className="sidebar-header">
         <div className="portal-badge">
           <ShieldCheck size={16} />
-          <span>ITS Device Stock Taking System</span>
+          <span>Indonesia Toray Synthetics Device Stock Taking System</span>
         </div>
       </div>
 

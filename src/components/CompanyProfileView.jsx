@@ -113,7 +113,7 @@ export const CompanyProfileView = () => {
             <Factory size={16} />
             <span>Fasilitas Manufaktur & Unit Operasional</span>
           </div>
-          <h2>Infrastruktur IT Per Pabrik & Master Departemen ITS</h2>
+          <h2>Infrastruktur IT Per Pabrik & Master Departemen Indonesia Toray Synthetics</h2>
           <p>
             Setiap unit pabrik PT. Indonesia Toray Synthetics di Tangerang (IS, RSN, QATECH, SIS, NFY, PFY) terhubung dalam sistem pemantauan dan Stock Opname fisik terpusat.
           </p>
@@ -158,7 +158,7 @@ export const CompanyProfileView = () => {
             <ClipboardCheck size={16} />
             <span>Modul Stock Opname Terintegrasi</span>
           </div>
-          <h2>Modul Utama Stock Taking Device ITS</h2>
+          <h2>Modul Utama Stock Taking Device Indonesia Toray Synthetics</h2>
           <p>
             Pencatatan verifikasi fisik, status keberadaan lokasi, kondisi perangkat, dan berita acara Stock Opname fisik.
           </p>
@@ -184,7 +184,7 @@ export const CompanyProfileView = () => {
           <div className="launchpad-card" onClick={() => handleLaunchPortal('devices')}>
             <div className="card-badge">{safeDevices.length} Perangkat</div>
             <div className="launchpad-icon text-blue"><Cpu size={32} /></div>
-            <h3>Katalog Perangkat ITS</h3>
+            <h3>Katalog Perangkat Indonesia Toray Synthetics</h3>
             <p>Katalog lengkap PC, Laptop, Server, IPC Industri, Network Switch, dan Printer Barcode dengan status audit fisik.</p>
             <span className="launchpad-link">Lihat Katalog →</span>
           </div>
@@ -193,7 +193,7 @@ export const CompanyProfileView = () => {
             <div className="card-badge">Master Departemen</div>
             <div className="launchpad-icon text-purple"><Building2 size={32} /></div>
             <h3>Master Departemen (IS, RSN, QATECH...)</h3>
-            <p>Struktur master departemen resmi ITS: Information System (IS), Resin (RSN), QA Tech (QATECH), SIS, NFY, PFY.</p>
+            <p>Struktur master departemen resmi Indonesia Toray Synthetics: Information System (IS), Resin (RSN), QA Tech (QATECH), SIS, NFY, PFY.</p>
             <span className="launchpad-link">Kelola Departemen →</span>
           </div>
         </div>

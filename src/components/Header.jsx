@@ -66,7 +66,7 @@ export const Header = () => {
         <button
           className="header-icon-btn danger-hover"
           onClick={() => {
-            if (window.confirm('Apakah Anda yakin ingin mereset seluruh data inventaris ke data awal pabrik ITS?')) {
+            if (window.confirm('Apakah Anda yakin ingin mereset seluruh data inventaris ke data awal pabrik Indonesia Toray Synthetics?')) {
               resetToSeedData();
             }
           }}

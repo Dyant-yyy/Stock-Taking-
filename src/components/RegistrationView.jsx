@@ -125,7 +125,7 @@ export const RegistrationView = () => {
 
         {/* Top Header Asterisk Icon */}
         <div className="saleskip-hero-top">
-          <div className="saleskip-asterisk-icon" title="ITS Synergy Star">
+          <div className="saleskip-asterisk-icon" title="Indonesia Toray Synthetics Synergy Star">
             <svg
               className="saleskip-asterisk-svg"
               viewBox="0 0 64 64"
@@ -138,28 +138,36 @@ export const RegistrationView = () => {
               <line x1="49.7" y1="14.3" x2="14.3" y2="49.7" stroke="white" strokeWidth="8" strokeLinecap="round" />
             </svg>
           </div>
+          <div className="saleskip-hero-badge">
+            <span className="hero-live-beacon" />
+            <span>PORTAL RESMI • PT. INDONESIA TORAY SYNTHETICS</span>
+          </div>
         </div>
 
         {/* Center Main Headline & Description */}
         <div className="saleskip-hero-center">
+          <div className="hero-pill-category">
+            <Sparkles size={13} className="hero-pill-icon" />
+            <span>ENTERPRISE IT MANAGEMENT</span>
+          </div>
           <h1 className="saleskip-hero-title">
             Hello<br />
-            ITS! <span className="saleskip-hand-emoji">👋</span>
+            Indonesia Toray Synthetics! <span className="saleskip-hand-emoji">👋</span>
           </h1>
           <p className="saleskip-hero-subtitle">
-            IT Device Stock Taking & PC Ledger System. Kelola inventarisasi komputer, audit bulanan 12 bulan, barcode scanner, dan verifikasi fisik perangkat IT PT. ITS dengan cepat, akurat, dan transparan.
+            IT Device Stock Taking & PC Ledger System. Kelola inventarisasi komputer, audit bulanan 12 bulan, barcode scanner, dan verifikasi fisik perangkat IT PT. Indonesia Toray Synthetics dengan cepat, akurat, dan transparan.
           </p>
 
           <div className="saleskip-hero-highlights">
-            <div className="hero-highlight-item">
+            <div className="hero-highlight-item" style={{ '--delay': '0.1s' }}>
               <span className="highlight-bullet" />
               <span>Audit & Checklist 12 Bulan (Januari s/d Desember)</span>
             </div>
-            <div className="hero-highlight-item">
+            <div className="hero-highlight-item" style={{ '--delay': '0.2s' }}>
               <span className="highlight-bullet" />
               <span>Master PC Ledger Status Online & Offline Seluruh Dept</span>
             </div>
-            <div className="hero-highlight-item">
+            <div className="hero-highlight-item" style={{ '--delay': '0.3s' }}>
               <span className="highlight-bullet" />
               <span>Label Barcode Code 128 & QR Code Spesifikasi Hardware</span>
             </div>

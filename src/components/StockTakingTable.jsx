@@ -29,6 +29,7 @@ export const StockTakingTable = () => {
     openEditModal,
     deleteDevice,
     openBarcodeModal,
+    openScannerModal,
     signatures,
     setSignatures
   } = useInventory();
@@ -144,6 +145,11 @@ export const StockTakingTable = () => {
         ))}
       </div>
 
+      {/* Mobile Swipe Hint */}
+      <div className="mobile-table-scroll-hint print-hide">
+        <span>⇄ Geser tabel ke samping untuk melihat seluruh status & aksi</span>
+      </div>
+
       {/* 4. The Authentic Stock Taking Table (Sesuai Gambar 1) */}
       <div className="authentic-table-container">
         <table className="authentic-table stock-taking-table">
@@ -191,8 +197,15 @@ export const StockTakingTable = () => {
                     </td>
 
                     {/* 3. Computer Name */}
-                    <td className="cell-name">
-                      <strong className="code-font">{dev.computerName}</strong>
+                    <td
+                      className="cell-name"
+                      onClick={() => openScannerModal && openScannerModal(dev)}
+                      title="Klik untuk lihat spesifikasi lengkap & verifikasi kondisi perangkat"
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <strong className="code-font text-link-hover" style={{ textDecoration: 'underline', textDecorationColor: 'rgba(56, 189, 248, 0.4)', textUnderlineOffset: '3px' }}>
+                        {dev.computerName}
+                      </strong>
                     </td>
 
                     {/* 4. Type */}
