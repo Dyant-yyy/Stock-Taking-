@@ -2966,3 +2966,81 @@
   }
 }
 
+/* ==========================================================================
+   SCAN BARCODE ➔ FORM INPUT 1-PER-1 WORKFLOW STYLES
+   ========================================================================== */
+
+/* Scan Barcode Navigation Highlight */
+.btn-scan-barcode-nav.highlight-scan-nav {
+  background: linear-gradient(135deg, #0284c7 0%, #00a3e0 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(56, 189, 248, 0.5) !important;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 163, 224, 0.35);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.2s ease;
+}
+
+.btn-scan-barcode-nav.highlight-scan-nav:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(0, 163, 224, 0.5);
+}
+
+/* Hero Quick CTA Button for Barcode Scan */
+.btn-hero-scan-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.3) 0%, rgba(0, 163, 224, 0.4) 100%);
+  border: 1.5px solid rgba(56, 189, 248, 0.6);
+  padding: 8px 16px;
+  border-radius: 10px;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-hero-scan-cta:hover {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.5) 0%, rgba(0, 163, 224, 0.6) 100%);
+  border-color: #38bdf8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 163, 224, 0.35);
+}
+
+.btn-hero-scan-cta .hero-scan-icon {
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.hero-scan-cta-text {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.hero-scan-cta-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1.2;
+}
+
+.hero-scan-cta-sub {
+  font-size: 10.5px;
+  color: #7dd3fc;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .btn-hero-scan-cta {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 14px;
+    margin-bottom: 6px;
+  }
+}
+
+

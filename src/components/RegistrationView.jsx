@@ -20,7 +20,7 @@ import {
 import './RegistrationView.css';
 
 export const RegistrationView = () => {
-  const { loginUser, departments, setCurrentScreen, currentUser } = useInventory();
+  const { loginUser, departments, setCurrentScreen, currentUser, openScannerModal } = useInventory();
 
   // Form State
   const [loginForm, setLoginForm] = useState({
@@ -75,7 +75,7 @@ export const RegistrationView = () => {
     });
   };
 
-  // Direct Bypass to Dashboard
+  // Direct Bypass to Dashboard & Barcode Scanner
   const handleDirectDashboard = () => {
     if (!currentUser) {
       loginUser({
@@ -85,6 +85,7 @@ export const RegistrationView = () => {
       });
     } else {
       setCurrentScreen('dashboard');
+      if (openScannerModal) openScannerModal();
     }
   };
 

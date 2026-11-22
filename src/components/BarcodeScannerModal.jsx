@@ -41,6 +41,8 @@ export const BarcodeScannerModal = () => {
     devices = [],
     scannedDevice,
     setScannedDevice,
+    scannerNotice,
+    setScannerNotice,
     getDeviceCurrentStatus,
     getDeviceCurrentRemark,
     updateDeviceCondition,
@@ -312,7 +314,7 @@ export const BarcodeScannerModal = () => {
     handleProcessScan(clean);
   };
 
-  // Parse raw barcode / QR code / URL into device match
+  // Parse raw barcode / QR code / URL into device match and transition to Form Input
   const handleProcessScan = (inputVal) => {
     const clean = (inputVal || '').trim();
     if (!clean) return;
@@ -331,15 +333,16 @@ export const BarcodeScannerModal = () => {
       }
     }
 
-    searchKey = decodeURIComponent(searchKey).trim().toLowerCase();
+    const rawKey = decodeURIComponent(searchKey).trim();
+    const normalizedKey = rawKey.toLowerCase();
 
     // Match against devices
     const matched = devices.find(d => 
-      (d.computerName || '').toLowerCase() === searchKey ||
-      (d.id || '').toLowerCase() === searchKey ||
-      (d.specs?.assetTag || '').toLowerCase() === searchKey ||
-      (d.specs?.serialNumber || '').toLowerCase() === searchKey ||
-      (d.ipAddress || '').toLowerCase() === searchKey
+      (d.computerName || '').toLowerCase() === normalizedKey ||
+      (d.id || '').toLowerCase() === normalizedKey ||
+      (d.specs?.assetTag || '').toLowerCase() === normalizedKey ||
+      (d.specs?.serialNumber || '').toLowerCase() === normalizedKey ||
+      (d.ipAddress || '').toLowerCase() === normalizedKey
     );
 
     if (matched) {
@@ -349,14 +352,39 @@ export const BarcodeScannerModal = () => {
       setAuditRemarkInput(currentRemark);
       setVerificationFeedback({
         type: 'success',
-        message: `Barcode Terverifikasi! Komputer [${matched.computerName}] terhubung dari Dept ${matched.department}.`
+        message: `✓ Barcode Terverifikasi! Komputer [${matched.computerName}] (${matched.department}). Membuka formulir pendataan...`
       });
     } else {
       setVerificationFeedback({
-        type: 'error',
-        message: `Barcode / Tag "${inputVal}" tidak ditemukan dalam sistem inventaris PT. Indonesia Toray Synthetics.`
+        type: 'info',
+        message: `★ Barcode Baru: [${rawKey.toUpperCase()}]. Membuka formulir pendaftaran perangkat baru...`
       });
     }
+
+    // Alur Baru: Langsung masuk ke form input untuk didata 1 per 1!
+    setTimeout(() => {
+      stopCamera();
+      closeScannerModal();
+      if (matched) {
+        openEditModal({
+          ...matched,
+          _isFromScan: true,
+          _scannedCode: rawKey
+        });
+      } else {
+        openAddModal({
+          computerName: rawKey.toUpperCase(),
+          assetTag: `ITS-${rawKey.toUpperCase()}`,
+          department: 'IS',
+          type: 'Notebook',
+          user: '',
+          status: 'Online',
+          remark: '',
+          _isFromScan: true,
+          _scannedCode: rawKey
+        });
+      }
+    }, 420);
   };
 
   // Continuous frame analysis loop: uses jsQR (works everywhere) + BarcodeDetector fallback
@@ -547,10 +575,15 @@ export const BarcodeScannerModal = () => {
   };
 
   useEffect(() => {
+    if (isScannerOpen) {
+      startCamera(facingMode, selectedCameraId);
+    } else {
+      stopCamera();
+    }
     return () => {
       stopCamera();
     };
-  }, []);
+  }, [isScannerOpen]);
 
   if (!isScannerOpen) return null;
 
@@ -596,6 +629,53 @@ export const BarcodeScannerModal = () => {
 
         {/* MODAL SCROLLABLE BODY */}
         <div className="modal-body" style={{ overflowY: 'auto', flex: 1, padding: '16px 20px' }}>
+          
+          {/* STEP WORKFLOW GUIDANCE */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            background: 'rgba(15, 23, 42, 0.7)',
+            border: '1px solid rgba(56, 189, 248, 0.25)',
+            borderRadius: '8px',
+            padding: '8px 12px',
+            marginBottom: '12px',
+            fontSize: '0.8rem'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: '#10b981' }}></span>
+              <strong style={{ color: '#38bdf8' }}>Alur Pendataan:</strong>
+              <span style={{ color: '#e2e8f0' }}>1. Scan Barcode ➔ 2. Form Input Perangkat ➔ 3. Simpan & Lanjut Scan</span>
+            </div>
+            <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>Auto-Direct Aktif</span>
+          </div>
+
+          {/* DYNAMIC SUCCESS / NOTICE BANNER (AFTER SAVING PREVIOUS DEVICE OR LOGIN) */}
+          {scannerNotice && (
+            <div style={{
+              background: 'rgba(16, 185, 129, 0.15)',
+              border: '1px solid rgba(16, 185, 129, 0.45)',
+              color: '#34d399',
+              padding: '10px 14px',
+              borderRadius: '8px',
+              marginBottom: '12px',
+              fontSize: '0.85rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <CheckCircle2 size={18} style={{ flexShrink: 0, color: '#10b981' }} />
+              <span style={{ flex: 1, fontWeight: 500 }}>{scannerNotice}</span>
+              <button
+                type="button"
+                onClick={() => setScannerNotice('')}
+                style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer', padding: '2px 4px' }}
+                title="Tutup Pesan"
+              >
+                ✕
+              </button>
+            </div>
+          )}
           
           {/* CAMERA VIEWPORT FRAME */}
           <div className={`scanner-camera-frame ${isScanningSuccessAnim ? 'scan-success-pulse' : ''}`} style={{ minHeight: '180px' }}>

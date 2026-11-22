@@ -18,7 +18,7 @@ import {
 import './LoginView.css';
 
 export const LoginView = () => {
-  const { loginUser, departments, setCurrentScreen, currentUser } = useInventory();
+  const { loginUser, departments, setCurrentScreen, currentUser, openScannerModal } = useInventory();
 
   // Completely empty form state by default
   const [formData, setFormData] = useState({
@@ -42,7 +42,7 @@ export const LoginView = () => {
     });
   };
 
-  // Direct bypass to dashboard without entering any credentials
+  // Direct bypass to dashboard & barcode scanner
   const handleDirectDashboard = () => {
     if (!currentUser) {
       loginUser({
@@ -53,6 +53,7 @@ export const LoginView = () => {
       });
     } else {
       setCurrentScreen('dashboard');
+      if (openScannerModal) openScannerModal();
     }
   };
 

@@ -36,12 +36,17 @@ export const InventoryProvider = ({ children }) => {
     return session ? 'dashboard' : 'login';
   });
 
+  const [loginUserTrigger, setLoginUserTrigger] = useState(0);
+
   const loginUser = (userData) => {
     const user = typeof userData === 'string'
       ? { name: userData, dept: 'IS', role: 'Staff' }
       : (userData || { name: 'Staff User', dept: 'IS', role: 'Staff' });
     setCurrentUser(user);
     setCurrentScreen('dashboard');
+    setIsScannerOpen(true);
+    setScannerNotice('Selamat datang di Sistem Stock Taking PT. ITS! Arahkan kamera atau scan barcode stiker komputer untuk memulai pendataan.');
+    setLoginUserTrigger(prev => prev + 1);
     try {
       localStorage.setItem('its_user_session', JSON.stringify(user));
     } catch (e) {}
@@ -110,6 +115,7 @@ export const InventoryProvider = ({ children }) => {
   // 9. Universal Barcode & Camera Scanner State
   const [isScannerOpen, setIsScannerOpen] = useState(false);
   const [scannedDevice, setScannedDevice] = useState(null);
+  const [scannerNotice, setScannerNotice] = useState('');
 
   // Auto-detect URL parameter on initial load (e.g. https://domain/?scan=NITSIS2307352)
   // Allows any mobile phone camera or QR scanner to open the web app directly to that device!
@@ -237,32 +243,55 @@ export const InventoryProvider = ({ children }) => {
   const addDevice = (deviceData) => {
     const newId = `dev-${Date.now()}`;
     const nextNo = devices.length > 0 ? Math.max(...devices.map(d => d.no || 0)) + 1 : 1;
+    const cleanData = { ...deviceData };
+    delete cleanData._isFromScan;
+    delete cleanData._scannedCode;
+
     const newDevice = {
-      ...deviceData,
+      ...cleanData,
       id: newId,
       no: nextNo
     };
     setDevices(prev => [...prev, newDevice]);
 
     // Also set default status for current period
-    if (deviceData.status) {
+    if (deviceData.status || deviceData.remark !== undefined) {
       setStockRecords(prev => ({
         ...prev,
         [periodKey]: {
           ...(prev[periodKey] || {}),
           [newId]: {
-            status: deviceData.status,
+            status: deviceData.status || 'Online',
             remark: deviceData.remark || ''
           }
         }
       }));
     }
     setIsDeviceModalOpen(false);
+    setEditingDevice(null);
   };
 
   // Update Existing Device
   const updateDevice = (updatedDevice) => {
-    setDevices(prev => prev.map(d => d.id === updatedDevice.id ? updatedDevice : d));
+    const cleanData = { ...updatedDevice };
+    delete cleanData._isFromScan;
+    delete cleanData._scannedCode;
+
+    setDevices(prev => prev.map(d => d.id === cleanData.id ? cleanData : d));
+
+    if (cleanData.status || cleanData.remark !== undefined) {
+      setStockRecords(prev => ({
+        ...prev,
+        [periodKey]: {
+          ...(prev[periodKey] || {}),
+          [cleanData.id]: {
+            status: cleanData.status || 'Online',
+            remark: cleanData.remark || ''
+          }
+        }
+      }));
+    }
+
     setIsDeviceModalOpen(false);
     setEditingDevice(null);
   };
@@ -275,8 +304,8 @@ export const InventoryProvider = ({ children }) => {
   };
 
   // Modal controls
-  const openAddModal = () => {
-    setEditingDevice(null);
+  const openAddModal = (initialData = null) => {
+    setEditingDevice(initialData);
     setIsDeviceModalOpen(true);
   };
 
@@ -300,8 +329,9 @@ export const InventoryProvider = ({ children }) => {
     setBarcodeDevice(null);
   };
 
-  const openScannerModal = (device = null) => {
+  const openScannerModal = (device = null, notice = '') => {
     if (device) setScannedDevice(device);
+    if (notice) setScannerNotice(notice);
     setIsScannerOpen(true);
   };
 
@@ -436,6 +466,8 @@ export const InventoryProvider = ({ children }) => {
         isScannerOpen,
         scannedDevice,
         setScannedDevice,
+        scannerNotice,
+        setScannerNotice,
         openScannerModal,
         closeScannerModal,
         getDeviceCurrentStatus,

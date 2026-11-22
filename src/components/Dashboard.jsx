@@ -155,12 +155,12 @@ export const Dashboard = () => {
         {/* Action Buttons Ribbon */}
         <div className="navbar-action-buttons">
           <button
-            className="btn-scan-barcode-nav"
+            className="btn-scan-barcode-nav highlight-scan-nav"
             onClick={() => openScannerModal()}
-            title="Scan Barcode & QR Code Perangkat IT via Kamera HP / Webcam / Barcode Gun"
+            title="Scan Barcode & QR Code Perangkat IT via Kamera HP / Webcam / Barcode Gun untuk Pendataan 1 per 1"
           >
             <QrCode size={15} />
-            <span>Scan Barcode</span>
+            <span>Scan Barcode (1 per 1)</span>
           </button>
 
           <button
@@ -220,6 +220,17 @@ export const Dashboard = () => {
           </div>
 
           <div className="hero-quick-status-side">
+            <button
+              className="btn-hero-scan-cta"
+              onClick={() => openScannerModal()}
+              title="Mulai Scan Barcode untuk Pendataan Komputer 1 per 1"
+            >
+              <QrCode size={18} className="hero-scan-icon" />
+              <div className="hero-scan-cta-text">
+                <span className="hero-scan-cta-title">Mulai Scan Barcode</span>
+                <span className="hero-scan-cta-sub">Pendataan 1 per 1 ➔</span>
+              </div>
+            </button>
             <div className="hero-stat-badge">
               <span className="stat-num">{devices.length}</span>
               <span className="stat-label">Total Komputer</span>
